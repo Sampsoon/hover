@@ -15,7 +15,7 @@
     {
       "matches": ["<all_urls>"],
       "js": ["contentScripts/keyListener.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "icons": {

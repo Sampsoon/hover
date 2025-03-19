@@ -14,13 +14,21 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'index.html'),
-        // TODO: make this dynamic
-        onUserDictateWorker: resolve(__dirname, 'src/onUserDictateWorker.ts'),
+        onUserDictateWorker: resolve(__dirname, 'src/serviceWorkers/onUserDictateWorker.ts'),
+        keyListener: resolve(__dirname, 'src/contentScripts/keyListener.ts'),
       },
       output: {
         entryFileNames: (chunkInfo) => {
           const serviceWorkers = ['onUserDictateWorker'];
-          return serviceWorkers.includes(chunkInfo.name) ? '[name].js' : 'assets/[name]-[hash].js';
+          const contentScripts = ['keyListener'];
+
+          if (serviceWorkers.includes(chunkInfo.name)) {
+            return 'serviceWorkers/[name].js';
+          } else if (contentScripts.includes(chunkInfo.name)) {
+            return 'contentScripts/[name].js';
+          } else {
+            return 'assets/[name]-[hash].js';
+          }
         },
       },
     },

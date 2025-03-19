@@ -1,12 +1,13 @@
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('Service worker installed');
+  console.log('[Service Worker] Installed');
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  console.log('Service worker received message:', message);
+  console.log('[Service Worker] Received message:', message);
 
   if (message.action === 'activate') {
-    console.log('Service worker activated');
+    console.log('[Service Worker] Activated');
+
     sendResponse({ status: 'activated' });
   }
 

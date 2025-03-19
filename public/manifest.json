@@ -8,9 +8,16 @@
     "default_title": "Scribe"
   },
   "background": {
-    "service_worker": "onUserDictateWorker.js",
+    "service_worker": "serviceWorkers/onUserDictateWorker.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScripts/keyListener.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

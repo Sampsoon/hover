@@ -1,11 +1,11 @@
 {
-  "name": "Scribe",
+  "name": "vibey_lsp",
   "version": "1.0.0",
   "description": "",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "Scribe"
+    "default_title": "Vibey LSP"
   },
   "background": {
     "service_worker": "serviceWorkers/onUserDictateWorker.js",

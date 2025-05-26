@@ -18,7 +18,8 @@ Input HTML:
 <span>):</span>
 </code>
 
-Expected Output: {
+Expected Output: 
+{
   "hoverHintList": [
     {
       "htmlText": "calculate_area",
@@ -34,11 +35,6 @@ Expected Output: {
       "htmlText": "math",
       "htmlClass": "hljs-built_in",
       "docInHtml": "<strong>math</strong> module<br/>Python's built-in mathematical functions and constants"
-    },
-    {
-      "htmlText": "pi",
-      "htmlClass": "hljs-property",
-      "docInHtml": "<code>math.pi: float</code><br/>Mathematical constant π (pi), approximately 3.14159"
     }
   ]
 }
@@ -62,29 +58,75 @@ Another Example with Class:
 
 Expected Output:
 {
-    "hoverHintList":
-    [
-        {
-            "htmlText": "UserService",
-            "htmlClass": "hljs-title class_",
-            "docInHtml": "<code>class UserService</code><br/>Service class for handling user-related operations"
-        },
-        {
-            "htmlText": "apiClient",
-            "htmlClass": "hljs-attr",
-            "docInHtml": "<code>private apiClient: HttpClient</code><br/>Private property for making HTTP requests"
-        },
-        {
-            "htmlText": "HttpClient",
-              "htmlClass": "hljs-title class_",
-            "docInHtml": "<code>HttpClient</code><br/>Type representing an HTTP client for making web requests"
-        }
-    ]
+  "hoverHintList": [
+    {
+      "htmlText": "UserService",
+      "htmlClass": "hljs-title class_",
+      "docInHtml": "<code>class UserService</code><br/>Service class for handling user-related operations"
+    },
+    {
+      "htmlText": "apiClient",
+      "htmlClass": "hljs-attr",
+      "docInHtml": "<code>private apiClient: HttpClient</code><br/>Private property for making HTTP requests"
+    },
+    {
+      "htmlText": "HttpClient",
+      "htmlClass": "hljs-title class_",
+      "docInHtml": "<code>HttpClient</code><br/>Type representing an HTTP client for making web requests"
+    }
+  ]
 }
+
+Example showing what NOT to include (common built-ins):
+<code class="language-python">
+<span class="hljs-keyword">class</span>
+<span> </span>
+<span class="hljs-title class_">Person</span>
+<span>:</span>
+<br>
+<span>    </span>
+<span class="hljs-keyword">def</span>
+<span> </span>
+<span class="hljs-title function_">__init__</span>
+<span>(</span>
+<span class="hljs-params">self</span>
+<span>, </span>
+<span class="hljs-params">name</span>
+<span>: </span>
+<span class="hljs-built_in">str</span>
+<span>):</span>
+<br>
+<span>        </span>
+<span class="hljs-variable-name">self.name</span>
+<span> = name</span>
+</code>
+
+Expected Output (notice what's excluded):
+{
+  "hoverHintList": [
+    {
+      "htmlText": "Person",
+      "htmlClass": "hljs-title class_",
+      "docInHtml": "<code>class Person</code><br/>Represents a person with a name"
+    },
+    {
+      "htmlText": "name",
+      "htmlClass": "hljs-params",
+      "docInHtml": "<code>name: str</code><br/>Parameter for the person's name"
+    },
+    {
+      "htmlText": "self.name",
+      "htmlClass": "hljs-variable-name",
+      "docInHtml": "<code>self.name: str</code><br/>Instance attribute storing the person's name"
+    }
+  ]
+}
+
+Note: __init__, self (by itself), str, and the math module are NOT included because they are common built-ins that don't need custom documentation. However, self.name IS included because it's a user-defined instance attribute.
 
 Guidelines:
 
-1. Focus on definable elements only: Only provide hints for user-defined functions, variables, classes, types, imported modules/libraries, and built-in functions/constants - NOT language keywords like def, class, if, private, etc.
+1. Focus on definable elements only: Only provide hints for functions, variables, classes, types, instance attributes (like self.property), imported third-party modules/libraries, and standard library functions (such as Python's print, input, open, or JavaScript's Math.max, Array.prototype.map, etc). Do NOT provide hints for language keywords or built-in types. For example, exclude common elements like def, class, if, private, str, int, float, etc.
 
 2. Match exact text: The htmlText should exactly match the text content of the HTML span, including casing.
 
@@ -103,7 +145,9 @@ Guidelines:
 
 7. Concise but informative: Keep descriptions brief but include essential information like parameters, return types, and purpose.
 
-Now, analyze the provided HTML code block and return the hover hints as a JSON array matching this format.
+8. Standard library functions: You should also provide hints for standard library functions, such as print in Python or Math.max in JavaScript, with a brief description of what they do and their signature.
+
+Now, analyze the provided HTML code block and return the hover hints as a JSON object with a "hoverHintList" array matching this format.
 
 HTML Code Block to Analyze:
 
@@ -111,5 +155,5 @@ ${code.html.innerHTML}
 `;
 
 export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): Promise<HoverHintList> => {
-    return llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
+  return llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
 }

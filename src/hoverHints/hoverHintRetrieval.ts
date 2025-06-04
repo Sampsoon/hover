@@ -1,6 +1,6 @@
-import { CodeBlock } from "../htmlParsing";
-import { LlmInterface } from "../llm";
-import { ElementIdName as ELEMENT_ID_NAME, ElementLookupTable, HoverHintList, hoverHintListSchema } from "./types";
+import { CodeBlock } from '../htmlParsing';
+import { LlmInterface } from '../llm';
+import { CODE_TOKEN_ID_NAME, ElementLookupTable, HoverHintList, hoverHintListSchema } from './types';
 
 const RETRIEVAL_HOVER_HINTS_PROMPT = (code: CodeBlock) => `# Code Analysis Prompt for Hover Hints
 
@@ -142,25 +142,26 @@ ${code.html.innerHTML}
 `;
 
 const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
-  return Array.from(
-    element.querySelectorAll(':scope *:not(:has(*))')
-  );
-}
+  return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
+};
 
 const hashElement = (element: HTMLElement): string => {
   return element.innerHTML;
-}
+};
 
 const attachIds = (code: CodeBlock): ElementLookupTable => {
   const { html } = code;
 
+  // Map of element hash to id
   const idLookupTable = new Map<string, string>();
+
+  // Map of id to list of code tokens
   const elementLookupTable: ElementLookupTable = new Map<string, HTMLElement[]>();
 
-  const leaves = getDomLeaves(html);
+  const codeTokens = getDomLeaves(html);
 
-  leaves.forEach(leave => {
-    const hash = hashElement(leave);
+  codeTokens.forEach((token) => {
+    const hash = hashElement(token);
     if (!idLookupTable.has(hash)) {
       idLookupTable.set(hash, crypto.randomUUID());
     }
@@ -168,23 +169,23 @@ const attachIds = (code: CodeBlock): ElementLookupTable => {
     const id = idLookupTable.get(hash);
 
     if (!id) {
-      throw new Error("Id lookup failed when attaching ids to elements. We should never get here");
+      throw new Error('Id lookup failed when attaching ids to code token. We should never get here');
     }
 
     const existing = elementLookupTable.get(id);
     if (existing) {
-      existing.push(leave);
+      existing.push(token);
     } else {
-      elementLookupTable.set(id, [leave]);
+      elementLookupTable.set(id, [token]);
     }
 
-    leave.dataset[ELEMENT_ID_NAME] = id;
+    token.dataset[CODE_TOKEN_ID_NAME] = id;
   });
 
   return elementLookupTable;
-}
+};
 
 export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): Promise<HoverHintList> => {
   attachIds(code);
   return llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
-}
+};

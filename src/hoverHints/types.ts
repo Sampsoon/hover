@@ -1,14 +1,17 @@
 import * as z from 'zod';
 
-export const ElementIdName = 'elementId';
+export const CODE_TOKEN_ID_NAME = 'codeTokenId';
+
+const makeKebabCase = (str: string) => str.replace(/([A-Z])/g, '-$1').toLowerCase();
+export const CODE_TOKEN_ID_ATTRIBUTE_NAME = `data-${makeKebabCase(CODE_TOKEN_ID_NAME)}`;
 
 export const hoverHintSchema = z.object({
-  [ElementIdName]: z.string(),
+  [CODE_TOKEN_ID_NAME]: z.string(),
   docInHtml: z.string(),
 });
 
 export const hoverHintListSchema = z.object({
-  hoverHintList: z.array(hoverHintSchema)
+  hoverHintList: z.array(hoverHintSchema),
 });
 
 export type HoverHint = z.infer<typeof hoverHintSchema>;

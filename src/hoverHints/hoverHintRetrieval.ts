@@ -1,4 +1,4 @@
-import { CodeBlock } from '../htmlParsing';
+import { CodeBlock } from '../htmlProcessing';
 import { LlmInterface } from '../llm';
 import { CODE_TOKEN_ID_NAME, ElementLookupTable, HoverHintList, hoverHintListSchema } from './types';
 

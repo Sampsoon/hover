@@ -1,14 +1,16 @@
-import { HoverHintList, CODE_TOKEN_ID_ATTRIBUTE_NAME } from './types';
+import {
+  HoverHintList,
+  CODE_TOKEN_ID_NAME,
+  NO_TIMEOUT_ACTIVE,
+  TimeoutId,
+  NoTimeoutActive,
+  HoverHintState,
+} from './types';
 
 const MOUSE_EVENTS = {
   MOUSE_ENTER: 'mouseenter',
   MOUSE_LEAVE: 'mouseleave',
 } as const;
-
-const NO_TIMEOUT_ACTIVE = 'Not Timeout Active';
-type NoTimeoutActive = typeof NO_TIMEOUT_ACTIVE;
-
-export type TimeoutId = number | NoTimeoutActive;
 
 const isNoTimeoutActive = (timeoutId: TimeoutId): timeoutId is NoTimeoutActive => {
   return timeoutId === NO_TIMEOUT_ACTIVE;
@@ -20,12 +22,6 @@ const clearTimeoutIfActive = (state: HoverHintState) => {
     state.timeoutId = NO_TIMEOUT_ACTIVE;
   }
 };
-
-export interface HoverHintState {
-  hoverHintMap: Map<string, string>;
-  tooltip: HTMLElement;
-  timeoutId: TimeoutId;
-}
 
 export const setupHoverHintState = (): HoverHintState => {
   return {
@@ -71,7 +67,7 @@ const onMouseEnterCodeToken = (event: MouseEvent, state: HoverHintState) => {
     return;
   }
 
-  const tokenId = target.getAttribute(CODE_TOKEN_ID_ATTRIBUTE_NAME);
+  const tokenId = target.dataset[CODE_TOKEN_ID_NAME];
 
   if (!tokenId || !state.hoverHintMap.has(tokenId)) {
     return;
@@ -93,7 +89,7 @@ const onMouseLeaveCodeToken = (event: MouseEvent, state: HoverHintState) => {
     return;
   }
 
-  const tokenId = target.getAttribute(CODE_TOKEN_ID_ATTRIBUTE_NAME);
+  const tokenId = target.dataset[CODE_TOKEN_ID_NAME];
 
   if (!tokenId || !state.hoverHintMap.has(tokenId)) {
     return;

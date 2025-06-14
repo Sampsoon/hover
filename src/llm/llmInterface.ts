@@ -2,7 +2,7 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import type { LlmInterface } from './types';
-import { OPENAI_API_KEY } from '../tempApiKey';
+import { API_KEYS } from './tempApiKeys';
 
 const createOpenAiInterface = (client: OpenAI, model: string): LlmInterface => {
   return {
@@ -42,7 +42,7 @@ const createOpenAiInterface = (client: OpenAI, model: string): LlmInterface => {
 
 export const createHoverHintRetrievalLlmInterface = (): LlmInterface => {
   const client = new OpenAI({
-    apiKey: OPENAI_API_KEY,
+    apiKey: API_KEYS.OPENAI,
     dangerouslyAllowBrowser: true,
   });
 

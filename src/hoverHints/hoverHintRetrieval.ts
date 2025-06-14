@@ -141,6 +141,9 @@ HTML Code Block to Analyze:
 ${code.html.innerHTML}
 `;
 
+export const MAX_RETRIES = 5;
+export const RETRY_DELAY = 1000;
+
 const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
 };
@@ -169,7 +172,8 @@ const attachIds = (code: CodeBlock): ElementLookupTable => {
     const id = idLookupTable.get(hash);
 
     if (!id) {
-      throw new Error('Id lookup failed when attaching ids to code token. We should never get here');
+      console.error('Id lookup failed when attaching ids to code token. We should never get here');
+      return;
     }
 
     const existing = elementLookupTable.get(id);
@@ -187,5 +191,19 @@ const attachIds = (code: CodeBlock): ElementLookupTable => {
 
 export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): Promise<HoverHintList> => {
   attachIds(code);
-  return llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
+
+  let currentRetryDelay = RETRY_DELAY;
+
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      const hoverHintList = await llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
+      return hoverHintList;
+    } catch (error) {
+      console.error('Error retrieving annotations', error);
+      await new Promise((resolve) => setTimeout(resolve, currentRetryDelay));
+      currentRetryDelay *= 2;
+    }
+  }
+
+  return { hoverHintList: [] };
 };

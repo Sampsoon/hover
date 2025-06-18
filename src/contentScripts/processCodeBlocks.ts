@@ -2,6 +2,7 @@ import {
   addIdToCodeBlock,
   clearCodeBlockTimeoutIfExists,
   CodeBlockTrackingState,
+  findCodeBlocksOnPage,
   getIdFromCodeBlock,
   searchForCodeBlockElementIsPartOf,
   setCodeBlockTimeout,
@@ -36,6 +37,15 @@ async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterfac
   const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
   attachHoverHints(hoverHintList, state);
 }
+
+const processAllCodeBlocksOnPageLoad = (hoverHintState: HoverHintState, llmInterface: LlmInterface) => {
+  const blocks = findCodeBlocksOnPage(document);
+
+  blocks.forEach((codeBlock) => {
+    const htmlElement = codeBlock.html;
+    void processCodeBlock(hoverHintState, llmInterface, htmlElement);
+  });
+};
 
 const setupMutationObserver = (
   hoverHintState: HoverHintState,
@@ -83,5 +93,9 @@ const setupMutationObserver = (
 };
 
 const { hoverHintState, codeBlockTrackingState, llmInterface } = setup();
+
+window.addEventListener('load', () => {
+  processAllCodeBlocksOnPageLoad(hoverHintState, llmInterface);
+});
 
 setupMutationObserver(hoverHintState, codeBlockTrackingState, llmInterface);

@@ -16,4 +16,4 @@ export {
   setCodeBlockTimeout,
 } from './codeBlocks';
 
-export { searchForCodeBlockElementIsPartOf } from './parsing';
+export { searchForCodeBlockElementIsPartOf, findCodeBlocksOnPage } from './parsing';

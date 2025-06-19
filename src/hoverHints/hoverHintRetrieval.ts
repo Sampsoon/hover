@@ -148,32 +148,23 @@ const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
 };
 
-const hashElement = (element: HTMLElement): string => {
-  return element.outerHTML;
-};
-
-const attachIdToToken = (token: HTMLElement, idLookupTable: Map<string, string>): void => {
-  const hash = hashElement(token);
-
-  if (!idLookupTable.has(hash)) {
-    idLookupTable.set(hash, crypto.randomUUID());
+const generateTokenHashId = (element: HTMLElement): string => {
+  const outerHTML = element.outerHTML;
+  let hash = 5381;
+  for (let i = 0; i < outerHTML.length; i++) {
+    hash = (hash << 5) + hash + outerHTML.charCodeAt(i);
   }
-
-  const id = idLookupTable.get(hash);
-
-  token.dataset[CODE_TOKEN_ID_NAME] = id;
+  return (hash >>> 0).toString(36);
 };
 
 const attachIds = (code: CodeBlock) => {
   const { html } = code;
 
-  // Map of element hash to id
-  const idLookupTable = new Map<string, string>();
-
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
-    attachIdToToken(token, idLookupTable);
+    const id = generateTokenHashId(token);
+    token.dataset[CODE_TOKEN_ID_NAME] = id;
   });
 };
 

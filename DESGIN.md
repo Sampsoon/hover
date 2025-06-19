@@ -81,7 +81,6 @@ The following design is for a Chrome extension that will identify code blocks in
 ### POC Tasks
 * Preprocess LLM HTML input
 * Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
-* Clean up hoverHintMap on reprocessing of code blocks
 * Handle user edits in canvas so that it does not fire on every edit
 * Pick a good LLM
 * Handle large pages by processing all code blocks at once with a single prompt and limiting input size

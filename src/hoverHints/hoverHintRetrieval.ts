@@ -149,7 +149,7 @@ const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
 };
 
 const hashElement = (element: HTMLElement): string => {
-  return element.innerHTML;
+  return element.outerHTML;
 };
 
 const attachIds = (code: CodeBlock): ElementLookupTable => {

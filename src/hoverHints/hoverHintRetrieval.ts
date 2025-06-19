@@ -193,5 +193,7 @@ export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): P
     }
   }
 
+  console.error('Failed to retrieve annotations after 5 retries');
+
   return { hoverHintList: [] };
 };

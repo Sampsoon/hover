@@ -1,8 +1,8 @@
 import { CODE_BLOCK_ALREADY_PROCESSED, CodeBlock, CodeBlockStabilityTimer, CodeBlockTrackingState } from './types';
 
-const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'codeBlockId';
+const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
-export const CODE_TOKEN_ID_NAME = 'codeTokenId';
+export const CODE_TOKEN_ID_NAME = 'tokenId';
 
 const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));

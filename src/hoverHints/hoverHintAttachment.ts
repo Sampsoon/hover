@@ -45,8 +45,8 @@ export const setupHoverHintTriggers = (element_to_listen_on: Document | HTMLElem
 
 export const attachHoverHints = (hoverHintList: HoverHintList, state: HoverHintState) => {
   hoverHintList.hoverHintList.forEach((hint) => {
-    const { codeTokenId, docInHtml } = hint;
-    state.hoverHintMap.set(codeTokenId, docInHtml);
+    const { tokenId, docInHtml } = hint;
+    state.hoverHintMap.set(tokenId, docInHtml);
   });
 };
 

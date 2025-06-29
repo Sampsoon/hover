@@ -84,3 +84,20 @@ The following design is for a Chrome extension that will identify code blocks in
 * Handle user edits in canvas so that it does not fire on every edit
 * Pick a good LLM
 * Handle large pages by processing all code blocks at once with a single prompt and limiting input size
+
+* Fix issue where the same name is used more then once place. The best way to handle this is by having the LLM output a list of ids.
+class W;ordCounter:
+```
+    def __init__(self, filename):
+        self.filename = filename
+
+    def count_words(self):
+        try:
+            with open(self.filename, 'r') as f:
+                return sum(len(line.split()) for line in f)
+        except FileNotFoundError:
+            return "File not found."
+
+wc = WordCounter('example.txt')
+print(wc.count_words())
+```

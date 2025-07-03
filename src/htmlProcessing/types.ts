@@ -15,9 +15,6 @@ export const CODE_SELECTORS = {
   MARKDOWN: {
     selector: 'code',
   },
-  CHATGPT_CANVAS: {
-    selector: 'div.cm-content[data-language]',
-  },
 } as const satisfies Record<string, CodeBlockSelector>;
 
 export type CodeSelectors = keyof typeof CODE_SELECTORS;

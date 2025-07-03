@@ -38,50 +38,9 @@ The following design is for a Chrome extension that will identify code blocks in
 ```
 
 
-### Canvas
-```html
-<div spellcheck="true" autocorrect="true" autocapitalize="off" translate="no" contenteditable="false" style="tab-size: 4;" class="cm-content" role="textbox" aria-multiline="true" aria-readonly="true" data-language="python" aria-autocomplete="list">
-<div class="cm-line">
-    <span class="ͼ28">def</span>
-    <span> </span>
-    <span class="ͼ2d">main</span>
-    <span class="ͼ2f">(</span>
-    <span class="ͼ2f">)</span>
-    <span class="ͼ2f">:</span>
-</div>
-<div class="cm-line">
-    <span>    </span>
-    <span class="ͼ2d">print</span>
-    <span class="ͼ2f">(</span>
-    <span class="ͼ2h">"Hello, World!"</span>
-    <span class="ͼ2f">)</span>
-</div>
-<div class="cm-line"><br></div>
-<div class="cm-line">
-    <span class="ͼ29">if</span>
-    <span> </span>
-    <span class="ͼ2a">__name__</span>
-    <span> </span>
-    <span class="ͼ2f">==</span>
-    <span> </span>
-    <span class="ͼ2h">"__main__"</span>
-    <span>:</span>
-</div>
-<div class="cm-line">
-    <span>    </span>
-    <span class="ͼ2d">main</span>
-    <span class="ͼ2f">(</span>
-    <span class="ͼ2f">)</span>
-</div>
-<div class="cm-line"><br></div>
-</div>
-```
-
-
 ### POC Tasks
 * Preprocess LLM HTML input
 * Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
-* Handle user edits in canvas so that it does not fire on every edit
 * Pick a good LLM
 * Handle large pages by processing all code blocks at once with a single prompt and limiting input size
 

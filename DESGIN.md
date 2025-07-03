@@ -43,7 +43,6 @@ The following design is for a Chrome extension that will identify code blocks in
 * Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
 * Pick a good LLM
 * Handle large pages by processing all code blocks at once with a single prompt and limiting input size
-* Filter codeblocks by size as `this` is a codeblock
 * Fix issue where the same name is used more then once place. The best way to handle this is by having the LLM output a list of ids.
 class W;ordCounter:
 ```

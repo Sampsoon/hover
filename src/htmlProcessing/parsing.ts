@@ -5,6 +5,10 @@ const queryAllSelectorsSelector = Object.values(CODE_SELECTORS)
   .map((selector) => selector.selector)
   .join(', ');
 
+const isMultiLineCodeBlock = (element: Element): boolean => {
+  return element.children.length > 0;
+};
+
 export const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
   const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
 
@@ -22,14 +26,21 @@ export const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock |
 export const findCodeBlocksOnPage = (document: Document): CodeBlock[] => {
   const elements = document.querySelectorAll(queryAllSelectorsSelector);
 
-  return Array.from(elements).map((element: Element) => {
+  const codeBlocks: CodeBlock[] = [];
+  for (const element of elements) {
     const htmlElement = element as HTMLElement;
+
+    if (!isMultiLineCodeBlock(htmlElement)) {
+      continue;
+    }
 
     const codeBlockId = getOrAddIdToCodeBlock(htmlElement);
 
-    return {
+    codeBlocks.push({
       html: htmlElement,
       codeBlockId,
-    };
-  });
+    });
+  }
+
+  return codeBlocks;
 };

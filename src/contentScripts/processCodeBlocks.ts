@@ -25,18 +25,24 @@ async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterfac
 }
 
 const createCodeBlockProcessingObserver = (hoverHintState: HoverHintState, llmInterface: LlmInterface) => {
-  const intersectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
+  const intersectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const codeBlock = searchForCodeBlockElementIsPartOf(entry.target as HTMLElement);
 
-        if (codeBlock) {
-          intersectionObserver.unobserve(entry.target as HTMLElement);
-          void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+          if (codeBlock) {
+            intersectionObserver.unobserve(entry.target as HTMLElement);
+            console.log('Processing code block');
+            void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+          }
         }
-      }
-    });
-  });
+      });
+    },
+    {
+      rootMargin: '50%',
+    },
+  );
 
   return intersectionObserver;
 };

@@ -7,6 +7,7 @@ import {
   searchForCodeBlockElementIsPartOf,
   setCodeBlockTimeout,
   setupCodeBlockTracking,
+  isCodeBlockInView,
 } from '../htmlProcessing';
 import { LlmInterface, createHoverHintRetrievalLlmInterface } from '../llm';
 import {
@@ -80,14 +81,22 @@ const setup = () => {
     llmInterface,
   );
 
-  return { codeBlockTrackingState, codeBlockProcessingObserver };
+  return { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState, llmInterface };
 };
 
-const processCodeBlocksOnPage = (codeBlockProcessingObserver: IntersectionObserver) => {
+const processCodeBlocksOnPage = (
+  hoverHintState: HoverHintState,
+  llmInterface: LlmInterface,
+  codeBlockProcessingObserver: IntersectionObserver,
+) => {
   const blocks = findCodeBlocksOnPage(document);
-
   blocks.forEach((codeBlock) => {
-    codeBlockProcessingObserver.observe(codeBlock.html);
+    // We process code blocks that are in view on page load so that there is no delay in showing hover hints
+    if (isCodeBlockInView(codeBlock)) {
+      void processCodeBlock(hoverHintState, llmInterface, codeBlock);
+    } else {
+      codeBlockProcessingObserver.observe(codeBlock.html);
+    }
   });
 };
 
@@ -127,10 +136,10 @@ const setupMutationObserver = (
   return mutationObserver;
 };
 
-const { codeBlockTrackingState, codeBlockProcessingObserver } = setup();
+const { codeBlockTrackingState, codeBlockProcessingObserver, hoverHintState, llmInterface } = setup();
 
 window.addEventListener('load', () => {
-  processCodeBlocksOnPage(codeBlockProcessingObserver);
+  processCodeBlocksOnPage(hoverHintState, llmInterface, codeBlockProcessingObserver);
 });
 
 setupMutationObserver(codeBlockTrackingState, codeBlockProcessingObserver);

@@ -16,6 +16,7 @@ export {
   setCodeBlockTimeout,
   CODE_TOKEN_ID_NAME,
   attachIdsToTokens,
+  isCodeBlockInView,
 } from './codeBlocks';
 
 export { searchForCodeBlockElementIsPartOf, findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

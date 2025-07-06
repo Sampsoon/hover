@@ -89,3 +89,9 @@ export const setCodeBlockTimeout = (
 
   trackingTable.set(id, timeoutId);
 };
+
+export const isCodeBlockInView = (codeBlock: CodeBlock): boolean => {
+  const { html } = codeBlock;
+  const rect = html.getBoundingClientRect();
+  return rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
+};

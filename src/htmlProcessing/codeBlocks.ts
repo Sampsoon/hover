@@ -57,7 +57,6 @@ export const setupCodeBlockTracking = (): CodeBlockTrackingState => {
 
 export const clearCodeBlockTimeoutIfExists = (codeBlockTrackingState: CodeBlockTrackingState, id: string) => {
   if (!codeBlockTrackingState.codeBlockLookupTable.has(id)) {
-    console.warn('Code block not found in lookup table');
     return;
   }
 

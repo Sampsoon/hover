@@ -21,6 +21,9 @@ import {
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
 
+const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight);
+const ROOT_MARGIN_PERCENTAGE = 0.25;
+
 async function processCodeBlock(state: HoverHintState, llmInterface: LlmInterface, codeBlock: CodeBlock) {
   console.log('Processing code block');
   const hoverHintList = await retrieveAnnotations(codeBlock, llmInterface);
@@ -59,7 +62,7 @@ const createCodeBlockProcessingObserver = (
       });
     },
     {
-      rootMargin: '25%',
+      rootMargin: `${(SMALLEST_SCREEN_DIMENSION * ROOT_MARGIN_PERCENTAGE).toFixed(0)}px`,
     },
   );
 

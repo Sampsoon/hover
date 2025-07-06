@@ -41,12 +41,12 @@ const getIdFromCodeBlock = (element: HTMLElement) => {
   return element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME];
 };
 
-export const getOrAddIdToCodeBlock = (element: HTMLElement) => {
+export const getOrAddIdToCodeBlock = (element: HTMLElement): { id: string; isNewCodeBlock: boolean } => {
   const id = getIdFromCodeBlock(element);
   if (id) {
-    return id;
+    return { id, isNewCodeBlock: false };
   }
-  return addIdToCodeBlock(element);
+  return { id: addIdToCodeBlock(element), isNewCodeBlock: true };
 };
 
 export const setupCodeBlockTracking = (): CodeBlockTrackingState => {

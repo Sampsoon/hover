@@ -13,7 +13,7 @@ export const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock |
   const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
 
   if (codeBlockElement) {
-    const codeBlockId = getOrAddIdToCodeBlock(codeBlockElement);
+    const { id: codeBlockId } = getOrAddIdToCodeBlock(codeBlockElement);
     return {
       html: codeBlockElement,
       codeBlockId,
@@ -34,7 +34,7 @@ export const findCodeBlocksOnPage = (document: Document): CodeBlock[] => {
       continue;
     }
 
-    const codeBlockId = getOrAddIdToCodeBlock(htmlElement);
+    const { id: codeBlockId } = getOrAddIdToCodeBlock(htmlElement);
 
     codeBlocks.push({
       html: htmlElement,

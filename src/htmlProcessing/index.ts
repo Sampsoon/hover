@@ -17,4 +17,4 @@ export {
   attachIdsToTokens,
 } from './codeBlocks';
 
-export { searchForCodeBlockElementIsPartOf, findCodeBlocksOnPage } from './parsing';
+export { searchForCodeBlockElementIsPartOf, findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

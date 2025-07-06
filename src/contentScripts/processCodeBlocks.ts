@@ -3,6 +3,7 @@ import {
   CodeBlock,
   CodeBlockTrackingState,
   findCodeBlocksOnPage,
+  findCodeBlockPartOfMutation,
   searchForCodeBlockElementIsPartOf,
   setCodeBlockTimeout,
   setupCodeBlockTracking,
@@ -68,17 +69,13 @@ const setupMutationObserver = (
 ) => {
   const mutationObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      const target = mutation.target;
+      const codeBlock = findCodeBlockPartOfMutation(mutation);
 
-      const element = target.nodeType === Node.ELEMENT_NODE ? (target as HTMLElement) : target.parentElement;
-
-      const possibleCodeBlock = element ? searchForCodeBlockElementIsPartOf(element) : null;
-
-      if (!possibleCodeBlock) {
+      if (!codeBlock) {
         return;
       }
 
-      const { codeBlockId } = possibleCodeBlock;
+      const { codeBlockId } = codeBlock;
 
       clearCodeBlockTimeoutIfExists(codeBlockTrackingState, codeBlockId);
 
@@ -86,7 +83,7 @@ const setupMutationObserver = (
         codeBlockTrackingState,
         codeBlockId,
         () => {
-          codeBlockProcessingObserver.observe(possibleCodeBlock.html);
+          codeBlockProcessingObserver.observe(codeBlock.html);
         },
         MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_STABLE,
       );

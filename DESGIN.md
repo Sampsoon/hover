@@ -60,4 +60,3 @@ print(wc.count_words())
 ```
 * await until view is stable before processing code block in view
 * Add threshold for intersection observer
-* *Filter element in mutation observer

@@ -43,6 +43,7 @@ The following design is for a Chrome extension that will identify code blocks in
 * Make LLM return structured json object rather then HTML to avoid prompt injection and lead to better consistency and improve LLM prompt
 * Pick a good LLM
 * Fix issue where the same name is used more then once place. The best way to handle this is by having the LLM output a list of ids.
+* Stream json response rather then wait for the whole thing
 class W;ordCounter:
 ```
     def __init__(self, filename):

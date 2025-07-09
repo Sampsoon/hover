@@ -61,3 +61,4 @@ print(wc.count_words())
 
 ## Remember
 * Turn off dangerouslyAllowBrowser before launch
+* Remove logic for LLMs that are not being used

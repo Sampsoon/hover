@@ -1,5 +1,5 @@
 import { attachIdsToTokens, CodeBlock } from '../htmlProcessing';
-import { LlmInterface } from '../llm';
+import { callLLM } from '../llm';
 import { HoverHintList, hoverHintListSchema } from './types';
 
 const RETRIEVAL_HOVER_HINTS_PROMPT = (code: CodeBlock) => `# Code Analysis Prompt for Hover Hints
@@ -144,14 +144,16 @@ ${code.html.innerHTML}
 export const MAX_RETRIES = 5;
 export const RETRY_DELAY = 1000;
 
-export const retrieveAnnotations = async (code: CodeBlock, llm: LlmInterface): Promise<HoverHintList> => {
+export const retrieveAnnotations = async (code: CodeBlock): Promise<HoverHintList> => {
   attachIdsToTokens(code);
 
   let currentRetryDelay = RETRY_DELAY;
 
+  const prompt = RETRIEVAL_HOVER_HINTS_PROMPT(code);
+
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      const hoverHintList = await llm.callLlmForJsonOutput(RETRIEVAL_HOVER_HINTS_PROMPT(code), hoverHintListSchema);
+      const hoverHintList = await callLLM.GPT_4_1_STRUCTURED_OUTPUT(prompt, hoverHintListSchema);
       return hoverHintList;
     } catch (error) {
       console.error('Error retrieving annotations', error);

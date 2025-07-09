@@ -1,2 +1,1 @@
-export type { LlmInterface } from './types';
-export { createHoverHintRetrievalLlmInterface } from './llmInterface';
+export { callLLM } from './llmInterface';

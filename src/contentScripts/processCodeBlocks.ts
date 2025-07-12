@@ -8,14 +8,10 @@ import {
   setupCodeBlockTracking,
   isCodeBlockInView,
   getOrAddIdToCodeBlock,
+  attachIdsToTokens,
 } from '../htmlProcessing';
-import {
-  attachHoverHints,
-  retrieveAnnotations,
-  setupHoverHintState,
-  setupHoverHintTriggers,
-  HoverHintState,
-} from '../hoverHints';
+import { attachHoverHints, setupHoverHintState, setupHoverHintTriggers, HoverHintState } from '../hoverHints';
+import { invokeHoverHintRetrievalServiceWorker } from '../serviceWorkers/interface';
 
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_MUTATIONS_STABLE = 800;
 const MS_TO_WAIT_BEFORE_CONSIDERING_CODE_BLOCK_IN_VIEW_STABLE = 1000;
@@ -24,9 +20,15 @@ const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight
 const ROOT_MARGIN_PERCENTAGE = 0.25;
 
 async function generateHoverhintsForCodeBlock(state: HoverHintState, codeBlock: CodeBlock) {
-  console.log('Processing code block id:', codeBlock.codeBlockId);
-  const hoverHintList = await retrieveAnnotations(codeBlock);
+  const time = performance.now();
+  console.log('Retrieving annotations for code block:', codeBlock.codeBlockId);
+
+  attachIdsToTokens(codeBlock);
+  const hoverHintList = await invokeHoverHintRetrievalServiceWorker(codeBlock);
   attachHoverHints(hoverHintList, state);
+
+  const timeTaken = (performance.now() - time) / 1000;
+  console.log('Time taken to retrieve annotations:', timeTaken, 'seconds');
 }
 
 const processCodeBlock = (

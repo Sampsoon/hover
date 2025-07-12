@@ -13,7 +13,7 @@ const retrieveHoverHints = async (codeBlockRawHtml: string): Promise<HoverHintLi
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      const hoverHintList = await callLLM.GPT_4_1_STRUCTURED_OUTPUT(prompt, hoverHintListSchema);
+      const hoverHintList = await callLLM.OPEN_ROUTER_STRUCTURED_OUTPUT(prompt, hoverHintListSchema);
       return hoverHintList;
     } catch (error) {
       console.error('Error retrieving annotations', error);

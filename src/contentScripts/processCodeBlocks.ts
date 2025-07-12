@@ -24,7 +24,7 @@ const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight
 const ROOT_MARGIN_PERCENTAGE = 0.25;
 
 async function generateHoverhintsForCodeBlock(state: HoverHintState, codeBlock: CodeBlock) {
-  console.log('Processing code block');
+  console.log('Processing code block id:', codeBlock.codeBlockId);
   const hoverHintList = await retrieveAnnotations(codeBlock);
   attachHoverHints(hoverHintList, state);
 }

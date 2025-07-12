@@ -1,5 +1,5 @@
 export const enum ServiceWorkerMessageType {
-  TEXT_LLM_INTERFACING = 'textLlmInterfacing',
+  HOVER_HINT_RETRIEVAL = 'hoverHintRetrieval',
 }
 
 export interface ServiceWorkerMessage<T> {

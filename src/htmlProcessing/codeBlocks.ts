@@ -14,31 +14,25 @@ const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
 };
 
-const generateTokenHashId = (element: HTMLElement, codeBlockId: string): string => {
-  const outerHTML = element.outerHTML;
-  let hash = 5381;
-  for (let i = 0; i < outerHTML.length; i++) {
-    hash = (hash << 5) + hash + outerHTML.charCodeAt(i);
-  }
-  const id = (hash >>> 0).toString(36);
-  return `${codeBlockId}-${id}`;
+const generateRandomId = (): string => {
+  return ((Math.random() * 0x100000000) | 0).toString(36);
 };
 
 export const attachIdsToTokens = (code: CodeBlock) => {
-  const { html, codeBlockId } = code;
+  const { html } = code;
 
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
-      const id = generateTokenHashId(token, codeBlockId);
+      const id = generateRandomId();
       token.dataset[CODE_TOKEN_ID_NAME] = id;
     }
   });
 };
 
 const addIdToCodeBlock = (element: HTMLElement) => {
-  const id = ((Math.random() * 0x100000000) | 0).toString(36);
+  const id = generateRandomId();
   element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME] = id;
   return id;
 };

@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { CODE_TOKEN_ID_NAME } from '../htmlProcessing';
 
 export const hoverHintSchema = z.object({
-  [CODE_TOKEN_ID_NAME]: z.string(),
+  [`${CODE_TOKEN_ID_NAME}s`]: z.array(z.string()),
   docInHtml: z.string(),
 });
 

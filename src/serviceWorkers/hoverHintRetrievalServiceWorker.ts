@@ -1,7 +1,8 @@
-import { HoverHint, HoverHintList, hoverHintListSchema } from '../hoverHints';
+import { HoverHint, hoverHintListSchema } from '../hoverHints';
+import { hoverHintSchema } from '../hoverHints/types';
 import { callLLM } from '../llm';
 import { LlmParams } from '../llm/llmInvocation';
-import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
+import { createHoverHintStreamError, createHoverHintStreamMessage, parseListOfObjectsFromStream } from '../stream';
 import { RETRIEVAL_HOVER_HINTS_PROMPT } from './hoverHintRetrieval';
 import { isHoverHintRetrievalMessage, ServiceWorkerMessage } from './interface';
 
@@ -13,7 +14,7 @@ const retrieveHoverHintsStream = async (
   const MAX_RETRIES = 5;
   const RETRY_DELAY = 1000;
 
-  const llmParams: LlmParams<HoverHintList> = {
+  const llmParams: LlmParams = {
     prompt: RETRIEVAL_HOVER_HINTS_PROMPT,
     schema: hoverHintListSchema,
   };
@@ -22,11 +23,10 @@ const retrieveHoverHintsStream = async (
 
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
-      const hoverHintList = await callLLM.OPEN_ROUTER(codeBlockRawHtml, llmParams);
+      const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, onHoverHint);
 
-      hoverHintList.hoverHintList.forEach((hoverHint) => {
-        onHoverHint(hoverHint);
-      });
+      await callLLM.OPEN_ROUTER(codeBlockRawHtml, llmParams, onParsedElement);
+
       return;
     } catch (error) {
       console.error('Error retrieving annotations', error);

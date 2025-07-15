@@ -3,25 +3,32 @@ import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams, ChatCompletionCreateParamsNonStreaming } from 'openai/resources.mjs';
 
-export interface LlmParams<ReturnType> {
+export interface LlmParams {
   prompt: string;
-  schema: z.ZodSchema<ReturnType>;
+  schema: z.ZodSchema;
 }
 
-const invokeOpenAiClient = async (client: OpenAI, params: ChatCompletionCreateParamsNonStreaming) => {
-  const response = await client.chat.completions.create(params);
+const invokeOpenAiClient = async (
+  client: OpenAI,
+  params: ChatCompletionCreateParamsNonStreaming,
+  onChunk: (chunk: string) => void,
+) => {
+  const response = await client.chat.completions.create({
+    ...params,
+    stream: true,
+  });
 
-  const rawContent = response.choices[0]?.message?.content;
+  for await (const chunk of response) {
+    const content = chunk.choices[0]?.delta?.content;
 
-  if (!rawContent) {
-    throw new Error('No content received from LLM');
+    if (content) {
+      onChunk(content);
+    }
   }
-
-  return rawContent;
 };
 
 export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
-  return async <ReturnType>(input: string, llmParams: LlmParams<ReturnType>) => {
+  return async (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) => {
     const { prompt, schema } = llmParams;
 
     const jsonSchema = zodToJsonSchema(schema);
@@ -52,7 +59,6 @@ export const createOpenAiClientInterface = (client: OpenAI, model: string) => {
       },
     };
 
-    const rawContent = await invokeOpenAiClient(client, params);
-    return schema.parse(JSON.parse(rawContent));
+    await invokeOpenAiClient(client, params, onChunk);
   };
 };

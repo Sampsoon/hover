@@ -53,6 +53,25 @@ The following design is for a Chrome extension that will identify code blocks in
 
 ### Bugs
 * Fix bug where hover hint is being added to the new part of "new function" as function does not have an id: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda-readme.html
+* Fix bug where IDs may be hallucinated?
+```
+    > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id xp2n6 not found in idToCodeTokenMap
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > A @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:13
+    > o @ processCodeBlocks.ts-1AjmrRd_.js:13Understand this error
+    > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id c8y8g not found in idToCodeTokenMap
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > A @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:13
+    > o @ processCodeBlocks.ts-1AjmrRd_.js:13Understand this error
+    > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id 47j3k not found in idToCodeTokenMap
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > A @ processCodeBlocks.ts-1AjmrRd_.js:1
+    > (anonymous) @ processCodeBlocks.ts-1AjmrRd_.js:13
+    > o @ processCodeBlocks.ts-1AjmrRd_.js:13Understand this error
+    > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id g4z0b not found in idToCodeTokenMap
+```
 
 ### House Keeping
 * Clean up `processCodeBlocks.ts`

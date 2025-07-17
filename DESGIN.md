@@ -52,7 +52,6 @@ The following design is for a Chrome extension that will identify code blocks in
 * Have ability to exclude websites 
 
 ### Bugs
-* Figure out why extension does not always fire for code blocks
 
 ### House Keeping
 * Clean up `processCodeBlocks.ts`

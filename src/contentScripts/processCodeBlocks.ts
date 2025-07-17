@@ -152,4 +152,6 @@ window.addEventListener('load', () => {
   processCodeBlocksOnPage(codeBlockProcessingObserver, idToCodeTokenMap);
 });
 
+processCodeBlocksOnPage(codeBlockProcessingObserver, idToCodeTokenMap);
+
 setupMutationObserver(codeBlockTrackingState, codeBlockProcessingObserver, idToCodeTokenMap);

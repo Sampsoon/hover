@@ -8,5 +8,5 @@ const openRouterClient = new OpenAI({
 });
 
 export const callLLM = {
-  OPEN_ROUTER: createOpenAiClientInterface(openRouterClient, 'google/gemini-2.5-flash-preview-05-20'),
+  OPEN_ROUTER: createOpenAiClientInterface(openRouterClient, 'google/gemini-2.5-flash'),
 } as const;

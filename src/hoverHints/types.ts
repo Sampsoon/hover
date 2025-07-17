@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { CODE_TOKEN_ID_NAME } from '../htmlProcessing';
+import { CODE_TOKEN_ID_NAME, Id } from '../htmlProcessing';
 
 export const hoverHintSchema = z.object({
   [`${CODE_TOKEN_ID_NAME}s`]: z.array(z.string()),
@@ -20,7 +20,7 @@ export type NoTimeoutActive = typeof NO_TIMEOUT_ACTIVE;
 export type TimeoutId = number | NoTimeoutActive;
 
 export interface HoverHintState {
-  hoverHintMap: Map<string, string>;
+  hoverHintMap: Map<Id, string>;
   tooltip: HTMLElement;
   timeoutId: TimeoutId;
 }

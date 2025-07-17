@@ -44,7 +44,6 @@ The following design is for a Chrome extension that will identify code blocks in
 * Pick a good LLM
 * Stream json response rather then wait for the whole thing
 * Scrub inputs to service workers
-* Add effect to code tokens that have definitions
 * Have ability to select local LLMs
 * Have toggle to add button to code blocks that when clicked generates suggestions
 
@@ -57,3 +56,4 @@ The following design is for a Chrome extension that will identify code blocks in
 
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
+* Clean up state management

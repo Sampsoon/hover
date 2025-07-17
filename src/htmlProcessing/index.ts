@@ -7,6 +7,8 @@ export type {
   CodeBlockStabilityTimer,
   CodeBlockTrackingState,
   CodeBlockTrackingTable,
+  IdToCodeTokenMap,
+  Id,
 } from './types';
 
 export {
@@ -17,6 +19,7 @@ export {
   CODE_TOKEN_ID_NAME,
   attachIdsToTokens,
   isCodeBlockInView,
+  setupIdToCodeTokenMap,
 } from './codeBlocks';
 
 export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

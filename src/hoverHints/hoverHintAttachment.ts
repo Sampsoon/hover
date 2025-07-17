@@ -1,4 +1,4 @@
-import { CODE_TOKEN_ID_NAME } from '../htmlProcessing';
+import { CODE_TOKEN_ID_NAME, Id, IdToCodeTokenMap } from '../htmlProcessing';
 import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
 
 const MOUSE_EVENTS = {
@@ -19,7 +19,7 @@ const clearTimeoutIfActive = (state: HoverHintState) => {
 
 export const setupHoverHintState = (): HoverHintState => {
   return {
-    hoverHintMap: new Map<string, string>(),
+    hoverHintMap: new Map<Id, string>(),
     tooltip: createTooltip(),
     timeoutId: NO_TIMEOUT_ACTIVE,
   };
@@ -43,9 +43,22 @@ export const setupHoverHintTriggers = (element_to_listen_on: Document | HTMLElem
   );
 };
 
-export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState) => {
+export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) => {
   const { tokenIds, docInHtml } = hoverHint;
-  tokenIds.forEach((tokenId) => state.hoverHintMap.set(tokenId, docInHtml));
+  tokenIds.forEach((tokenId) => {
+    state.hoverHintMap.set(tokenId, docInHtml);
+
+    const codeToken = idToCodeTokenMap.get(tokenId);
+    if (codeToken) {
+      addEffectToCodeToken(codeToken);
+    } else {
+      console.error(`Code token with id ${tokenId} not found in idToCodeTokenMap`);
+    }
+  });
+};
+
+const addEffectToCodeToken = (htmlElement: HTMLElement) => {
+  htmlElement.style.textDecoration = 'underline dotted';
 };
 
 const isHTMLElement = (target: EventTarget | null): target is HTMLElement => {

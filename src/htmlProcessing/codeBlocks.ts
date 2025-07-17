@@ -4,6 +4,8 @@ import {
   CodeBlockStabilityTimer,
   CodeBlockTrackingState,
   CodeBlockTrackingTable,
+  Id,
+  IdToCodeTokenMap,
 } from './types';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
@@ -18,7 +20,7 @@ const generateRandomId = (): string => {
   return ((Math.random() * 0x100000000) | 0).toString(36);
 };
 
-export const attachIdsToTokens = (code: CodeBlock) => {
+export const attachIdsToTokens = (code: CodeBlock, idToCodeTokenMap: IdToCodeTokenMap) => {
   const { html } = code;
 
   const codeTokens = getDomLeaves(html);
@@ -27,6 +29,7 @@ export const attachIdsToTokens = (code: CodeBlock) => {
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
       const id = generateRandomId();
       token.dataset[CODE_TOKEN_ID_NAME] = id;
+      idToCodeTokenMap.set(id, token);
     }
   });
 };
@@ -51,10 +54,12 @@ export const getOrAddIdToCodeBlock = (element: HTMLElement): { id: string; isNew
 
 export const setupCodeBlockTracking = (): CodeBlockTrackingState => {
   return {
-    mutatedCodeBlocksLookupTable: new Map<string, CodeBlockStabilityTimer>(),
-    codeBlocksInViewLookupTable: new Map<string, CodeBlockStabilityTimer>(),
+    mutatedCodeBlocksLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
+    codeBlocksInViewLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
   };
 };
+
+export const setupIdToCodeTokenMap = (): IdToCodeTokenMap => new Map<Id, HTMLElement>();
 
 export const clearCodeBlockTimeoutIfExists = (trackingTable: CodeBlockTrackingTable, id: string) => {
   if (!trackingTable.has(id)) {

@@ -17,6 +17,8 @@ export const CODE_SELECTORS = {
   },
 } as const satisfies Record<string, CodeBlockSelector>;
 
+export type Id = string;
+
 export type CodeSelectors = keyof typeof CODE_SELECTORS;
 
 export const CODE_BLOCK_ALREADY_PROCESSED = 'Code Block Already Processed';
@@ -24,7 +26,9 @@ export type CodeBlockAlreadyProcessed = typeof CODE_BLOCK_ALREADY_PROCESSED;
 
 export type CodeBlockStabilityTimer = number | CodeBlockAlreadyProcessed;
 
-export type CodeBlockTrackingTable = Map<string, CodeBlockStabilityTimer>;
+export type CodeBlockTrackingTable = Map<Id, CodeBlockStabilityTimer>;
+
+export type IdToCodeTokenMap = Map<Id, HTMLElement>;
 
 export interface CodeBlockTrackingState {
   mutatedCodeBlocksLookupTable: CodeBlockTrackingTable;

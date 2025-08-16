@@ -42,6 +42,7 @@ The following design is for a Chrome extension that will identify code blocks in
 * Scrub inputs to service workers
 * Have ability to select local LLMs
 * Have toggle to add button to code blocks that when clicked generates suggestions
+* Keep popup on screen when user moves mouse over it
 
 ### UI
 * Have ability for users to select permissions of chrome extension during setup 

@@ -12,6 +12,8 @@ const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
 export const CODE_TOKEN_ID_NAME = 'tokenId';
 
+export const PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME = 'programmatically-added-element';
+
 const CODE_DELIMITERS = new Set<string>([
   // Whitespace
   ' ',
@@ -61,6 +63,13 @@ const generateRandomId = (): string => {
   return ((Math.random() * 0x100000000) | 0).toString(36);
 };
 
+const createProgrammaticallyAddedSpan = (content: string) => {
+  const span = document.createElement('span');
+  span.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
+  span.textContent = content;
+  return span;
+};
+
 const breakIntoTokens = (elementContent: string) => {
   const fragment = document.createDocumentFragment();
 
@@ -78,9 +87,8 @@ const breakIntoTokens = (elementContent: string) => {
     if (stateChanged && isTraversingDelimiters) {
       fragment.appendChild(document.createTextNode(currentToken.join('')));
     } else if (stateChanged && !isTraversingDelimiters) {
-      const span = document.createElement('span');
-      span.textContent = currentToken.join('');
-      fragment.appendChild(span);
+      const newSpan = createProgrammaticallyAddedSpan(currentToken.join(''));
+      fragment.appendChild(newSpan);
     }
 
     if (stateChanged) {
@@ -96,9 +104,8 @@ const breakIntoTokens = (elementContent: string) => {
   }
 
   if (currentToken.length > 0 && !isTraversingDelimiters) {
-    const span = document.createElement('span');
-    span.textContent = currentToken.join('');
-    fragment.appendChild(span);
+    const newSpan = createProgrammaticallyAddedSpan(currentToken.join(''));
+    fragment.appendChild(newSpan);
   }
 
   return fragment;
@@ -112,7 +119,9 @@ const wrapTokensInSpans = (element: HTMLElement) => {
       const originalText = node.textContent;
       const tokens = breakIntoTokens(originalText);
 
-      element.replaceChild(tokens, node);
+      if (tokens.childNodes.length > 1) {
+        element.replaceChild(tokens, node);
+      }
     } else if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== 'SPAN') {
       wrapTokensInSpans(node as HTMLElement);
     }

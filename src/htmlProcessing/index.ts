@@ -20,6 +20,7 @@ export {
   attachIdsToTokens,
   isCodeBlockInView,
   setupIdToCodeTokenMap,
+  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
 } from './codeBlocks';
 
 export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

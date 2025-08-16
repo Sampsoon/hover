@@ -11,6 +11,7 @@ import {
   attachIdsToTokens,
   setupIdToCodeTokenMap,
   IdToCodeTokenMap,
+  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
 import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorkers';
@@ -107,6 +108,25 @@ const processCodeBlocksOnPage = (
   });
 };
 
+const isMutationProgrammaticallyAddedByChromeExtension = (mutation: MutationRecord): boolean => {
+  if (mutation.type !== 'childList') {
+    return false;
+  }
+
+  const addedNodes = Array.from(mutation.addedNodes);
+
+  return addedNodes
+    .filter((node) => node.nodeType === Node.ELEMENT_NODE)
+    .some((node) => {
+      const element = node as HTMLElement;
+      if (element.hasAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME)) {
+        return true;
+      }
+
+      return element.querySelectorAll(`[${PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME}]`).length > 0;
+    });
+};
+
 const setupMutationObserver = (
   codeBlockTrackingState: CodeBlockTrackingState,
   codeBlockProcessingObserver: IntersectionObserver,
@@ -117,6 +137,10 @@ const setupMutationObserver = (
       const codeBlock = findCodeBlockPartOfMutation(mutation);
 
       if (!codeBlock) {
+        return;
+      }
+
+      if (isMutationProgrammaticallyAddedByChromeExtension(mutation)) {
         return;
       }
 

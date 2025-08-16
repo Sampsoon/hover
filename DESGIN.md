@@ -52,7 +52,6 @@ The following design is for a Chrome extension that will identify code blocks in
 * Have ability to exclude websites 
 
 ### Bugs
-* Fix bug where hover hint is being added to the new part of "new function" as function does not have an id: https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_lambda-readme.html
 * Fix bug where IDs may be hallucinated?
 ```
     > processCodeBlocks.ts-1AjmrRd_.js:1 Code token with id xp2n6 not found in idToCodeTokenMap

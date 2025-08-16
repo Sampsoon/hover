@@ -12,6 +12,47 @@ const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
 export const CODE_TOKEN_ID_NAME = 'tokenId';
 
+const CODE_DELIMITERS = new Set<string>([
+  // Whitespace
+  ' ',
+  '\t',
+  '\n',
+  '\r',
+  '\v',
+  '\f',
+  // Structural punctuation
+  '.',
+  ',',
+  ';',
+  ':',
+  '(',
+  ')',
+  '[',
+  ']',
+  '{',
+  '}',
+  // Comparison/assignment operators
+  '>',
+  '<',
+  '=',
+  // Arithmetic operators
+  '+',
+  '*',
+  '/',
+  '%',
+  // Bitwise/logical operators
+  '&',
+  '|',
+  '^',
+  '~',
+  // String delimiters
+  '"',
+  "'",
+  '`',
+  // Escape character
+  '\\',
+]);
+
 const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
 };
@@ -20,8 +61,68 @@ const generateRandomId = (): string => {
   return ((Math.random() * 0x100000000) | 0).toString(36);
 };
 
+const breakIntoTokens = (elementContent: string) => {
+  const fragment = document.createDocumentFragment();
+
+  if (!elementContent.trim()) {
+    fragment.appendChild(document.createTextNode(elementContent));
+    return fragment;
+  }
+
+  let currentToken = [];
+  let isTraversingDelimiters = CODE_DELIMITERS.has(elementContent[0]);
+
+  for (const char of elementContent) {
+    const stateChanged = isTraversingDelimiters !== CODE_DELIMITERS.has(char);
+
+    if (stateChanged && isTraversingDelimiters) {
+      fragment.appendChild(document.createTextNode(currentToken.join('')));
+    } else if (stateChanged && !isTraversingDelimiters) {
+      const span = document.createElement('span');
+      span.textContent = currentToken.join('');
+      fragment.appendChild(span);
+    }
+
+    if (stateChanged) {
+      isTraversingDelimiters = !isTraversingDelimiters;
+      currentToken = [];
+    }
+
+    currentToken.push(char);
+  }
+
+  if (currentToken.length > 0 && isTraversingDelimiters) {
+    fragment.appendChild(document.createTextNode(currentToken.join('')));
+  }
+
+  if (currentToken.length > 0 && !isTraversingDelimiters) {
+    const span = document.createElement('span');
+    span.textContent = currentToken.join('');
+    fragment.appendChild(span);
+  }
+
+  return fragment;
+};
+
+const wrapTokensInSpans = (element: HTMLElement) => {
+  const childNodes = Array.from(element.childNodes);
+
+  childNodes.forEach((node) => {
+    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+      const originalText = node.textContent;
+      const tokens = breakIntoTokens(originalText);
+
+      element.replaceChild(tokens, node);
+    } else if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== 'SPAN') {
+      wrapTokensInSpans(node as HTMLElement);
+    }
+  });
+};
+
 export const attachIdsToTokens = (code: CodeBlock, idToCodeTokenMap: IdToCodeTokenMap) => {
   const { html } = code;
+
+  wrapTokensInSpans(html);
 
   const codeTokens = getDomLeaves(html);
 

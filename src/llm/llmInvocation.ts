@@ -13,6 +13,9 @@ type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
     sort?: string;
     require_parameters?: boolean;
   };
+  thinking?: {
+    type: 'enabled' | 'disabled';
+  };
 };
 
 const invokeOpenRouterClient = async (
@@ -45,6 +48,9 @@ export const createOpenRouterClientInterface = (client: OpenAI, model: string) =
       provider: {
         sort: 'throughput',
         require_parameters: true,
+      },
+      thinking: {
+        type: 'disabled',
       },
       messages: [
         {

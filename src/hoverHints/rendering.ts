@@ -7,8 +7,6 @@ import {
   DocString,
   ParamDocString,
   ReturnDocString,
-  isParamDocString,
-  isReturnDocString,
 } from './types';
 
 // Used to prevent cross-site scripting attacks
@@ -47,21 +45,10 @@ const renderReturnDocStringAsHtml = (docString: ReturnDocString) => {
   return `<div style="${getPrimaryTextStyle()}">@Return: ${documentation}</div>`;
 };
 
-const renderDocStringAsHtml = (docString: DocString[]) => {
-  return docString
-    .map((docString) => {
-      if (isParamDocString(docString)) {
-        return renderParamDocStringAsHtml(docString);
-      }
-
-      if (isReturnDocString(docString)) {
-        return renderReturnDocStringAsHtml(docString);
-      }
-
-      console.error('Unknown docString type', docString);
-      return '';
-    })
-    .join('');
+const renderDocStringAsHtml = (docString: DocString) => {
+  const params = docString.params.map((param) => renderParamDocStringAsHtml(param));
+  const returns = renderReturnDocStringAsHtml(docString.returns);
+  return `${params.join('')}${returns}`;
 };
 
 const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation) => {

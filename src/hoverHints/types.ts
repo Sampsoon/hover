@@ -7,13 +7,7 @@ const TOKEN_TYPES = {
   VARIABLE: 'variable',
 } as const;
 
-const DOC_STRING_TYPE = {
-  PARAM: 'param',
-  RETURN: 'return',
-} as const;
-
 const returnDocStringSchema = z.object({
-  type: z.literal(DOC_STRING_TYPE.RETURN),
   documentation: z.string().describe(`
     The documentation for the return value of the function.
     `),
@@ -21,13 +15,8 @@ const returnDocStringSchema = z.object({
 
 export type ReturnDocString = z.infer<typeof returnDocStringSchema>;
 
-export const isReturnDocString = (docString: DocString): docString is ReturnDocString => {
-  return docString.type === DOC_STRING_TYPE.RETURN;
-};
-
 const paramDocStringSchema = z.object({
   name: z.string().describe('The name of the argument'),
-  type: z.literal(DOC_STRING_TYPE.PARAM),
   documentation: z.string().describe(`
     The documentation for the argument to the function.
     `),
@@ -35,11 +24,10 @@ const paramDocStringSchema = z.object({
 
 export type ParamDocString = z.infer<typeof paramDocStringSchema>;
 
-export const isParamDocString = (docString: DocString): docString is ParamDocString => {
-  return docString.type === DOC_STRING_TYPE.PARAM;
-};
-
-const docStringSchema = z.union([returnDocStringSchema, paramDocStringSchema]);
+const docStringSchema = z.object({
+  params: z.array(paramDocStringSchema),
+  returns: returnDocStringSchema,
+});
 
 export type DocString = z.infer<typeof docStringSchema>;
 
@@ -48,18 +36,15 @@ const functionDocumentationSchema = z.object({
   functionSignature: z
     .string()
     .describe('The function signature. This should cover function return type and types for the arguments'),
-  docString: z
-    .array(docStringSchema)
-    .optional()
-    .describe(
-      `Documentation for the function signature.
+  docString: docStringSchema.optional().describe(
+    `Documentation for the function signature.
       This should also include the return values when the function returns something.
       Never include a subset of the function signature, only the full signature or none.
       All documentation should be short and concise. Only include this if the information is not obvious to the user.
       Please include any nuances of the parameter, such it's inclusive or exclusive, mutated, etc so that nothing is ambiguous.
       Please do not include documentation that is redundant with with other documentation for the function.
       `,
-    ),
+  ),
   documentation: z.string().optional()
     .describe(`An explanations of the nuances of how the function is used and it's expected behavior.
       This should be between 1 and 15 lines.

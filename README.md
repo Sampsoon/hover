@@ -1,10 +1,5 @@
 # Vibey LSP
 
-A minimal React + TypeScript + Vite project with strict ESLint and Prettier integration.
-
-- Fast Refresh (HMR) via Vite and @vitejs/plugin-react.
-- Strict linting and formatting enforced on build.
-
 ## Scripts
 
 - `pnpm dev` — Start development server
@@ -16,3 +11,15 @@ A minimal React + TypeScript + Vite project with strict ESLint and Prettier inte
 
 - Node.js ≥ 18
 - pnpm
+
+
+#### API Key Setup
+
+- Create a `.env` file in the project root.
+- Add the following API key(s) with the Vite prefix:
+
+```
+VITE_OPEN_ROUTER_API_KEY=your-openrouter-key-here
+```
+
+Access the key(s) in code go to `src/keys/index.ts`

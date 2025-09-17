@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
-import { API_KEYS } from './tempApiKeys';
 import { createOpenRouterClientInterface } from './llmInvocation';
+import { API_KEYS } from '../keys';
 
 const openRouterClient = new OpenAI({
   apiKey: API_KEYS.OPEN_ROUTER,

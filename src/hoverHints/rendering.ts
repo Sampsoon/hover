@@ -20,11 +20,11 @@ import {
 } from './types';
 
 // Used to prevent cross-site scripting attacks
-const sanitizeHtml = (value: string) => {
+function sanitizeHtml(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-};
+}
 
-const renderSignatureAsHtml = (signature: string) => {
+function renderSignatureAsHtml(signature: string) {
   const sanitizedSignature = sanitizeHtml(signature);
 
   const signatureElement = document.createElement('span');
@@ -35,26 +35,26 @@ const renderSignatureAsHtml = (signature: string) => {
   signatureElement.innerHTML = sanitizedSignature;
 
   return signatureElement;
-};
+}
 
-const renderParamDocStringAsHtml = (docString: ParamDocString) => {
+function renderParamDocStringAsHtml(docString: ParamDocString) {
   const name = sanitizeHtml(docString.name);
   const documentation = sanitizeHtml(docString.documentation);
   const div = document.createElement('div');
   applyPrimaryTextStyle(div.style);
   div.innerHTML = `@Param ${name}: ${documentation}`;
   return div.outerHTML;
-};
+}
 
-const renderReturnDocStringAsHtml = (docString: ReturnDocString) => {
+function renderReturnDocStringAsHtml(docString: ReturnDocString) {
   const documentation = sanitizeHtml(docString.documentation);
   const div = document.createElement('div');
   applyPrimaryTextStyle(div.style);
   div.innerHTML = `@Return: ${documentation}`;
   return div.outerHTML;
-};
+}
 
-const renderDocStringAsHtml = (docString: DocString) => {
+function renderDocStringAsHtml(docString: DocString) {
   const docStringElement = document.createElement('div');
 
   applySecondaryTextStyle(docStringElement.style);
@@ -66,9 +66,9 @@ const renderDocStringAsHtml = (docString: DocString) => {
   docStringElement.innerHTML = renderedText;
 
   return docStringElement;
-};
+}
 
-const renderFunctionDocumentationTextAsHtml = (documentation: string) => {
+function renderFunctionDocumentationTextAsHtml(documentation: string) {
   const sanitizedDocumentation = sanitizeHtml(documentation);
   const documentationElement = document.createElement('div');
 
@@ -77,9 +77,9 @@ const renderFunctionDocumentationTextAsHtml = (documentation: string) => {
 
   documentationElement.innerHTML = sanitizedDocumentation;
   return documentationElement;
-};
+}
 
-const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation) => {
+function renderFunctionDocumentationAsHtml(documentation: FunctionDocumentation) {
   const hoverHintElement = document.createElement('div');
 
   const signatureElement = renderSignatureAsHtml(documentation.functionSignature);
@@ -101,9 +101,9 @@ const renderFunctionDocumentationAsHtml = (documentation: FunctionDocumentation)
   hoverHintElement.remove();
 
   return renderedElement;
-};
+}
 
-const renderObjectDocumentationAsHtml = (documentation: ObjectDocumentation) => {
+function renderObjectDocumentationAsHtml(documentation: ObjectDocumentation) {
   const body = sanitizeHtml(documentation.docInHtml);
   const container = document.createElement('div');
   applyTextContainerStyle(container.style);
@@ -114,9 +114,9 @@ const renderObjectDocumentationAsHtml = (documentation: ObjectDocumentation) => 
 
   container.appendChild(contentDiv);
   return container.outerHTML;
-};
+}
 
-const renderVariableDocumentationAsHtml = (documentation: VariableDocumentation) => {
+function renderVariableDocumentationAsHtml(documentation: VariableDocumentation) {
   const body = sanitizeHtml(documentation.docInHtml);
   const container = document.createElement('div');
   applyTextContainerStyle(container.style);
@@ -127,9 +127,9 @@ const renderVariableDocumentationAsHtml = (documentation: VariableDocumentation)
 
   container.appendChild(contentDiv);
   return container.outerHTML;
-};
+}
 
-export const renderDocumentationAsHtml = (documentation: HoverHintDocumentation) => {
+export function renderDocumentationAsHtml(documentation: HoverHintDocumentation) {
   if (isFunctionDocumentation(documentation)) {
     return renderFunctionDocumentationAsHtml(documentation);
   }
@@ -144,4 +144,4 @@ export const renderDocumentationAsHtml = (documentation: HoverHintDocumentation)
 
   console.error('Unknown documentation type', documentation);
   return undefined;
-};
+}

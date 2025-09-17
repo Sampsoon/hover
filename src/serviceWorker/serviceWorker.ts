@@ -2,7 +2,7 @@ import browser from 'webextension-polyfill';
 import { isHoverHintRetrievalMessage, isServiceWorkerMessage } from './interface';
 import handleHoverHintRetrievalMessages from './handleHoverHintRetrievalMessages';
 
-const validateSender = (sender: browser.Runtime.MessageSender): boolean => {
+function validateSender(sender: browser.Runtime.MessageSender): boolean {
   if (!sender.tab) {
     return false;
   }
@@ -12,7 +12,7 @@ const validateSender = (sender: browser.Runtime.MessageSender): boolean => {
   }
 
   return true;
-};
+}
 
 browser.runtime.onMessage.addListener((message: unknown, sender: browser.Runtime.MessageSender) => {
   if (!validateSender(sender)) {

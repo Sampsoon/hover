@@ -55,22 +55,22 @@ const CODE_DELIMITERS = new Set<string>([
   '\\',
 ]);
 
-const getDomLeaves = (element: HTMLElement): HTMLElement[] => {
+function getDomLeaves(element: HTMLElement): HTMLElement[] {
   return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
-};
+}
 
-const generateRandomId = (): string => {
+function generateRandomId(): string {
   return ((Math.random() * 0x100000000) | 0).toString(36);
-};
+}
 
-const createProgrammaticallyAddedSpan = (content: string) => {
+function createProgrammaticallyAddedSpan(content: string) {
   const span = document.createElement('span');
   span.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
   span.textContent = content;
   return span;
-};
+}
 
-const breakIntoTokens = (elementContent: string) => {
+function breakIntoTokens(elementContent: string) {
   const fragment = document.createDocumentFragment();
 
   if (!elementContent.trim()) {
@@ -109,9 +109,9 @@ const breakIntoTokens = (elementContent: string) => {
   }
 
   return fragment;
-};
+}
 
-const wrapTokensInSpans = (element: HTMLElement) => {
+function wrapTokensInSpans(element: HTMLElement) {
   const childNodes = Array.from(element.childNodes);
 
   childNodes.forEach((node) => {
@@ -126,9 +126,9 @@ const wrapTokensInSpans = (element: HTMLElement) => {
       wrapTokensInSpans(node as HTMLElement);
     }
   });
-};
+}
 
-export const attachIdsToTokens = (code: CodeBlock, idToCodeTokenMap: IdToCodeTokenMap) => {
+export function attachIdsToTokens(code: CodeBlock, idToCodeTokenMap: IdToCodeTokenMap) {
   const { html } = code;
 
   wrapTokensInSpans(html);
@@ -142,36 +142,38 @@ export const attachIdsToTokens = (code: CodeBlock, idToCodeTokenMap: IdToCodeTok
       idToCodeTokenMap.set(id, token);
     }
   });
-};
+}
 
-const addIdToCodeBlock = (element: HTMLElement) => {
+function addIdToCodeBlock(element: HTMLElement) {
   const id = generateRandomId();
   element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME] = id;
   return id;
-};
+}
 
-const getIdFromCodeBlock = (element: HTMLElement) => {
+function getIdFromCodeBlock(element: HTMLElement) {
   return element.dataset[CODE_BLOCK_ID_ATTRIBUTE_NAME];
-};
+}
 
-export const getOrAddIdToCodeBlock = (element: HTMLElement): { id: string; isNewCodeBlock: boolean } => {
+export function getOrAddIdToCodeBlock(element: HTMLElement): { id: string; isNewCodeBlock: boolean } {
   const id = getIdFromCodeBlock(element);
   if (id) {
     return { id, isNewCodeBlock: false };
   }
   return { id: addIdToCodeBlock(element), isNewCodeBlock: true };
-};
+}
 
-export const setupCodeBlockTracking = (): CodeBlockTrackingState => {
+export function setupCodeBlockTracking(): CodeBlockTrackingState {
   return {
     mutatedCodeBlocksLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
     codeBlocksInViewLookupTable: new Map<Id, CodeBlockStabilityTimer>(),
   };
-};
+}
 
-export const setupIdToCodeTokenMap = (): IdToCodeTokenMap => new Map<Id, HTMLElement>();
+export function setupIdToCodeTokenMap(): IdToCodeTokenMap {
+  return new Map<Id, HTMLElement>();
+}
 
-export const clearCodeBlockTimeoutIfExists = (trackingTable: CodeBlockTrackingTable, id: string) => {
+export function clearCodeBlockTimeoutIfExists(trackingTable: CodeBlockTrackingTable, id: string) {
   if (!trackingTable.has(id)) {
     return;
   }
@@ -183,24 +185,24 @@ export const clearCodeBlockTimeoutIfExists = (trackingTable: CodeBlockTrackingTa
   }
 
   clearTimeout(timeout);
-};
+}
 
-export const setCodeBlockTimeout = (
+export function setCodeBlockTimeout(
   trackingTable: CodeBlockTrackingTable,
   id: string,
   callback: () => void,
   timeout: number,
-) => {
+) {
   const timeoutId = window.setTimeout(() => {
     callback();
     trackingTable.set(id, CODE_BLOCK_ALREADY_PROCESSED);
   }, timeout);
 
   trackingTable.set(id, timeoutId);
-};
+}
 
-export const isCodeBlockInView = (codeBlock: CodeBlock): boolean => {
+export function isCodeBlockInView(codeBlock: CodeBlock): boolean {
   const { html } = codeBlock;
   const rect = html.getBoundingClientRect();
   return rect.top < window.innerHeight && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
-};
+}

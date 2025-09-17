@@ -76,21 +76,17 @@ export const hoverHintDocumentation = z.union([
   variableDocumentationSchema,
 ]);
 
-export const isFunctionDocumentation = (
-  documentation: HoverHintDocumentation,
-): documentation is FunctionDocumentation => {
+export function isFunctionDocumentation(documentation: HoverHintDocumentation): documentation is FunctionDocumentation {
   return documentation.type === TOKEN_TYPES.FUNCTION;
-};
+}
 
-export const isObjectDocumentation = (documentation: HoverHintDocumentation): documentation is ObjectDocumentation => {
+export function isObjectDocumentation(documentation: HoverHintDocumentation): documentation is ObjectDocumentation {
   return documentation.type === TOKEN_TYPES.OBJECT;
-};
+}
 
-export const isVariableDocumentation = (
-  documentation: HoverHintDocumentation,
-): documentation is VariableDocumentation => {
+export function isVariableDocumentation(documentation: HoverHintDocumentation): documentation is VariableDocumentation {
   return documentation.type === TOKEN_TYPES.VARIABLE;
-};
+}
 
 export const hoverHintSchema = z.object({
   ids: z.array(z.string()),

@@ -8,26 +8,26 @@ const MOUSE_EVENTS = {
   MOUSE_LEAVE: 'mouseleave',
 } as const;
 
-const isNoTimeoutActive = (timeoutId: TimeoutId): timeoutId is NoTimeoutActive => {
+function isNoTimeoutActive(timeoutId: TimeoutId): timeoutId is NoTimeoutActive {
   return timeoutId === NO_TIMEOUT_ACTIVE;
-};
+}
 
-const clearTimeoutIfActive = (state: HoverHintState) => {
+function clearTimeoutIfActive(state: HoverHintState) {
   if (!isNoTimeoutActive(state.timeoutId)) {
     clearTimeout(state.timeoutId);
     state.timeoutId = NO_TIMEOUT_ACTIVE;
   }
-};
+}
 
-export const setupHoverHintState = (): HoverHintState => {
+export function setupHoverHintState(): HoverHintState {
   return {
     hoverHintMap: new Map<Id, string>(),
     tooltip: createTooltip(),
     timeoutId: NO_TIMEOUT_ACTIVE,
   };
-};
+}
 
-export const setupHoverHintTriggers = (element_to_listen_on: Document | HTMLElement, state: HoverHintState) => {
+export function setupHoverHintTriggers(element_to_listen_on: Document | HTMLElement, state: HoverHintState) {
   element_to_listen_on.addEventListener(
     MOUSE_EVENTS.MOUSE_ENTER,
     (event) => {
@@ -43,9 +43,9 @@ export const setupHoverHintTriggers = (element_to_listen_on: Document | HTMLElem
     },
     true,
   );
-};
+}
 
-export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) => {
+export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idToCodeTokenMap: IdToCodeTokenMap) {
   const { ids, documentation } = hoverHint;
   const renderedHtml = renderDocumentationAsHtml(documentation);
 
@@ -63,17 +63,17 @@ export const attachHoverHint = (hoverHint: HoverHint, state: HoverHintState, idT
       console.error(`Code token with id ${id} not found in idToCodeTokenMap`);
     }
   });
-};
+}
 
-const addEffectToCodeToken = (htmlElement: HTMLElement) => {
+function addEffectToCodeToken(htmlElement: HTMLElement) {
   htmlElement.style.textDecoration = 'underline dotted';
-};
+}
 
-const isHTMLElement = (target: EventTarget | null): target is HTMLElement => {
+function isHTMLElement(target: EventTarget | null): target is HTMLElement {
   return target instanceof HTMLElement;
-};
+}
 
-const onMouseEnterCodeToken = (event: MouseEvent, state: HoverHintState) => {
+function onMouseEnterCodeToken(event: MouseEvent, state: HoverHintState) {
   const target = event.target;
 
   if (!isHTMLElement(target)) {
@@ -93,9 +93,9 @@ const onMouseEnterCodeToken = (event: MouseEvent, state: HoverHintState) => {
   if (renderedHtml) {
     showTooltip(renderedHtml, event, state);
   }
-};
+}
 
-const onMouseLeaveCodeToken = (event: MouseEvent, state: HoverHintState) => {
+function onMouseLeaveCodeToken(event: MouseEvent, state: HoverHintState) {
   const target = event.target;
 
   if (!isHTMLElement(target)) {
@@ -111,9 +111,9 @@ const onMouseLeaveCodeToken = (event: MouseEvent, state: HoverHintState) => {
   clearTimeoutIfActive(state);
 
   setHideTooltipTimeout(state);
-};
+}
 
-const createTooltip = (): HTMLElement => {
+function createTooltip(): HTMLElement {
   const tooltip = document.createElement('div');
   tooltip.className = 'vibey-tooltip';
   applyHoverHintStyle(tooltip.style);
@@ -121,21 +121,21 @@ const createTooltip = (): HTMLElement => {
 
   document.body.appendChild(tooltip);
   return tooltip;
-};
+}
 
-const showTooltip = (html: string, event: MouseEvent, state: HoverHintState) => {
+function showTooltip(html: string, event: MouseEvent, state: HoverHintState) {
   state.tooltip.innerHTML = html;
   positionTooltip(state.tooltip, event.target as HTMLElement);
   state.tooltip.style.display = 'block';
-};
+}
 
-const setHideTooltipTimeout = (state: HoverHintState) => {
+function setHideTooltipTimeout(state: HoverHintState) {
   state.timeoutId = window.setTimeout(() => {
     state.tooltip.style.display = 'none';
   }, 300);
-};
+}
 
-const positionTooltip = (tooltip: HTMLElement, element: HTMLElement) => {
+function positionTooltip(tooltip: HTMLElement, element: HTMLElement) {
   const PADDING = 10;
 
   const { innerWidth: viewportWidth, innerHeight: viewportHeight } = window;
@@ -160,9 +160,9 @@ const positionTooltip = (tooltip: HTMLElement, element: HTMLElement) => {
 
   tooltip.style.left = `${left.toString()}px`;
   tooltip.style.top = `${top.toString()}px`;
-};
+}
 
-const getTooltipDimensions = (tooltip: HTMLElement) => {
+function getTooltipDimensions(tooltip: HTMLElement) {
   const originalDisplay = tooltip.style.display;
   const originalVisibility = tooltip.style.visibility;
 
@@ -175,4 +175,4 @@ const getTooltipDimensions = (tooltip: HTMLElement) => {
   tooltip.style.visibility = originalVisibility;
 
   return { tooltipWidth, tooltipHeight };
-};
+}

@@ -16,14 +16,14 @@ export interface HoverHintRetrievalMessage extends ServiceWorkerMessage<HoverHin
   payload: HoverHintRetrievalPayload;
 }
 
-export const isServiceWorkerMessage = (message: unknown): message is ServiceWorkerMessage<unknown> => {
+export function isServiceWorkerMessage(message: unknown): message is ServiceWorkerMessage<unknown> {
   return message !== null && typeof message === 'object' && 'type' in message && 'payload' in message;
-};
+}
 
-export const isHoverHintRetrievalMessage = (
+export function isHoverHintRetrievalMessage(
   message: ServiceWorkerMessage<unknown>,
-): message is HoverHintRetrievalMessage => {
+): message is HoverHintRetrievalMessage {
   // TODO: Delete eslint rule once more message types are added
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   return message.type === ServiceWorkerMessageType.HOVER_HINT_RETRIEVAL;
-};
+}

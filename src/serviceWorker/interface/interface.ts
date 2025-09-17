@@ -4,7 +4,7 @@ import { isHoverHintStreamError, isHoverHintStreamMessage } from '../../stream';
 import { ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';
 import browser from 'webextension-polyfill';
 
-export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock) => {
+export async function invokeHoverHintRetrievalServiceWorker(codeBlock: CodeBlock) {
   const message: HoverHintRetrievalMessage = {
     type: ServiceWorkerMessageType.HOVER_HINT_RETRIEVAL,
     payload: {
@@ -13,9 +13,9 @@ export const invokeHoverHintRetrievalServiceWorker = async (codeBlock: CodeBlock
   };
 
   await browser.runtime.sendMessage(message);
-};
+}
 
-export const listenForHoverHintsFromServiceWorker = (processHoverHint: (hoverHint: HoverHint) => void) => {
+export function listenForHoverHintsFromServiceWorker(processHoverHint: (hoverHint: HoverHint) => void) {
   const messageListener = (msg: unknown) => {
     if (isHoverHintStreamMessage(msg)) {
       processHoverHint(msg.hoverHint);
@@ -28,4 +28,4 @@ export const listenForHoverHintsFromServiceWorker = (processHoverHint: (hoverHin
   };
 
   browser.runtime.onMessage.addListener(messageListener);
-};
+}

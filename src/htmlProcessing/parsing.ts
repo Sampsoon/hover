@@ -5,13 +5,15 @@ const queryAllSelectorsSelector = Object.values(CODE_SELECTORS)
   .map((selector) => selector.selector)
   .join(', ');
 
-const codeBlockContainsSpans = (element: Element): boolean => {
+function codeBlockContainsSpans(element: Element): boolean {
   return element.querySelectorAll('span').length > 0;
-};
+}
 
-const isValidCodeBlockElement = (element: Element): boolean => codeBlockContainsSpans(element);
+function isValidCodeBlockElement(element: Element): boolean {
+  return codeBlockContainsSpans(element);
+}
 
-const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null => {
+function searchForCodeBlockElementIsPartOf(element: Element): CodeBlock | null {
   const codeBlockElement = element.closest(queryAllSelectorsSelector) as HTMLElement | undefined;
 
   if (codeBlockElement) {
@@ -23,9 +25,9 @@ const searchForCodeBlockElementIsPartOf = (element: Element): CodeBlock | null =
   }
 
   return null;
-};
+}
 
-export const findCodeBlockPartOfMutation = (mutation: MutationRecord): CodeBlock | null => {
+export function findCodeBlockPartOfMutation(mutation: MutationRecord): CodeBlock | null {
   const target = mutation.target;
 
   const element = target.nodeType === Node.ELEMENT_NODE ? (target as HTMLElement) : target.parentElement;
@@ -45,9 +47,9 @@ export const findCodeBlockPartOfMutation = (mutation: MutationRecord): CodeBlock
   }
 
   return possibleCodeBlock;
-};
+}
 
-export const findCodeBlocksOnPage = (document: Document): CodeBlock[] => {
+export function findCodeBlocksOnPage(document: Document): CodeBlock[] {
   const elements = document.querySelectorAll(queryAllSelectorsSelector);
 
   const codeBlocks: CodeBlock[] = [];
@@ -67,4 +69,4 @@ export const findCodeBlocksOnPage = (document: Document): CodeBlock[] => {
   }
 
   return codeBlocks;
-};
+}

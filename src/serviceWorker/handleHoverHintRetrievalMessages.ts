@@ -5,11 +5,11 @@ import { cleanHoverHintRetrievalHtml, RETRIEVAL_HOVER_HINTS_PROMPT } from './hov
 import { HoverHintRetrievalMessage } from './interface';
 import browser from 'webextension-polyfill';
 
-const retrieveHoverHintsStream = async (
+async function retrieveHoverHintsStream(
   codeBlockRawHtml: string,
   onHoverHint: (hoverHint: HoverHint) => void,
   onError: (errorMessage: string) => void,
-) => {
+) {
   const MAX_RETRIES = 5;
   const RETRY_DELAY = 1000;
 
@@ -37,12 +37,9 @@ const retrieveHoverHintsStream = async (
   }
 
   onError('Failed to retrieve annotations after 5 retries');
-};
+}
 
-const handleHoverHintRetrievalMessages = (
-  message: HoverHintRetrievalMessage,
-  sender: browser.Runtime.MessageSender,
-) => {
+function handleHoverHintRetrievalMessages(message: HoverHintRetrievalMessage, sender: browser.Runtime.MessageSender) {
   const tabId = sender.tab?.id;
 
   if (!tabId) {
@@ -59,6 +56,6 @@ const handleHoverHintRetrievalMessages = (
       void browser.tabs.sendMessage(tabId, createHoverHintStreamError(errorMessage));
     },
   );
-};
+}
 
 export default handleHoverHintRetrievalMessages;

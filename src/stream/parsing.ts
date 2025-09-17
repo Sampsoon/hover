@@ -2,10 +2,10 @@ import z from 'zod';
 
 // Requires input with the following format:
 // { key: [{...}, {...}, ...] }
-export const parseListOfObjectsFromStream = <ListElement>(
+export function parseListOfObjectsFromStream<ListElement>(
   parser: z.ZodSchema<ListElement>,
   onElement: (element: ListElement) => void,
-) => {
+) {
   let currentChunk: string[] = [];
   let isInList = false;
   let bracketDepth = 0;
@@ -39,4 +39,4 @@ export const parseListOfObjectsFromStream = <ListElement>(
       }
     }
   };
-};
+}

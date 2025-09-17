@@ -28,23 +28,23 @@ function generateHoverhintsForCodeBlock(codeBlock: CodeBlock, idToCodeTokenMap: 
   void invokeHoverHintRetrievalServiceWorker(codeBlock);
 }
 
-const processCodeBlock = (
+function processCodeBlock(
   codeBlock: CodeBlock,
   codeBlockProcessingObserver: IntersectionObserver,
   idToCodeTokenMap: IdToCodeTokenMap,
-) => {
+) {
   // We process code blocks that are in view on page load so that there is no delay in showing hover hints
   if (isCodeBlockInView(codeBlock)) {
     generateHoverhintsForCodeBlock(codeBlock, idToCodeTokenMap);
   } else {
     codeBlockProcessingObserver.observe(codeBlock.html);
   }
-};
+}
 
-const createCodeBlockProcessingObserver = (
+function createCodeBlockProcessingObserver(
   codeBlockTrackingState: CodeBlockTrackingState,
   idToCodeTokenMap: IdToCodeTokenMap,
-) => {
+) {
   const intersectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -78,9 +78,9 @@ const createCodeBlockProcessingObserver = (
   );
 
   return intersectionObserver;
-};
+}
 
-const setup = () => {
+function setup() {
   const hoverHintState = setupHoverHintState();
 
   const codeBlockTrackingState = setupCodeBlockTracking();
@@ -96,19 +96,19 @@ const setup = () => {
   const codeBlockProcessingObserver = createCodeBlockProcessingObserver(codeBlockTrackingState, idToCodeTokenMap);
 
   return { codeBlockTrackingState, codeBlockProcessingObserver, idToCodeTokenMap };
-};
+}
 
-const processCodeBlocksOnPage = (
+function processCodeBlocksOnPage(
   codeBlockProcessingObserver: IntersectionObserver,
   idToCodeTokenMap: IdToCodeTokenMap,
-) => {
+) {
   const blocks = findCodeBlocksOnPage(document);
   blocks.forEach((codeBlock) => {
     processCodeBlock(codeBlock, codeBlockProcessingObserver, idToCodeTokenMap);
   });
-};
+}
 
-const isMutationProgrammaticallyAddedByChromeExtension = (mutation: MutationRecord): boolean => {
+function isMutationProgrammaticallyAddedByChromeExtension(mutation: MutationRecord): boolean {
   if (mutation.type !== 'childList') {
     return false;
   }
@@ -125,13 +125,13 @@ const isMutationProgrammaticallyAddedByChromeExtension = (mutation: MutationReco
 
       return element.querySelectorAll(`[${PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME}]`).length > 0;
     });
-};
+}
 
-const setupMutationObserver = (
+function setupMutationObserver(
   codeBlockTrackingState: CodeBlockTrackingState,
   codeBlockProcessingObserver: IntersectionObserver,
   idToCodeTokenMap: IdToCodeTokenMap,
-) => {
+) {
   const mutationObserver = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       const codeBlock = findCodeBlockPartOfMutation(mutation);
@@ -168,7 +168,7 @@ const setupMutationObserver = (
   });
 
   return mutationObserver;
-};
+}
 
 const { codeBlockTrackingState, codeBlockProcessingObserver, idToCodeTokenMap } = setup();
 

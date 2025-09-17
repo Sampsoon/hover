@@ -18,11 +18,11 @@ type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
   };
 };
 
-const invokeOpenRouterClient = async (
+async function invokeOpenRouterClient(
   client: OpenAI,
   params: OpenRouterChatCompletionCreateParams,
   onChunk: (chunk: string) => void,
-) => {
+) {
   const response = await client.chat.completions.create({
     ...params,
     stream: true,
@@ -35,9 +35,9 @@ const invokeOpenRouterClient = async (
       onChunk(content);
     }
   }
-};
+}
 
-export const createOpenRouterClientInterface = (client: OpenAI, model: string) => {
+export function createOpenRouterClientInterface(client: OpenAI, model: string) {
   return async (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) => {
     const { prompt, schema } = llmParams;
 
@@ -74,4 +74,4 @@ export const createOpenRouterClientInterface = (client: OpenAI, model: string) =
 
     await invokeOpenRouterClient(client, params, onChunk);
   };
-};
+}

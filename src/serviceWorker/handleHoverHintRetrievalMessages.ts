@@ -26,7 +26,7 @@ async function retrieveHoverHintsStream(
     try {
       const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, onHoverHint);
 
-      await callLLM.OPEN_ROUTER(cleanedHtml, llmParams, onParsedElement);
+      await callLLM.OPEN_ROUTER('google/gemini-2.5-flash', cleanedHtml, llmParams, onParsedElement);
 
       return;
     } catch (error) {

@@ -10,6 +10,8 @@ async function retrieveHoverHintsStream(
   onHoverHint: (hoverHint: HoverHint) => void,
   onError: (errorMessage: string) => void,
 ) {
+  const startTime = performance.now();
+
   const MAX_RETRIES = 5;
   const RETRY_DELAY = 1000;
 
@@ -26,7 +28,10 @@ async function retrieveHoverHintsStream(
     try {
       const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, onHoverHint);
 
-      await callLLM.OPEN_ROUTER('google/gemini-2.5-flash', cleanedHtml, llmParams, onParsedElement);
+      await callLLM.OPEN_ROUTER('x-ai/grok-code-fast-1', cleanedHtml, llmParams, onParsedElement);
+
+      const latency = (performance.now() - startTime) / 1000;
+      console.log(`Annotation retrieval latency: ${latency.toFixed(2)}s`);
 
       return;
     } catch (error) {
@@ -35,6 +40,9 @@ async function retrieveHoverHintsStream(
       currentRetryDelay *= 2;
     }
   }
+
+  const latency = (performance.now() - startTime) / 1000;
+  console.log(`Annotation retrieval latency (failed): ${latency.toFixed(2)}s`);
 
   onError('Failed to retrieve annotations after 5 retries');
 }

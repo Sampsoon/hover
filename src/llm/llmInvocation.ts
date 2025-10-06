@@ -19,8 +19,11 @@ type OpenRouterChatCompletionCreateParams = ChatCompletionCreateParams & {
     sort?: string;
     require_parameters?: boolean;
   };
-  thinking?: {
-    type: 'enabled' | 'disabled';
+  reasoning?: {
+    effort?: 'high' | 'medium' | 'low';
+    max_tokens?: number;
+    exclude?: boolean;
+    enabled?: boolean;
   };
 };
 
@@ -55,8 +58,8 @@ export async function callLLMViaOpenRouter(
       sort: 'throughput',
       require_parameters: true,
     },
-    thinking: {
-      type: 'disabled',
+    reasoning: {
+      exclude: true,
     },
     messages: [
       {

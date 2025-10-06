@@ -3,8 +3,11 @@ import {
   applyCodeTextStyle,
   applyPrimaryTextStyle,
   applySecondaryTextStyle,
+  applyBottomMarginStyle,
   applyTextContainerStyle,
-  setWidth,
+  applyTopMarginStyle,
+  applySemiBoldTextStyle,
+  MarginSize,
 } from './styles';
 import {
   HoverHintDocumentation,
@@ -27,10 +30,12 @@ function sanitizeHtml(value: string) {
 function renderSignatureAsHtml(signature: string) {
   const sanitizedSignature = sanitizeHtml(signature);
 
-  const signatureElement = document.createElement('span');
+  const signatureElement = document.createElement('div');
 
   applyCodeTextStyle(signatureElement.style);
   applyCodeContainerStyle(signatureElement.style);
+  applyTopMarginStyle(signatureElement.style);
+  applyBottomMarginStyle(signatureElement.style, MarginSize.LARGE);
 
   signatureElement.innerHTML = sanitizedSignature;
 
@@ -41,8 +46,17 @@ function renderParamDocStringAsHtml(docString: ParamDocString) {
   const name = sanitizeHtml(docString.name);
   const documentation = sanitizeHtml(docString.documentation);
   const div = document.createElement('div');
+
   applyPrimaryTextStyle(div.style);
-  div.innerHTML = `@Param ${name}: ${documentation}`;
+  applyBottomMarginStyle(div.style);
+
+  const nameSpan = document.createElement('span');
+  applySemiBoldTextStyle(nameSpan.style);
+  nameSpan.textContent = name;
+
+  div.innerHTML = `<i>@Param</i> `;
+  div.appendChild(nameSpan);
+  div.innerHTML += ` — ${documentation}`;
   return div.outerHTML;
 }
 
@@ -50,7 +64,8 @@ function renderReturnDocStringAsHtml(docString: ReturnDocString) {
   const documentation = sanitizeHtml(docString.documentation);
   const div = document.createElement('div');
   applyPrimaryTextStyle(div.style);
-  div.innerHTML = `@Return: ${documentation}`;
+  applyBottomMarginStyle(div.style);
+  div.innerHTML = `<i>@Return</i> — ${documentation}`;
   return div.outerHTML;
 }
 
@@ -74,8 +89,10 @@ function renderFunctionDocumentationTextAsHtml(documentation: string) {
 
   applyPrimaryTextStyle(documentationElement.style);
   applyTextContainerStyle(documentationElement.style);
+  applyBottomMarginStyle(documentationElement.style);
 
   documentationElement.innerHTML = sanitizedDocumentation;
+
   return documentationElement;
 }
 
@@ -87,13 +104,11 @@ function renderFunctionDocumentationAsHtml(documentation: FunctionDocumentation)
 
   if (documentation.docString) {
     const docStringElement = renderDocStringAsHtml(documentation.docString);
-    setWidth(docStringElement, signatureElement.offsetWidth);
     hoverHintElement.appendChild(docStringElement);
   }
 
   if (documentation.documentation) {
     const documentationElement = renderFunctionDocumentationTextAsHtml(documentation.documentation);
-    setWidth(documentationElement, signatureElement.offsetWidth);
     hoverHintElement.appendChild(documentationElement);
   }
 

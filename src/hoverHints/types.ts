@@ -8,18 +8,14 @@ const TOKEN_TYPES = {
 } as const;
 
 const returnDocStringSchema = z.object({
-  documentation: z.string().describe(`
-    The documentation for the return value of the function.
-    `),
+  documentation: z.string().describe(`Documentation for the function return value.`),
 });
 
 export type ReturnDocString = z.infer<typeof returnDocStringSchema>;
 
 const paramDocStringSchema = z.object({
-  name: z.string().describe('The name of the argument'),
-  documentation: z.string().describe(`
-    The documentation for the argument to the function.
-    `),
+  name: z.string().describe(`Argument name.`),
+  documentation: z.string().describe(`Documentation for the function argument.`),
 });
 
 export type ParamDocString = z.infer<typeof paramDocStringSchema>;
@@ -32,49 +28,57 @@ const docStringSchema = z.object({
 export type DocString = z.infer<typeof docStringSchema>;
 
 const functionDocumentationSchema = z.object({
-  type: z.literal(TOKEN_TYPES.FUNCTION).describe('Designates the documentation as function documentation'),
-  functionSignature: z
-    .string()
-    .describe('The function signature. This should cover function return type and types for the arguments'),
+  type: z.literal(TOKEN_TYPES.FUNCTION).describe(`Marks this as function documentation.`),
+  functionSignature: z.string().describe(`Function signature including return type and argument types.`),
   docString: docStringSchema.optional().describe(
-    `Documentation for the function signature.
-      This should also include the return values when the function returns something.
-      Never include a subset of the function signature, only the full signature or none.
-      All documentation should be short and concise. Only include this if the information is not obvious to the user.
-      Please include any nuances of the parameter, such it's inclusive or exclusive, mutated, etc so that nothing is ambiguous.
-      Please do not include documentation that is redundant with with other documentation for the function.
-      `,
+    `Documentation for the function signature including return values when the function returns something.
+    Never include a subset of the signature, only the full signature or none.
+    Be short and concise. Only include if not obvious to the user.
+    Include parameter nuances (inclusive/exclusive, mutated, etc.) to avoid ambiguity.
+    Do not duplicate other function documentation.
+    Constructors are functions, not objects.`,
   ),
-  documentation: z.string().optional()
-    .describe(`An explanations of the nuances of how the function is used and it's expected behavior.
-      This should be between 1 and 15 lines.
-      It should be a short summary of what you would typically find online.
-      It should be concise and to the point.
-      Feel free to add examples of how the function is used, but do not become overly verbose.
-      Only include this if the information is not obvious to the user.`),
+  documentation: z
+    .string()
+    .optional()
+    .describe(
+      `Explanation of how the function is used and its expected behavior.
+    Should be 1-15 lines: a concise summary of what you would find online.
+    May include usage examples but avoid verbosity.
+    Only include if not obvious to the user.`,
+    ),
 });
 
 export type FunctionDocumentation = z.infer<typeof functionDocumentationSchema>;
 
 const propertyDocStringSchema = z.object({
-  name: z.string().describe('The name of the property'),
-  documentation: z.string().describe('The documentation for the property'),
+  name: z.string().describe(`Property name.`),
+  documentation: z.string().describe(`Documentation for the property.`),
 });
 
 export type PropertyDocString = z.infer<typeof propertyDocStringSchema>;
 
 const objectDocumentationSchema = z.object({
-  type: z
-    .literal(TOKEN_TYPES.OBJECT)
-    .describe('Designates the documentation as object documentation. An object is anything that has fields.'),
+  type: z.literal(TOKEN_TYPES.OBJECT).describe(
+    `Marks this as object documentation.
+    An object is anything with fields that has been instantiated or is being declared. This includes classes, structs, objects, etc.
+    Constructors count as functions, not objects.`,
+  ),
   docInHtml: z.string(),
-  properties: z.array(propertyDocStringSchema).optional().describe('The properties / fields on the object'),
+  properties: z.array(propertyDocStringSchema).optional().describe(`Properties/fields on the object.`),
 });
 
 export type ObjectDocumentation = z.infer<typeof objectDocumentationSchema>;
 
 const variableDocumentationSchema = z.object({
-  type: z.literal(TOKEN_TYPES.VARIABLE),
+  type: z.literal(TOKEN_TYPES.VARIABLE).describe(
+    `Marks this as variable documentation.
+    Only use for data containers (arrays, sets, maps, variables, properties, etc.) whose use is not obvious to the user.
+    When in doubt, do not include variable documentation.
+    Never document variables where the name makes the use obvious. Example of what NOT to do: var id = 1 // The id of the object.
+    Be consistent. If you generate documentation for a variable, make sure to generate documentation for other variables of similar ambiguity.
+    For example, if you generate documentation for one property, generate it for the rest of the properties if they are similar ambiguity.`,
+  ),
   docInHtml: z.string(),
 });
 
@@ -100,7 +104,9 @@ export function isVariableDocumentation(documentation: HoverHintDocumentation): 
 
 export const hoverHintSchema = z.object({
   ids: z.array(z.string()),
-  documentation: hoverHintDocumentation,
+  documentation: hoverHintDocumentation.describe(
+    `Documentation for the element. ONLY INCLUDE DOCUMENTATION THAT WOULD BE USEFUL TO THE USER IN UNDERSTANDING THE CODE!`,
+  ),
 });
 
 export const hoverHintListSchema = z.object({

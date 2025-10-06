@@ -60,6 +60,8 @@ export async function callLLMViaOpenRouter(
     },
     reasoning: {
       exclude: true,
+      effort: 'low',
+      enabled: false,
     },
     messages: [
       {
@@ -75,7 +77,7 @@ export async function callLLMViaOpenRouter(
       type: 'json_schema',
       json_schema: {
         strict: true,
-        name: 'extracted_json_data',
+        name: '',
         schema: jsonSchema,
       },
     },

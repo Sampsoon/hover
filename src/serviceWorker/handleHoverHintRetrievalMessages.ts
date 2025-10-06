@@ -28,7 +28,7 @@ async function retrieveHoverHintsStream(
     try {
       const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, onHoverHint);
 
-      await callLLM.OPEN_ROUTER('x-ai/grok-code-fast-1', cleanedHtml, llmParams, onParsedElement);
+      await callLLM.OPEN_ROUTER('x-ai/grok-4-fast', cleanedHtml, llmParams, onParsedElement);
 
       const latency = (performance.now() - startTime) / 1000;
       console.log(`Annotation retrieval latency: ${latency.toFixed(2)}s`);

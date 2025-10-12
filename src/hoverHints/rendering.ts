@@ -81,7 +81,7 @@ function renderDocStringAsHtml(command: DocStringCommand, documentation: string,
     return div.outerHTML;
   }
 
-  div.innerHTML = ` <i>${command}</i> ${sanitizedDocumentation}`;
+  div.innerHTML = ` <i>${command}</i> — ${sanitizedDocumentation}`;
   return div.outerHTML;
 }
 

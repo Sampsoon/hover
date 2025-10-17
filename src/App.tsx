@@ -1,13 +1,31 @@
+import { useState } from 'react';
+import { Header } from './components/Header';
+import { ApiConfiguration } from './components/ApiConfiguration';
+import { SettingsMenu } from './components/SettingsMenu';
+import { WebsiteList } from './components/WebsiteList';
+import { ContactSection } from './components/ContactSection';
+
 function App() {
+  const [selectedTab, setSelectedTab] = useState<'api' | 'websites' | 'contact'>('api');
+
   return (
-    <>
-      <div>hello Vibey LSP app</div>
-      <input
-        type="text"
-        placeholder="Enter API Key"
-        className="w-full mt-4 px-3 py-2 text-sm border border-border rounded bg-input-bg text-inherit focus:outline-none focus:border-border-focus"
-      />
-    </>
+    <div
+      style={{
+        width: '600px',
+        minHeight: '500px',
+        padding: '20px 16px',
+      }}
+    >
+      <Header />
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <SettingsMenu selected={selectedTab} onSelect={setSelectedTab} />
+        <div style={{ flex: 1 }}>
+          {selectedTab === 'api' && <ApiConfiguration />}
+          {selectedTab === 'websites' && <WebsiteList />}
+          {selectedTab === 'contact' && <ContactSection />}
+        </div>
+      </div>
+    </div>
   );
 }
 

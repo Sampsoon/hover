@@ -8,7 +8,7 @@ interface InfoBoxProps {
 const styles = {
   container: {
     marginBottom: '16px',
-    padding: '0',
+    padding: '0 24px',
   },
   text: {
     ...typography.smallLabel,

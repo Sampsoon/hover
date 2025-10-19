@@ -22,7 +22,7 @@ const styles = {
     borderRadius: '8px',
     boxShadow: 'var(--shadow-md)',
     transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    transform: `translateY(${(index * 58).toString()}px)`,
+    transform: `translateY(calc(${(index * 62).toString()}px + 2px))`,
     zIndex: 0,
     pointerEvents: 'none' as const,
   }),
@@ -30,7 +30,7 @@ const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    padding: '14px 12px',
+    padding: '16px 14px',
     borderRadius: '8px',
     backgroundColor: 'transparent',
     transition: 'color 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -40,6 +40,8 @@ const styles = {
     color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
     position: 'relative' as const,
     zIndex: 1,
+    overflow: 'hidden' as const,
+    whiteSpace: 'nowrap' as const,
   }),
 };
 
@@ -118,7 +120,12 @@ export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
       <TabButton tab="api" selected={selected} onSelect={onSelect} title="API Key">
         <KeyIcon />
       </TabButton>
-      <TabButton tab="websites" selected={selected} onSelect={onSelect} title="Site Filtering">
+      <TabButton
+        tab="websites"
+        selected={selected}
+        onSelect={onSelect}
+        title="Block all websites & Allow run on all websites"
+      >
         <GlobeIcon />
       </TabButton>
       <TabButton tab="contact" selected={selected} onSelect={onSelect} title="Contact">

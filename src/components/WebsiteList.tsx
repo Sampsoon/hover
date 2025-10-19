@@ -5,6 +5,16 @@ import { ToggleSwitch, InfoBox, Input, Button } from './ui';
 type FilterMode = 'block-all' | 'allow-all';
 
 const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '12px',
+    width: '100%',
+    maxWidth: '600px',
+    padding: '0 8px',
+    boxSizing: 'border-box' as const,
+    overflow: 'hidden' as const,
+  },
   section: { marginBottom: '16px' },
   inputRow: {
     display: 'flex',
@@ -17,6 +27,15 @@ const styles = {
     flexDirection: 'column' as const,
     gap: '8px',
     width: '100%',
+    maxHeight: '400px',
+    overflowY: 'auto' as const,
+    overflowX: 'hidden' as const,
+    padding: '8px',
+    border: '1.5px solid var(--border-color)',
+    borderRadius: '8px',
+    backgroundColor: 'var(--card-bg-inactive)',
+    boxShadow: 'var(--shadow-sm)',
+    boxSizing: 'border-box' as const,
   },
   listItem: {
     display: 'flex',
@@ -60,15 +79,13 @@ export function WebsiteList() {
       : 'Allow all sites except those matching these patterns';
 
   return (
-    <div>
-      <h2 style={{ ...typography.label, marginBottom: '16px' }}>Site Filtering</h2>
-
+    <div style={styles.container}>
       <div style={styles.section}>
         <ToggleSwitch
           value={filterMode}
           onChange={setFilterMode}
           options={['allow-all', 'block-all']}
-          labels={['Allow All', 'Block All']}
+          labels={['Allow run on all websites', 'Block all websites']}
         />
       </div>
 

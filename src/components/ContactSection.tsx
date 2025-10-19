@@ -1,5 +1,3 @@
-import { typography } from '../config/theme';
-
 const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 const LINKEDIN_URL = 'https://www.linkedin.com/in/sampsonj/';
 
@@ -65,7 +63,6 @@ function LinkedInIcon() {
 export function ContactSection() {
   return (
     <div>
-      <h2 style={{ ...typography.label, marginBottom: '16px' }}>Contact Us</h2>
       <div style={styles.container}>
         <SocialLink href={GITHUB_URL}>
           <GitHubIcon />

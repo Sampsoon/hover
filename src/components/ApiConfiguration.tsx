@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { typography } from '../config/theme';
 import { RadioOption } from './RadioOption';
 import { FormField } from './FormField';
 
@@ -14,8 +13,6 @@ export function ApiConfiguration() {
 
   return (
     <div>
-      <h2 style={{ ...typography.label, marginBottom: '12px' }}>API Configuration</h2>
-
       <RadioOption
         id="openrouter"
         label="OpenRouter"
@@ -25,10 +22,10 @@ export function ApiConfiguration() {
         }}
       >
         <FormField
-          label="OpenRouter API key"
+          label="API key"
           type="password"
           placeholder="sk-or-v1-..."
-          linkText="learn how"
+          linkText="get one"
           linkHref="https://openrouter.ai/keys"
           value={openrouterKey}
           onChange={setOpenrouterKey}

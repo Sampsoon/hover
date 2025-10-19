@@ -29,26 +29,26 @@ export const typography = {
   heading: {
     fontFamily: 'Roboto',
     fontWeight: 400,
-    fontSize: '22px',
+    fontSize: '28px',
   },
   labelBold: {
     fontFamily: 'Roboto',
     fontWeight: 700,
-    fontSize: '17px',
+    fontSize: '16px',
   },
   label: {
     fontFamily: 'Roboto',
     fontWeight: 400,
-    fontSize: '17px',
+    fontSize: '16px',
   },
   body: {
     fontFamily: 'Roboto',
     fontWeight: 400,
-    fontSize: '13px',
+    fontSize: '16px',
   },
   smallLabel: {
     fontFamily: 'Roboto',
     fontWeight: 300,
-    fontSize: '13px',
+    fontSize: '14px',
   },
 };

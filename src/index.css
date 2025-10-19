@@ -18,10 +18,10 @@
   --success-color: #23cb8e;
   --alert-color: #f05177;
   
-  --shadow-sm: 0 1px 2px 0 rgba(47, 43, 72, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.08), 0 2px 4px -1px rgba(47, 43, 72, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(47, 43, 72, 0.1), 0 4px 6px -2px rgba(47, 43, 72, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(47, 43, 72, 0.12), 0 10px 10px -5px rgba(47, 43, 72, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(47, 43, 72, 0.169);
+  --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.27), 0 2px 4px -1px rgba(47, 43, 72, 0.135);
+  --shadow-lg: 0 10px 15px -3px rgba(47, 43, 72, 0.338), 0 4px 6px -2px rgba(47, 43, 72, 0.169);
+  --shadow-xl: 0 20px 25px -5px rgba(47, 43, 72, 0.405), 0 10px 10px -5px rgba(47, 43, 72, 0.135);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -42,10 +42,10 @@
     --success-color: #4ee9b1;
     --alert-color: #ff577f;
     
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px 0 rgba(47, 43, 72, 0.169);
+    --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.27), 0 2px 4px -1px rgba(47, 43, 72, 0.135);
+    --shadow-lg: 0 10px 15px -3px rgba(47, 43, 72, 0.338), 0 4px 6px -2px rgba(47, 43, 72, 0.169);
+    --shadow-xl: 0 20px 25px -5px rgba(47, 43, 72, 0.405), 0 10px 10px -5px rgba(47, 43, 72, 0.135);
   }
 }
 

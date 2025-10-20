@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { typography } from '../config/theme';
-import { ToggleSwitch, InfoBox, Input, Button } from './ui';
+import { ToggleSwitch, Input, Button } from './ui';
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');
@@ -40,10 +40,10 @@ export function WebsiteList() {
     setEditValue('');
   };
 
-  const description =
+  const emptyStateMessage =
     filterMode === 'block-all'
-      ? 'Block all sites except those matching these regexes'
-      : 'Allow all sites except those matching these regexes';
+      ? 'Add regex patterns to allow specific sites while blocking all others'
+      : 'Add regex patterns to block specific sites while allowing all others';
 
   const containerStyle = {
     display: 'flex',
@@ -142,8 +142,6 @@ export function WebsiteList() {
         />
       </div>
 
-      <InfoBox>{description}</InfoBox>
-
       <div style={tableContainerStyle} className="stable-scrollbar">
         <div style={tableHeaderStyle}>
           <Input value={newRegex} onChange={setNewRegex} onSubmit={addRegex} placeholder="example\.com|test\.org" />
@@ -212,7 +210,7 @@ export function WebsiteList() {
             ))}
           </div>
         ) : (
-          <div style={emptyStateStyle}>No regexes added yet</div>
+          <div style={emptyStateStyle}>{emptyStateMessage}</div>
         )}
       </div>
     </div>

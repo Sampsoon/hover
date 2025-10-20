@@ -7,12 +7,16 @@ interface ToggleSwitchProps<T extends string> {
   labels: readonly [string, string];
 }
 
+const PADDING_PX = 8;
+const H_GAP_PX = 12; // horizontal inner gutter inside each half
+const V_GAP_PX = 6; // vertical inner gutter
+
 const containerStyle = {
   display: 'flex' as const,
   backgroundColor: 'var(--card-bg-inactive)',
   border: '1.5px solid var(--border-color)',
   borderRadius: '8px',
-  padding: '3px',
+  padding: `${PADDING_PX.toString()}px`,
   position: 'relative' as const,
   boxShadow: 'var(--shadow-sm)',
   width: '100%',
@@ -20,20 +24,20 @@ const containerStyle = {
 
 const sliderStyle = (isFirstSelected: boolean) => ({
   position: 'absolute' as const,
-  width: 'calc(50% - 3px)',
-  height: 'calc(100% - 6px)',
+  // Ensure symmetrical spacing: inner gutters only, container padding handled by parent
+  width: `calc(50% - ${(H_GAP_PX * 2).toString()}px)`,
+  height: `calc(100% - ${(V_GAP_PX * 2).toString()}px)`,
   backgroundColor: 'transparent',
   borderRadius: '6px',
-  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  transform: isFirstSelected ? 'translateX(0)' : 'translateX(100%)',
-  top: '3px',
-  left: '3px',
+  transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+  top: `${V_GAP_PX.toString()}px`,
+  left: isFirstSelected ? `${H_GAP_PX.toString()}px` : `calc(50% + ${H_GAP_PX.toString()}px)`,
   boxShadow: 'var(--shadow-md)',
 });
 
 const buttonStyle = (isSelected: boolean) => ({
   ...typography.smallLabel,
-  padding: '8px 24px',
+  padding: '12px 24px',
   border: 'none',
   background: 'none',
   cursor: 'pointer',

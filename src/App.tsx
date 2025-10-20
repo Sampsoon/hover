@@ -8,9 +8,18 @@ function App() {
   const [selectedTab, setSelectedTab] = useState<'api' | 'websites' | 'contact'>('api');
 
   return (
-    <div style={{ width: '600px', minHeight: '500px', padding: '20px 16px', display: 'flex', gap: '16px' }}>
+    <div
+      style={{
+        width: '600px',
+        height: '500px',
+        padding: '20px 16px',
+        display: 'flex',
+        gap: '16px',
+        overflow: 'hidden',
+      }}
+    >
       <SettingsMenu selected={selectedTab} onSelect={setSelectedTab} />
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {selectedTab === 'api' && <ApiConfiguration />}
         {selectedTab === 'websites' && <WebsiteList />}
         {selectedTab === 'contact' && <ContactSection />}

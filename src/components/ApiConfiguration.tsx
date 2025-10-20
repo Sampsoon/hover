@@ -23,7 +23,7 @@ export function ApiConfiguration() {
           label="API key"
           type="password"
           placeholder="sk-or-v1-..."
-          linkText="get one"
+          linkText="click here to get one"
           linkHref="https://openrouter.ai/keys"
           value={openrouterKey}
           onChange={setOpenrouterKey}

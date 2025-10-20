@@ -3,20 +3,22 @@
 
 :root {
   color-scheme: light;
-  --bg-primary: #fffaf6;
-  --text-primary: #2f2b48;
-  --text-secondary: #b7b7b7;
-  --text-disabled: #9e9e9e;
-  --border-color: #d4cfc9;
-  --border-focus: #8089da;
+  /* Light theme colors from Figma tokens */
+  --bg-primary: #fffefc;
+  --text-primary: #1f1c33;
+  --text-secondary: #757575;
+  --text-disabled: #9a9a9a;
+  --border-color: #e0d3c5;
   --input-bg: #ffffff;
-  --card-bg-active: #ffffff;
-  --card-bg-inactive: #faf8f6;
-  --primary-color: #8089da;
-  --secondary-color: #8089da;
-  --link-color: #8089da;
-  --success-color: #23cb8e;
-  --alert-color: #f05177;
+  --card-bg-active: #fffefc;
+  --card-bg-inactive: #fffefc;
+  --card-bg-hover: #f5f0eb;
+  --primary-color: #6b75c9;
+  --link-color: #6b75c9;
+  --success-color: #1fb67e;
+  --warning-color: #e88888;
+  --alert-color: #e03d63;
+  --invite-color: #5bb3d8;
   
   --shadow-sm: 0 1px 2px 0 rgba(47, 43, 72, 0.169);
   --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.27), 0 2px 4px -1px rgba(47, 43, 72, 0.135);
@@ -27,20 +29,22 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --bg-primary: #1f1d29;
+    /* Dark theme colors from Figma tokens */
+    --bg-primary: #2d2935;
     --text-primary: #ffeeed;
-    --text-secondary: #a8a8a8;
-    --text-disabled: #757575;
-    --border-color: #2d2b37;
-    --border-focus: #f19c8a;
-    --input-bg: #2a2833;
-    --card-bg-active: #2a2833;
-    --card-bg-inactive: #24222e;
-    --primary-color: #f19c8a;
-    --secondary-color: #f19c8a;
-    --link-color: #f19c8a;
-    --success-color: #4ee9b1;
-    --alert-color: #ff577f;
+    --text-secondary: #d8d8d8;
+    --text-disabled: #b5b5b5;
+    --border-color: #5a5665;
+    --input-bg: #353240;
+    --card-bg-active: #2d2935;
+    --card-bg-inactive: #2d2935;
+    --card-bg-hover: #3a3644;
+    --primary-color: #f0d4c2;
+    --link-color: #f0d4c2;
+    --success-color: #5eedbd;
+    --warning-color: #8860cc;
+    --alert-color: #ff6b91;
+    --invite-color: #5dd4ff;
     
     --shadow-sm: 0 1px 2px 0 rgba(47, 43, 72, 0.169);
     --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.27), 0 2px 4px -1px rgba(47, 43, 72, 0.135);
@@ -61,4 +65,33 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 2px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Reserve space for scrollbar to avoid layout shift when it appears */
+.stable-scrollbar {
+  scrollbar-gutter: stable;
 }

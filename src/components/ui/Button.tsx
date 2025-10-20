@@ -13,6 +13,8 @@ const baseStyle = {
   borderRadius: '6px',
   cursor: 'pointer',
   fontWeight: 500,
+  transition: 'transform 0.1s ease, box-shadow 0.1s ease',
+  transform: 'scale(1)',
 };
 
 const variantStyles = {
@@ -45,8 +47,39 @@ const variantStyles = {
 };
 
 export function Button({ onClick, children, variant = 'primary' }: ButtonProps) {
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'scale(0.95)';
+    if (variant === 'success' || variant === 'ghost') {
+      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'scale(1)';
+    if (variant === 'success' || variant === 'ghost') {
+      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+    } else {
+      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+    }
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.style.transform = 'scale(1)';
+    if (variant === 'success' || variant === 'ghost') {
+      e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+    } else {
+      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+    }
+  };
+
   return (
-    <button onClick={onClick} style={{ ...baseStyle, ...variantStyles[variant] }}>
+    <button
+      onClick={onClick}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      style={{ ...baseStyle, ...variantStyles[variant] }}
+    >
       {children}
     </button>
   );

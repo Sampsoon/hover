@@ -4,24 +4,24 @@ import { ToggleSwitch, InfoBox, Input, Button } from './ui';
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');
-  const [patterns, setPatterns] = useState<string[]>([]);
-  const [newPattern, setNewPattern] = useState('');
+  const [regexes, setRegexes] = useState<string[]>([]);
+  const [newRegex, setNewRegex] = useState('');
 
-  const addPattern = () => {
-    if (newPattern.trim()) {
-      setPatterns([...patterns, newPattern.trim()]);
-      setNewPattern('');
+  const addRegex = () => {
+    if (newRegex.trim()) {
+      setRegexes([newRegex.trim(), ...regexes]);
+      setNewRegex('');
     }
   };
 
-  const removePattern = (index: number) => {
-    setPatterns(patterns.filter((_, i) => i !== index));
+  const removeRegex = (index: number) => {
+    setRegexes(regexes.filter((_, i) => i !== index));
   };
 
   const description =
     filterMode === 'block-all'
-      ? 'Block all sites except those matching these patterns'
-      : 'Allow all sites except those matching these patterns';
+      ? 'Block all sites except those matching these regexes'
+      : 'Allow all sites except those matching these regexes';
 
   const containerStyle = {
     display: 'flex',
@@ -109,27 +109,22 @@ export function WebsiteList() {
 
       <div style={tableContainerStyle} className="stable-scrollbar">
         <div style={tableHeaderStyle}>
-          <Input
-            value={newPattern}
-            onChange={setNewPattern}
-            onSubmit={addPattern}
-            placeholder="example\.com|test\.org"
-          />
-          <Button variant="success" onClick={addPattern}>
+          <Input value={newRegex} onChange={setNewRegex} onSubmit={addRegex} placeholder="example\.com|test\.org" />
+          <Button variant="success" onClick={addRegex}>
             <span style={{ fontSize: '1.5em' }}>✓</span>
           </Button>
         </div>
-        {patterns.length > 0 ? (
+        {regexes.length > 0 ? (
           <div style={tableBodyStyle}>
-            {patterns.map((pattern, index) => (
+            {regexes.map((regex, index) => (
               <div key={index} style={tableRowStyle}>
-                <div style={cellStyle} title={pattern}>
-                  {pattern}
+                <div style={cellStyle} title={regex}>
+                  {regex}
                 </div>
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    removePattern(index);
+                    removeRegex(index);
                   }}
                 >
                   <span style={{ fontSize: '1.5em', color: 'var(--alert-color)', fontWeight: 'bold' }}>✕</span>
@@ -138,7 +133,7 @@ export function WebsiteList() {
             ))}
           </div>
         ) : (
-          <div style={emptyStateStyle}>No patterns added yet</div>
+          <div style={emptyStateStyle}>No regexes added yet</div>
         )}
       </div>
     </div>

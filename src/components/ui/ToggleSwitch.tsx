@@ -37,7 +37,7 @@ const sliderStyle = (isFirstSelected: boolean) => ({
 
 const buttonStyle = (isSelected: boolean) => ({
   ...typography.smallLabel,
-  padding: '12px 24px',
+  padding: '6px 12px',
   border: 'none',
   background: 'none',
   cursor: 'pointer',

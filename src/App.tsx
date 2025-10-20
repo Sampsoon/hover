@@ -10,8 +10,8 @@ function App() {
   return (
     <div
       style={{
-        width: '600px',
-        height: '500px',
+        width: '800px',
+        height: '600px',
         padding: '20px 16px',
         display: 'flex',
         gap: '16px',

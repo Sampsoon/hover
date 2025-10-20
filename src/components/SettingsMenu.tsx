@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
+
 type Tab = 'api' | 'websites' | 'contact';
 
 interface SettingsMenuProps {
@@ -23,23 +25,27 @@ const tabs: { id: Tab; title: string; icon: string }[] = [
   },
 ];
 
-const containerStyle = {
+const containerStyle = (isDragging: boolean) => ({
   display: 'flex',
   flexDirection: 'column' as const,
   gap: '6px',
   paddingRight: '16px',
   borderRight: '1.5px solid var(--border-color)',
   position: 'relative' as const,
-};
+  cursor: isDragging ? 'grabbing' : 'grab',
+  userSelect: 'none' as const,
+});
 
-const sliderStyle = (index: number) => ({
+const sliderStyle = (index: number, isDragging: boolean) => ({
   position: 'absolute' as const,
   width: 'calc(100% - 16px)',
   height: '52px',
   backgroundColor: 'var(--card-bg-inactive)',
   borderRadius: '8px',
   boxShadow: 'var(--shadow-md)',
-  transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  transition: isDragging
+    ? 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   transform: `translateY(${(index * 62 + 2).toString()}px)`,
   zIndex: 0,
   pointerEvents: 'none' as const,
@@ -58,15 +64,66 @@ const buttonStyle = (isSelected: boolean) => ({
 
 export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
   const selectedIndex = tabs.findIndex((tab) => tab.id === selected);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = () => {
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging || !containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const y = e.clientY - rect.top;
+      const itemHeight = 62; // height (52px) + gap (6px) + padding
+
+      // Determine which tab based on vertical position
+      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(y / itemHeight)));
+      const targetTab = tabs[targetIndex];
+
+      if (targetTab.id !== selected) {
+        onSelect(targetTab.id);
+      }
+    },
+    [isDragging, selected, onSelect],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Add/remove global mouse event listeners
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      handleMouseMove(e);
+    };
+    const handleGlobalMouseUp = () => {
+      handleMouseUp();
+    };
+
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div style={containerStyle}>
-      <div style={sliderStyle(selectedIndex)} />
+    <div ref={containerRef} style={containerStyle(isDragging)} onMouseDown={handleMouseDown}>
+      <div style={sliderStyle(selectedIndex, isDragging)} />
       {tabs.map(({ id, title, icon }) => (
         <button
           key={id}
           onClick={() => {
-            onSelect(id);
+            if (!isDragging) {
+              onSelect(id);
+            }
           }}
           style={buttonStyle(selected === id)}
           title={title}

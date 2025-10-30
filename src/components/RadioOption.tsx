@@ -23,18 +23,22 @@ const containerStyle = (selected: boolean) => ({
   WebkitBackdropFilter: selected ? 'saturate(110%) blur(2px)' : undefined,
   opacity: selected ? 1 : 0.5,
   cursor: 'pointer',
+  transition:
+    'background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease, backdrop-filter 0.15s ease',
 });
 
 const headerStyle = (selected: boolean) => ({
   display: 'flex',
   alignItems: 'center',
   marginBottom: selected ? '12px' : '0',
+  transition: 'margin-bottom 0.15s ease',
 });
 
 const labelStyle = (selected: boolean) => ({
   ...typography.body,
   cursor: 'pointer',
   color: selected ? 'var(--text-primary)' : 'var(--text-disabled)',
+  transition: 'color 0.15s ease',
 });
 
 export function RadioOption({ id, label, selected, onSelect, children }: RadioOptionProps) {
@@ -52,6 +56,8 @@ export function RadioOption({ id, label, selected, onSelect, children }: RadioOp
             marginRight: '10px',
             cursor: 'pointer',
             accentColor: 'var(--primary-color)',
+            transform: selected ? 'scale(1.05)' : 'scale(1)',
+            transition: 'transform 0.12s ease',
           }}
         />
         <label htmlFor={id} style={labelStyle(selected)}>

@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { ApiConfiguration } from './components/ApiConfiguration';
-import { SettingsMenu } from './components/SettingsMenu';
-import { WebsiteList } from './components/WebsiteList';
-import { ContactSection } from './components/ContactSection';
+import { ApiConfiguration, SettingsMenu, WebsiteList, ContactSection } from './components';
 
 function App() {
   const [selectedTab, setSelectedTab] = useState<'api' | 'websites' | 'contact'>('api');

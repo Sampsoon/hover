@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { typography } from '../theme';
 
 interface ButtonProps {
   onClick: () => void;
@@ -9,11 +8,13 @@ interface ButtonProps {
 }
 
 const baseStyle = {
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   border: 'none',
   borderRadius: '6px',
   cursor: 'pointer',
-  fontWeight: 500,
   transition: 'transform 0.1s ease, box-shadow 0.1s ease, color 0.15s ease',
   transform: 'scale(1)',
 };

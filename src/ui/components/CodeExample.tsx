@@ -32,8 +32,8 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
           borderRadius: '8px',
           border: '1px solid var(--border-color)',
           overflow: 'auto',
-          fontSize: '12px',
-          lineHeight: '1.4',
+          fontSize: 'var(--font-code-size)',
+          lineHeight: 'var(--font-code-line-height)',
         }}
       >
         <code>

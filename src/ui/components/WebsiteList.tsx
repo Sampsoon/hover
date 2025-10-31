@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { typography } from '../theme';
 import { ToggleSwitch, Input, Button } from './';
 
 export function WebsiteList() {
@@ -100,8 +99,10 @@ export function WebsiteList() {
   };
 
   const cellStyle = {
-    ...typography.smallLabel,
     fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+    fontWeight: 'var(--font-small-label-weight)',
+    fontSize: 'var(--font-small-label-size)',
+    lineHeight: 'var(--font-small-label-line-height)',
     wordBreak: 'break-word' as const,
     minWidth: 0,
     overflow: 'hidden',
@@ -112,8 +113,10 @@ export function WebsiteList() {
   };
 
   const editInputStyle = {
-    ...typography.smallLabel,
     fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+    fontWeight: 'var(--font-small-label-weight)',
+    fontSize: 'var(--font-small-label-size)',
+    lineHeight: 'var(--font-small-label-line-height)',
     flex: 1,
     padding: '4px 8px',
     border: '1.5px solid var(--primary-color)',
@@ -127,7 +130,10 @@ export function WebsiteList() {
     padding: '32px 16px',
     textAlign: 'center' as const,
     color: 'var(--text-secondary)',
-    ...typography.body,
+    fontFamily: 'var(--font-body-family)',
+    fontWeight: 'var(--font-body-weight)',
+    fontSize: 'var(--font-body-size)',
+    lineHeight: 'var(--font-body-line-height)',
     fontStyle: 'italic',
   };
 

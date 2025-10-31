@@ -36,6 +36,20 @@
   --code-string: #A31515;
   --code-comment: #008000;
   --code-bg: #f5f5f5;
+
+  /* Typography */
+  --font-body-family: Roboto;
+  --font-body-weight: 400;
+  --font-body-size: 16px;
+  --font-body-line-height: 1.6;
+  
+  --font-small-label-family: Roboto;
+  --font-small-label-weight: 500;
+  --font-small-label-size: 15px;
+  --font-small-label-line-height: 1.5;
+
+  --font-code-size: 12px;
+  --font-code-line-height: 1.4;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -78,7 +92,10 @@
 }
 
 body {
-  font-family: Roboto, system-ui, sans-serif;
+  font-family: var(--font-body-family), system-ui, sans-serif;
+  font-weight: var(--font-body-weight);
+  font-size: var(--font-body-size);
+  line-height: var(--font-body-line-height);
   background-color: var(--bg-primary);
   color: var(--text-primary);
   margin: 0;

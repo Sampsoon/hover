@@ -43,9 +43,9 @@ const linkStyle = {
 };
 
 const labelStyle = {
-  fontFamily: 'Roboto',
-  fontSize: '15px',
-  fontWeight: 500,
+  fontFamily: 'var(--font-small-label-family)',
+  fontSize: 'var(--font-small-label-size)',
+  fontWeight: 'var(--font-small-label-weight)',
   color: 'var(--text-secondary)',
   textAlign: 'center' as const,
   marginTop: '8px',

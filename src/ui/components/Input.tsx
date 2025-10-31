@@ -1,5 +1,3 @@
-import { typography } from '../theme';
-
 interface InputProps {
   value: string;
   onChange: (value: string) => void;
@@ -9,7 +7,10 @@ interface InputProps {
 }
 
 const inputStyle = {
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   flex: 1,
   padding: '8px 12px',
   border: '1.5px solid var(--border-color)',

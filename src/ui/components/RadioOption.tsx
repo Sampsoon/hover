@@ -1,5 +1,4 @@
 import { ReactNode } from 'react';
-import { typography } from '../theme';
 
 interface RadioOptionProps {
   id: string;
@@ -35,7 +34,10 @@ const headerStyle = (selected: boolean) => ({
 });
 
 const labelStyle = (selected: boolean) => ({
-  ...typography.body,
+  fontFamily: 'var(--font-body-family)',
+  fontWeight: 'var(--font-body-weight)',
+  fontSize: 'var(--font-body-size)',
+  lineHeight: 'var(--font-body-line-height)',
   cursor: 'pointer',
   color: selected ? 'var(--text-primary)' : 'var(--text-disabled)',
   transition: 'color 0.15s ease',

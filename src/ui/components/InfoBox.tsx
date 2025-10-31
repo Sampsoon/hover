@@ -1,16 +1,16 @@
 import { ReactNode } from 'react';
-import { typography } from '../theme';
 
 interface InfoBoxProps {
   children: ReactNode;
 }
 
 const textStyle = {
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   margin: 0,
   color: 'var(--text-primary)',
-  lineHeight: '1.5',
-  fontWeight: 500,
 };
 
 export function InfoBox({ children }: InfoBoxProps) {

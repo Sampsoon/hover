@@ -1,5 +1,3 @@
-import { typography } from '../theme';
-
 interface FormFieldProps {
   label: string;
   type?: 'text' | 'password';
@@ -12,14 +10,20 @@ interface FormFieldProps {
 }
 
 const labelStyle = (disabled?: boolean) => ({
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   display: 'block',
   marginBottom: '6px',
   color: disabled ? 'var(--text-disabled)' : 'var(--text-primary)',
 });
 
 const inputStyle = (disabled?: boolean) => ({
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   width: '100%',
   padding: '8px 10px',
   border: disabled ? '1px solid var(--border-color)' : '1px solid rgba(107, 117, 201, 0.18)',

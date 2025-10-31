@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { typography } from '../theme';
 
 interface ToggleSwitchProps<T extends string> {
   value: T;
@@ -9,8 +8,8 @@ interface ToggleSwitchProps<T extends string> {
 }
 
 const PADDING_PX = 8;
-const H_GAP_PX = 12; // horizontal inner gutter inside each half
-const V_GAP_PX = 6; // vertical inner gutter
+const H_GAP_PX = 12;
+const V_GAP_PX = 6;
 
 const containerStyle = (isDragging: boolean) => ({
   display: 'flex' as const,
@@ -27,7 +26,6 @@ const containerStyle = (isDragging: boolean) => ({
 
 const sliderStyle = (isFirstSelected: boolean, isDragging: boolean) => ({
   position: 'absolute' as const,
-  // Ensure symmetrical spacing: inner gutters only, container padding handled by parent
   width: `calc(50% - ${(H_GAP_PX * 2).toString()}px)`,
   height: `calc(100% - ${(V_GAP_PX * 2).toString()}px)`,
   background: 'linear-gradient(180deg, rgba(107, 117, 201, 0.14) 0%, rgba(107, 117, 201, 0.10) 100%)',
@@ -46,7 +44,10 @@ const sliderStyle = (isFirstSelected: boolean, isDragging: boolean) => ({
 });
 
 const buttonStyle = (isSelected: boolean) => ({
-  ...typography.smallLabel,
+  fontFamily: 'var(--font-small-label-family)',
+  fontWeight: 'var(--font-small-label-weight)',
+  fontSize: 'var(--font-small-label-size)',
+  lineHeight: 'var(--font-small-label-line-height)',
   padding: '6px 12px',
   border: 'none',
   background: 'none',
@@ -54,7 +55,6 @@ const buttonStyle = (isSelected: boolean) => ({
   color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
   position: 'relative' as const,
   zIndex: 1,
-  fontWeight: 500,
   flex: 1,
 });
 

@@ -8,13 +8,13 @@
     "default_title": "Vibey LSP"
   },
   "background": {
-    "service_worker": "src/serviceWorker/serviceWorker.ts",
+    "service_worker": "src/colorFunctionality/serviceWorker/serviceWorker.ts",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/contentScripts/processCodeBlocks.ts"]
+      "js": ["src/colorFunctionality/contentScripts/processCodeBlocks.ts"]
     }
   ],
   "icons": {

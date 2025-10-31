@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { typography } from '../../config/theme';
+import { typography } from '../theme';
 
 interface ButtonProps {
   onClick: () => void;

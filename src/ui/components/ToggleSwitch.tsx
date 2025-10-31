@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { typography } from '../../config/theme';
+import { typography } from '../theme';
 
 interface ToggleSwitchProps<T extends string> {
   value: T;

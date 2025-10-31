@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from '../apiDefaults';
+import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from './apiDefaults';
 
 interface CodeExampleProps {
   apiKey: string;

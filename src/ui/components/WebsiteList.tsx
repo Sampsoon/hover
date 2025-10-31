@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { typography } from '../config/theme';
-import { ToggleSwitch, Input, Button } from './ui';
+import { typography } from '../theme';
+import { ToggleSwitch, Input, Button } from './';
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');

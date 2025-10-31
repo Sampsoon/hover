@@ -1,4 +1,4 @@
-import { typography } from '../../config/theme';
+import { typography } from '../theme';
 
 interface InputProps {
   value: string;

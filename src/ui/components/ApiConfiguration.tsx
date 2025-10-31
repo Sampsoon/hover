@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RadioOption } from './RadioOption';
 import { FormField } from './FormField';
-import { CodeExample } from './ui/CodeExample';
+import { CodeExample } from './CodeExample';
 import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from './apiDefaults';
 
 export function ApiConfiguration() {

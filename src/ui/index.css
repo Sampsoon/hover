@@ -1,98 +1,119 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
 :root {
   color-scheme: light;
-  /* Light theme colors from Figma tokens */
+  /* Base colors */
   --bg-primary: #fffefc;
   --text-primary: #1b1730;
   --text-secondary: #6a7082;
   --text-disabled: #9aa1af;
   --border-color: rgba(27, 23, 48, 0.12);
   --input-bg: #ffffff;
-  --card-bg-active: #fffefc;
-  --card-bg-inactive: #fffefc;
+  --code-bg: #f6f8ff;
+  --card-bg: #fffefc;
   --card-bg-hover: #f8f4f0;
+  
+  /* Theme colors */
   --primary-color: #5f6be1;
-  --link-color: #5f6be1;
   --success-color: #1fb67e;
   --warning-color: #e88888;
   --alert-color: #e03d63;
   --invite-color: #5bb3d8;
   
-  /* UI surfaces */
-  --code-panel-bg: #f6f8ff;
+  /* Shadow base and derived shadows */
+  --shadow-base: 47, 43, 72;
+  --shadow-sm: 0 1px 3px 0 rgba(var(--shadow-base), 0.08), 0 1px 2px 0 rgba(var(--shadow-base), 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(var(--shadow-base), 0.12), 0 2px 4px -1px rgba(var(--shadow-base), 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(var(--shadow-base), 0.15), 0 4px 6px -2px rgba(var(--shadow-base), 0.10);
+  --shadow-xl: 0 20px 25px -5px rgba(var(--shadow-base), 0.18), 0 10px 10px -5px rgba(var(--shadow-base), 0.08);
+
+  /* Primary color variations */
+  --primary-rgb: 95, 107, 225;
+  --slider-bg-start: rgba(var(--primary-rgb), 0.14);
+  --slider-bg-end: rgba(var(--primary-rgb), 0.10);
+  --slider-border: rgba(var(--primary-rgb), 0.35);
+  --slider-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.18), 0 2px 4px rgba(var(--shadow-base), 0.08);
+  --radio-selected-border: rgba(var(--primary-rgb), 0.22);
+  --radio-selected-bg-start: rgba(var(--primary-rgb), 0.08);
+  --radio-selected-bg-end: rgba(var(--primary-rgb), 0.04);
   
-  --shadow-sm: 0 1px 3px 0 rgba(47, 43, 72, 0.08), 0 1px 2px 0 rgba(47, 43, 72, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(47, 43, 72, 0.12), 0 2px 4px -1px rgba(47, 43, 72, 0.08);
-  --shadow-lg: 0 10px 15px -3px rgba(47, 43, 72, 0.15), 0 4px 6px -2px rgba(47, 43, 72, 0.10);
-  --shadow-xl: 0 20px 25px -5px rgba(47, 43, 72, 0.18), 0 10px 10px -5px rgba(47, 43, 72, 0.08);
-  
-  /* Syntax highlighting colors for code blocks */
+  /* Syntax highlighting */
   --code-keyword: #AF00DB;
   --code-variable: #001080;
   --code-operator: #000000;
   --code-class: #267F99;
   --code-string: #A31515;
   --code-comment: #008000;
-  --code-bg: #f5f5f5;
 
   /* Typography */
-  --font-body-family: Roboto;
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-monospace: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
   --font-body-weight: 400;
   --font-body-size: 16px;
   --font-body-line-height: 1.6;
   
-  --font-small-label-family: Roboto;
   --font-small-label-weight: 500;
   --font-small-label-size: 15px;
   --font-small-label-line-height: 1.5;
 
   --font-code-size: 12px;
   --font-code-line-height: 1.4;
+
+  /* Transitions */
+  --transition-dragging: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-normal: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    /* Dark theme colors from Figma tokens */
+    /* Base colors */
     --bg-primary: #2d2935;
     --text-primary: #e5e9f0;
     --text-secondary: #cfd6e4;
     --text-disabled: #b4bccb;
     --border-color: rgba(255, 255, 255, 0.18);
     --input-bg: #353240;
-    --card-bg-active: #2d2935;
-    --card-bg-inactive: #2d2935;
+    --code-bg: #23263a;
+    --card-bg: #2d2935;
     --card-bg-hover: #363240;
+    
+    /* Theme colors */
     --primary-color: #7e74ea;
-    --link-color: #7e74ea;
     --success-color: #5eedbd;
     --warning-color: #8860cc;
     --alert-color: #ff6b91;
     --invite-color: #5dd4ff;
     
-    /* UI surfaces (dark) */
-    --code-panel-bg: #23263a;
+    /* Shadow base and derived shadows */
+    --shadow-base: 0, 0, 0;
+    --shadow-sm: 0 1px 3px 0 rgba(var(--shadow-base), 0.35), 0 1px 2px 0 rgba(var(--shadow-base), 0.25);
+    --shadow-md: 0 4px 6px -1px rgba(var(--shadow-base), 0.45), 0 2px 4px -1px rgba(var(--shadow-base), 0.35);
+    --shadow-lg: 0 10px 15px -3px rgba(var(--shadow-base), 0.50), 0 4px 6px -2px rgba(var(--shadow-base), 0.35);
+    --shadow-xl: 0 20px 25px -5px rgba(var(--shadow-base), 0.55), 0 10px 10px -5px rgba(var(--shadow-base), 0.40);
+
+    /* Primary color variations */
+    --primary-rgb: 126, 116, 234;
+    --slider-bg-start: rgba(var(--primary-rgb), 0.20);
+    --slider-bg-end: rgba(var(--primary-rgb), 0.15);
+    --slider-border: rgba(var(--primary-rgb), 0.40);
+    --slider-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.25), 0 2px 4px rgba(var(--shadow-base), 0.20);
+    --radio-selected-border: rgba(var(--primary-rgb), 0.30);
+    --radio-selected-bg-start: rgba(var(--primary-rgb), 0.12);
+    --radio-selected-bg-end: rgba(var(--primary-rgb), 0.08);
     
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35), 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.45), 0 2px 4px -1px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.50), 0 4px 6px -2px rgba(0, 0, 0, 0.35);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.55), 0 10px 10px -5px rgba(0, 0, 0, 0.40);
-    
-    /* Syntax highlighting colors for code blocks (dark theme) */
+    /* Syntax highlighting */
     --code-keyword: #C586C0;
     --code-variable: #9CDCFE;
     --code-operator: #D4D4D4;
     --code-class: #4EC9B0;
     --code-string: #CE9178;
     --code-comment: #6A9955;
-    --code-bg: #1e1e1e;
   }
 }
 
 body {
-  font-family: var(--font-body-family), system-ui, sans-serif;
+  font-family: var(--font-family);
   font-weight: var(--font-body-weight);
   font-size: var(--font-body-size);
   line-height: var(--font-body-line-height);
@@ -100,50 +121,8 @@ body {
   color: var(--text-primary);
   margin: 0;
   padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
 }
-
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-  margin: 2px 0;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 6px;
-  border: 3px solid transparent;
-  background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
-  border: 3px solid transparent;
-  background-clip: padding-box;
-}
-
-/* Reserve space for scrollbar to avoid layout shift when it appears */
-.stable-scrollbar {
-  scrollbar-gutter: stable;
-}
-
-.table-row {
-  background-color: var(--card-bg-inactive);
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.table-body .table-row:nth-child(even) {
-  background-color: var(--card-bg-hover);
-}
-
-/* no hover highlight on rows */

@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { ToggleSwitch, Input, Button } from './';
+import { useState, useCallback } from 'react';
+import { ToggleSwitch } from './ToggleSwitch';
+import { Input } from './Input';
+import { IconButton } from './IconButton';
+import { bodyTextStyle } from './styles';
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<'block-all' | 'allow-all'>('allow-all');
@@ -8,23 +11,29 @@ export function WebsiteList() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const addRegex = () => {
+  const addRegex = useCallback(() => {
     if (newRegex.trim()) {
       setRegexes([newRegex.trim(), ...regexes]);
       setNewRegex('');
     }
-  };
+  }, [newRegex, regexes]);
 
-  const removeRegex = (index: number) => {
-    setRegexes(regexes.filter((_, i) => i !== index));
-  };
+  const removeRegex = useCallback(
+    (index: number) => {
+      setRegexes(regexes.filter((_, i) => i !== index));
+    },
+    [regexes],
+  );
 
-  const startEditing = (index: number) => {
-    setEditingIndex(index);
-    setEditValue(regexes[index]);
-  };
+  const startEditing = useCallback(
+    (index: number) => {
+      setEditingIndex(index);
+      setEditValue(regexes[index]);
+    },
+    [regexes],
+  );
 
-  const saveEdit = () => {
+  const saveEdit = useCallback(() => {
     if (editingIndex !== null && editValue.trim()) {
       const newRegexes = [...regexes];
       newRegexes[editingIndex] = editValue.trim();
@@ -32,17 +41,28 @@ export function WebsiteList() {
     }
     setEditingIndex(null);
     setEditValue('');
-  };
+  }, [editingIndex, editValue, regexes]);
 
-  const cancelEdit = () => {
+  const cancelEdit = useCallback(() => {
     setEditingIndex(null);
     setEditValue('');
-  };
+  }, []);
 
   const emptyStateMessage =
     filterMode === 'block-all'
       ? 'Add regex patterns to allow specific sites while blocking all others'
       : 'Add regex patterns to block specific sites while allowing all others';
+
+  const handleEditKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        saveEdit();
+      } else if (e.key === 'Escape') {
+        cancelEdit();
+      }
+    },
+    [saveEdit, cancelEdit],
+  );
 
   const containerStyle = {
     display: 'flex',
@@ -60,7 +80,7 @@ export function WebsiteList() {
     flex: 1,
     border: '1px solid var(--border-color)',
     borderRadius: '8px',
-    backgroundColor: 'var(--card-bg-inactive)',
+    backgroundColor: 'var(--card-bg)',
     boxShadow: 'var(--shadow-sm)',
   };
 
@@ -69,7 +89,7 @@ export function WebsiteList() {
     gap: '12px',
     padding: '12px 12px',
     borderBottom: '1px solid var(--border-color)',
-    backgroundColor: 'var(--card-bg-inactive)',
+    backgroundColor: 'var(--card-bg)',
     flexShrink: 0,
     alignItems: 'center',
     position: 'sticky' as const,
@@ -99,7 +119,7 @@ export function WebsiteList() {
   };
 
   const cellStyle = {
-    fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+    fontFamily: 'var(--font-monospace)',
     fontWeight: 'var(--font-small-label-weight)',
     fontSize: 'var(--font-small-label-size)',
     lineHeight: 'var(--font-small-label-line-height)',
@@ -113,7 +133,7 @@ export function WebsiteList() {
   };
 
   const editInputStyle = {
-    fontFamily: 'ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace',
+    fontFamily: 'var(--font-monospace)',
     fontWeight: 'var(--font-small-label-weight)',
     fontSize: 'var(--font-small-label-size)',
     lineHeight: 'var(--font-small-label-line-height)',
@@ -127,13 +147,10 @@ export function WebsiteList() {
   };
 
   const emptyStateStyle = {
+    ...bodyTextStyle,
     padding: '32px 16px',
     textAlign: 'center' as const,
     color: 'var(--text-secondary)',
-    fontFamily: 'var(--font-body-family)',
-    fontWeight: 'var(--font-body-weight)',
-    fontSize: 'var(--font-body-size)',
-    lineHeight: 'var(--font-body-line-height)',
     fontStyle: 'italic',
   };
 
@@ -163,13 +180,7 @@ export function WebsiteList() {
                     onChange={(e) => {
                       setEditValue(e.target.value);
                     }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        saveEdit();
-                      } else if (e.key === 'Escape') {
-                        cancelEdit();
-                      }
-                    }}
+                    onKeyDown={handleEditKeyDown}
                     onBlur={saveEdit}
                     autoFocus
                     style={editInputStyle}
@@ -185,9 +196,7 @@ export function WebsiteList() {
                     >
                       {regex}
                     </div>
-                    <Button
-                      variant="icon"
-                      size="sm"
+                    <IconButton
                       onClick={() => {
                         removeRegex(index);
                       }}
@@ -205,7 +214,7 @@ export function WebsiteList() {
                       >
                         <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
                       </svg>
-                    </Button>
+                    </IconButton>
                   </>
                 )}
               </div>

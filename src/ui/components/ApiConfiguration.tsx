@@ -1,15 +1,21 @@
 import { useState } from 'react';
 import { RadioOption } from './RadioOption';
-import { FormField } from './FormField';
+import { Input } from './Input';
+import { PasswordInput } from './PasswordInput';
 import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from './apiDefaults';
+import { DEFAULT_MODEL, DEFAULT_API_URL } from '../../apiDefaults';
+import { fieldLabelStyle } from './styles';
 
 export function ApiConfiguration() {
   const [selectedProvider, setSelectedProvider] = useState<'openrouter' | 'custom'>('openrouter');
+
   const [openrouterKey, setOpenrouterKey] = useState('');
+
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customKey, setCustomKey] = useState('');
+
+  const [showCustomKey, setShowCustomKey] = useState(false);
 
   return (
     <div>
@@ -21,15 +27,26 @@ export function ApiConfiguration() {
           setSelectedProvider('openrouter');
         }}
       >
-        <FormField
-          label="API key"
-          type="password"
-          placeholder="Your API key"
-          linkText="click here to get one"
-          linkHref="https://openrouter.ai/keys"
-          value={openrouterKey}
-          onChange={setOpenrouterKey}
-        />
+        <div style={{ marginBottom: '12px' }}>
+          <label style={fieldLabelStyle}>
+            API key{' '}
+            <a
+              href="https://openrouter.ai/keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--primary-color)', textDecoration: 'none' }}
+            >
+              (click here to get one)
+            </a>
+          </label>
+          <PasswordInput
+            placeholder="Your API key"
+            value={openrouterKey}
+            onChange={(val: string) => {
+              setOpenrouterKey(val);
+            }}
+          />
+        </div>
       </RadioOption>
 
       <RadioOption
@@ -40,28 +57,44 @@ export function ApiConfiguration() {
           setSelectedProvider('custom');
         }}
       >
-        <FormField
-          label="Model"
-          type="text"
-          placeholder={DEFAULT_MODEL}
-          value={customModel}
-          onChange={setCustomModel}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={fieldLabelStyle}>Model</label>
+          <Input
+            type="text"
+            placeholder={DEFAULT_MODEL}
+            value={customModel}
+            onChange={(val: string) => {
+              setCustomModel(val);
+            }}
+          />
+        </div>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={fieldLabelStyle}>API URL</label>
+          <Input
+            type="text"
+            placeholder={DEFAULT_API_URL}
+            value={customUrl}
+            onChange={(val: string) => {
+              setCustomUrl(val);
+            }}
+          />
+        </div>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={fieldLabelStyle}>API Key</label>
+          <PasswordInput
+            placeholder="Your API key"
+            value={customKey}
+            onChange={(val: string) => {
+              setCustomKey(val);
+            }}
+            onShowChange={setShowCustomKey}
+          />
+        </div>
+        <CodeExample
+          apiKey={showCustomKey ? customKey : customKey ? '•'.repeat(customKey.length) : ''}
+          baseURL={customUrl}
+          model={customModel}
         />
-        <FormField
-          label="API URL"
-          type="text"
-          placeholder={DEFAULT_API_URL}
-          value={customUrl}
-          onChange={setCustomUrl}
-        />
-        <FormField
-          label="API Key"
-          type="password"
-          placeholder={DEFAULT_API_KEY}
-          value={customKey}
-          onChange={setCustomKey}
-        />
-        <CodeExample apiKey={customKey} baseURL={customUrl} model={customModel} />
       </RadioOption>
     </div>
   );

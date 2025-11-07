@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, DEFAULT_API_URL, DEFAULT_API_KEY } from './apiDefaults';
+import { DEFAULT_MODEL, DEFAULT_API_URL } from '../../apiDefaults';
 
 interface CodeExampleProps {
   apiKey: string;
@@ -7,7 +7,7 @@ interface CodeExampleProps {
 }
 
 export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
-  const displayKey = apiKey || DEFAULT_API_KEY;
+  const displayKey = apiKey || 'Your API key';
   const displayURL = baseURL || DEFAULT_API_URL;
   const displayModel = model || DEFAULT_MODEL;
 
@@ -17,7 +17,7 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
         marginTop: '12px',
         marginBottom: '0px',
         padding: '0px',
-        backgroundColor: 'var(--card-bg-active)',
+        backgroundColor: 'var(--card-bg)',
         borderRadius: '10px',
         border: '1px solid var(--border-color)',
         boxShadow: 'none',
@@ -28,7 +28,7 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
         style={{
           margin: 0,
           padding: '12px',
-          backgroundColor: 'var(--bg-primary)',
+          backgroundColor: 'var(--code-bg)',
           borderRadius: '8px',
           border: '1px solid var(--border-color)',
           overflow: 'auto',

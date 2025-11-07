@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { baseSliderStyle } from './styles';
 
 type Tab = 'api' | 'websites' | 'contact';
 
@@ -6,6 +7,12 @@ interface SettingsMenuProps {
   selected: Tab;
   onSelect: (tab: Tab) => void;
 }
+
+const ITEM_HEIGHT = 62;
+const BUTTON_HEIGHT = 52;
+const ITEM_GAP = 6;
+const BORDER_WIDTH = 16;
+const SLIDER_OFFSET = 2;
 
 const tabs: { id: Tab; title: string; icon: string }[] = [
   {
@@ -25,44 +32,42 @@ const tabs: { id: Tab; title: string; icon: string }[] = [
   },
 ];
 
-const containerStyle = (isDragging: boolean) => ({
+const baseContainerStyle = {
   display: 'flex',
   flexDirection: 'column' as const,
-  gap: '6px',
-  paddingRight: '16px',
+  gap: `${ITEM_GAP.toString()}px`,
+  paddingRight: `${BORDER_WIDTH.toString()}px`,
   borderRight: '1.5px solid var(--border-color)',
   position: 'relative' as const,
-  cursor: isDragging ? 'grabbing' : 'grab',
   userSelect: 'none' as const,
+};
+
+const containerStyle = (isDragging: boolean) => ({
+  ...baseContainerStyle,
+  cursor: isDragging ? 'grabbing' : 'grab',
 });
 
 const sliderStyle = (index: number, isDragging: boolean) => ({
-  position: 'absolute' as const,
-  width: 'calc(100% - 16px)',
-  height: '52px',
-  background: 'linear-gradient(180deg, rgba(107, 117, 201, 0.14) 0%, rgba(107, 117, 201, 0.10) 100%)',
-  border: '1px solid rgba(107, 117, 201, 0.35)',
-  borderRadius: '10px',
-  boxShadow: '0 8px 20px rgba(107, 117, 201, 0.18), 0 2px 4px rgba(47, 43, 72, 0.08)',
-  transition: isDragging
-    ? 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, background 0.3s ease',
-  transform: `translateY(${(index * 62 + 2).toString()}px)`,
-  zIndex: 0,
-  pointerEvents: 'none' as const,
-  backdropFilter: 'saturate(120%) blur(2px)',
-  WebkitBackdropFilter: 'saturate(120%) blur(2px)',
+  ...baseSliderStyle,
+  width: `calc(100% - ${BORDER_WIDTH.toString()}px)`,
+  height: `${BUTTON_HEIGHT.toString()}px`,
+  transition: isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)',
+  transform: `translateY(${(index * ITEM_HEIGHT + SLIDER_OFFSET).toString()}px)`,
 });
 
-const buttonStyle = (isSelected: boolean) => ({
+const baseButtonStyle = {
   border: 'none',
   cursor: 'pointer',
   padding: '16px 14px',
   borderRadius: '8px',
   backgroundColor: 'transparent',
-  color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
   zIndex: 1,
   position: 'relative' as const,
+};
+
+const buttonStyle = (isSelected: boolean) => ({
+  ...baseButtonStyle,
+  color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)',
 });
 
 export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
@@ -70,20 +75,19 @@ export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseDown = () => {
+  const handleMouseDown = useCallback(() => {
     setIsDragging(true);
-  };
+  }, []);
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) return;
+      if (!isDragging || !containerRef.current) {
+        return;
+      }
 
       const rect = containerRef.current.getBoundingClientRect();
       const y = e.clientY - rect.top;
-      const itemHeight = 62; // height (52px) + gap (6px) + padding
-
-      // Determine which tab based on vertical position
-      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(y / itemHeight)));
+      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(y / ITEM_HEIGHT)));
       const targetTab = tabs[targetIndex];
 
       if (targetTab.id !== selected) {
@@ -97,25 +101,28 @@ export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
     setIsDragging(false);
   }, []);
 
-  // Add/remove global mouse event listeners
   useEffect(() => {
-    if (!isDragging) return;
+    if (!isDragging) {
+      return;
+    }
 
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      handleMouseMove(e);
-    };
-    const handleGlobalMouseUp = () => {
-      handleMouseUp();
-    };
-
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  const handleTabClick = useCallback(
+    (tabId: Tab) => {
+      if (!isDragging) {
+        onSelect(tabId);
+      }
+    },
+    [isDragging, onSelect],
+  );
 
   return (
     <div ref={containerRef} style={containerStyle(isDragging)} onMouseDown={handleMouseDown}>
@@ -124,9 +131,7 @@ export function SettingsMenu({ selected, onSelect }: SettingsMenuProps) {
         <button
           key={id}
           onClick={() => {
-            if (!isDragging) {
-              onSelect(id);
-            }
+            handleTabClick(id);
           }}
           style={buttonStyle(selected === id)}
           title={title}

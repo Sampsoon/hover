@@ -1,27 +1,27 @@
+import { smallLabelTextStyle } from './styles';
+
 interface InputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit?: () => void;
   placeholder?: string;
-  type?: 'text' | 'password';
+  type?: string;
+  style?: React.CSSProperties;
 }
 
 const inputStyle = {
-  fontFamily: 'var(--font-small-label-family)',
-  fontWeight: 'var(--font-small-label-weight)',
-  fontSize: 'var(--font-small-label-size)',
-  lineHeight: 'var(--font-small-label-line-height)',
-  flex: 1,
-  padding: '8px 12px',
-  border: '1.5px solid var(--border-color)',
-  borderRadius: '6px',
-  backgroundColor: 'var(--input-bg)',
+  ...smallLabelTextStyle,
+  width: '100%',
+  padding: '8px 10px',
+  border: '1px solid rgba(107, 117, 201, 0.18)',
+  borderRadius: '8px',
+  backgroundColor: 'var(--bg-primary)',
   color: 'var(--text-primary)',
   outline: 'none',
-  boxShadow: 'var(--shadow-sm)',
+  boxShadow: 'inset 0 1px 1px rgba(47, 43, 72, 0.04)',
 };
 
-export function Input({ value, onChange, onSubmit, placeholder, type = 'text' }: InputProps) {
+export function Input({ value, onChange, onSubmit, placeholder, type, style }: InputProps) {
   return (
     <input
       type={type}
@@ -31,7 +31,7 @@ export function Input({ value, onChange, onSubmit, placeholder, type = 'text' }:
       }}
       onKeyDown={(e) => e.key === 'Enter' && onSubmit?.()}
       placeholder={placeholder}
-      style={inputStyle}
+      style={{ ...inputStyle, ...style }}
     />
   );
 }

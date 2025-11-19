@@ -2,7 +2,7 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import { getAPIKeyConfig, OPENROUTER_API_URL } from '../../storage';
+import { getAPIKeyConfig, OPEN_ROUTER_API_URL } from '../../storage';
 
 export interface LlmParams {
   prompt: string;
@@ -91,7 +91,7 @@ export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chu
     },
   };
 
-  const allParams = apiKeyConfig.url === OPENROUTER_API_URL ? { ...openRouterParams, ...params } : params;
+  const allParams = apiKeyConfig.url === OPEN_ROUTER_API_URL ? { ...openRouterParams, ...params } : params;
 
   await invokeOpenRouterClient(client, allParams, onChunk);
 }

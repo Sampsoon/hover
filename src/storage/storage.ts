@@ -1,19 +1,23 @@
-import { ApiKeyConfig } from './types';
+import { CustomAPIConfig, APIProvider, OpenRouterAPIConfig } from './types';
 import browser from 'webextension-polyfill';
 
-const enum STORAGE_KEY {
-  API_KEY_CONFIG = 'apiKeyConfig',
+function createStorageAccessors<T>(key: string) {
+  return {
+    get: async () => {
+      const result = await browser.storage.local.get(key);
+      return result[key] as T | undefined;
+    },
+    set: async (value: T) => {
+      await browser.storage.local.set({ [key]: value });
+    },
+    remove: async () => {
+      await browser.storage.local.remove(key);
+    },
+  };
 }
 
-export async function getAPIKeyConfigFromStorage(): Promise<ApiKeyConfig | undefined> {
-  const result = await browser.storage.local.get(STORAGE_KEY.API_KEY_CONFIG);
-  return result[STORAGE_KEY.API_KEY_CONFIG] as ApiKeyConfig | undefined;
-}
-
-export async function saveAPIKeyConfigToStorage(config: ApiKeyConfig) {
-  await browser.storage.local.set({ [STORAGE_KEY.API_KEY_CONFIG]: config });
-}
-
-export async function deleteAPIKeyConfigFromStorage() {
-  await browser.storage.local.remove(STORAGE_KEY.API_KEY_CONFIG);
-}
+export const storage = {
+  openRouterApiConfig: createStorageAccessors<OpenRouterAPIConfig>('openRouterApiConfig'),
+  customApiConfig: createStorageAccessors<CustomAPIConfig>('customApiConfig'),
+  apiProvider: createStorageAccessors<APIProvider>('apiProvider'),
+} as const;

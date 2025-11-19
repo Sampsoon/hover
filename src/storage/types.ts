@@ -1,4 +1,4 @@
-export interface FullAPIConfig {
+export interface CustomAPIConfig {
   model: string;
   url: string;
   key: string;
@@ -8,12 +8,9 @@ export interface OpenRouterAPIConfig {
   key: string;
 }
 
-export type ApiKeyConfig = FullAPIConfig | OpenRouterAPIConfig;
+export type APIConfig = CustomAPIConfig;
 
-export function isFullAPIConfig(config: ApiKeyConfig): config is FullAPIConfig {
-  return 'model' in config && 'url' in config && 'key' in config;
-}
-
-export function isOpenRouterAPIConfig(config: ApiKeyConfig): config is OpenRouterAPIConfig {
-  return 'key' in config && !('model' in config) && !('url' in config);
+export enum APIProvider {
+  OPEN_ROUTER = 'open router',
+  CUSTOM = 'custom',
 }

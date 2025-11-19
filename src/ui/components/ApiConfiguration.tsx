@@ -3,75 +3,100 @@ import { RadioOption } from './RadioOption';
 import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
 import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, OPENROUTER_API_URL, deleteAPIKeyConfig, saveAPIKeyConfig } from '../../storage';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage, APIProvider } from '../../storage';
 import { fieldLabelStyle } from './styles';
 
-async function processOpenRouterConfigChange(openrouterKey: string) {
-  if (!openrouterKey) {
-    await deleteAPIKeyConfig();
-    return;
-  }
+const OPEN_ROUTER_API_KEY_URL = 'https://openrouter.ai/keys';
 
-  await saveAPIKeyConfig({
-    key: openrouterKey,
+async function processOpenRouterConfigChange(openRouterKey: string) {
+  await storage.openRouterApiConfig.set({
+    key: openRouterKey,
   });
 }
 
 async function processCustomConfigChange(customModel: string, customUrl: string, customKey: string) {
-  if (!customModel || !customUrl || !customKey) {
-    await deleteAPIKeyConfig();
-    return;
-  }
-
-  await saveAPIKeyConfig({
+  await storage.customApiConfig.set({
     model: customModel,
     url: customUrl,
     key: customKey,
   });
 }
 
-export function ApiConfiguration() {
-  const [selectedProvider, setSelectedProvider] = useState<'openrouter' | 'custom'>('openrouter');
+async function processProviderChange(provider: APIProvider) {
+  await storage.apiProvider.set(provider);
+}
 
-  const [openrouterKey, setOpenrouterKey] = useState('');
+function createDebounce(func: () => Promise<void>, delay = 500) {
+  const timeoutId = setTimeout(() => {
+    void func();
+  }, delay);
+
+  return () => {
+    clearTimeout(timeoutId);
+  };
+}
+
+export function ApiConfiguration() {
+  const [selectedProvider, setSelectedProvider] = useState<APIProvider>(APIProvider.OPEN_ROUTER);
+
+  const [openRouterKey, setOpenRouterKey] = useState('');
 
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customKey, setCustomKey] = useState('');
 
+  useEffect(() => {
+    const loadConfig = async () => {
+      const openRouterApiConfig = await storage.openRouterApiConfig.get();
+      const customApiConfig = await storage.customApiConfig.get();
+      const apiProvider = await storage.apiProvider.get();
+
+      if (apiProvider) {
+        setSelectedProvider(apiProvider);
+      }
+
+      if (openRouterApiConfig?.key) {
+        setOpenRouterKey(openRouterApiConfig.key);
+      }
+
+      if (customApiConfig) {
+        setCustomModel(customApiConfig.model);
+        setCustomUrl(customApiConfig.url);
+        setCustomKey(customApiConfig.key);
+      }
+    };
+    void loadConfig();
+  }, []);
+
   const [showCustomKey, setShowCustomKey] = useState(false);
 
-  const debounceTimeout = 500;
+  useEffect(() => {
+    return createDebounce(() => processOpenRouterConfigChange(openRouterKey));
+  }, [openRouterKey]);
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (selectedProvider === 'openrouter') {
-        void processOpenRouterConfigChange(openrouterKey);
-      } else {
-        void processCustomConfigChange(customModel, customUrl, customKey);
-      }
-    }, debounceTimeout);
+    return createDebounce(() => processCustomConfigChange(customModel, customUrl, customKey));
+  }, [customModel, customUrl, customKey]);
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [openrouterKey, customModel, customUrl, customKey, selectedProvider]);
+  useEffect(() => {
+    return createDebounce(() => processProviderChange(selectedProvider));
+  }, [selectedProvider]);
 
   return (
     <div>
       <RadioOption
-        id="openrouter"
-        label="OpenRouter"
-        selected={selectedProvider === 'openrouter'}
+        id="open router"
+        label="Open Router"
+        selected={selectedProvider === APIProvider.OPEN_ROUTER}
         onSelect={() => {
-          setSelectedProvider('openrouter');
+          setSelectedProvider(APIProvider.OPEN_ROUTER);
         }}
       >
         <div style={{ marginBottom: '12px' }}>
           <label style={fieldLabelStyle}>
             API key{' '}
             <a
-              href="https://openrouter.ai/keys"
+              href={OPEN_ROUTER_API_KEY_URL}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'var(--primary-color)', textDecoration: 'none' }}
@@ -81,9 +106,9 @@ export function ApiConfiguration() {
           </label>
           <PasswordInput
             placeholder="Your API key"
-            value={openrouterKey}
+            value={openRouterKey}
             onChange={(val: string) => {
-              setOpenrouterKey(val);
+              setOpenRouterKey(val);
             }}
           />
         </div>
@@ -92,9 +117,9 @@ export function ApiConfiguration() {
       <RadioOption
         id="custom"
         label="Custom Endpoint"
-        selected={selectedProvider === 'custom'}
+        selected={selectedProvider === APIProvider.CUSTOM}
         onSelect={() => {
-          setSelectedProvider('custom');
+          setSelectedProvider(APIProvider.CUSTOM);
         }}
       >
         <div style={{ marginBottom: '12px' }}>
@@ -112,7 +137,7 @@ export function ApiConfiguration() {
           <label style={fieldLabelStyle}>API URL</label>
           <Input
             type="text"
-            placeholder={OPENROUTER_API_URL}
+            placeholder={OPEN_ROUTER_API_URL}
             value={customUrl}
             onChange={(val: string) => {
               setCustomUrl(val);

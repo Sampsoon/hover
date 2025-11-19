@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL, OPENROUTER_API_URL } from '../../storage';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from '../../storage';
 
 interface CodeExampleProps {
   apiKey: string;
@@ -8,7 +8,7 @@ interface CodeExampleProps {
 
 export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
   const displayKey = apiKey || 'Your API key';
-  const displayURL = baseURL || OPENROUTER_API_URL;
+  const displayURL = baseURL || OPEN_ROUTER_API_URL;
   const displayModel = model || DEFAULT_MODEL;
 
   return (

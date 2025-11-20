@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import browser from 'webextension-polyfill';
 import { RadioOption } from './RadioOption';
-import { Input } from './Input';
 import { PasswordInput } from './PasswordInput';
-import { CodeExample } from './CodeExample';
-import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage, APIProvider } from '../../storage';
+import { Button } from './Button';
+import { storage, APIProvider } from '../../storage';
 import { fieldLabelStyle } from './styles';
+import { createDebounce } from '../utils';
 
 const OPEN_ROUTER_API_KEY_URL = 'https://openrouter.ai/keys';
 
@@ -14,41 +15,17 @@ async function processOpenRouterConfigChange(openRouterKey: string) {
   });
 }
 
-async function processCustomConfigChange(customModel: string, customUrl: string, customKey: string) {
-  await storage.customApiConfig.set({
-    model: customModel,
-    url: customUrl,
-    key: customKey,
-  });
-}
-
 async function processProviderChange(provider: APIProvider) {
   await storage.apiProvider.set(provider);
 }
 
-function createDebounce(func: () => Promise<void>, delay = 500) {
-  const timeoutId = setTimeout(() => {
-    void func();
-  }, delay);
-
-  return () => {
-    clearTimeout(timeoutId);
-  };
-}
-
 export function ApiConfiguration() {
   const [selectedProvider, setSelectedProvider] = useState<APIProvider>(APIProvider.OPEN_ROUTER);
-
   const [openRouterKey, setOpenRouterKey] = useState('');
-
-  const [customModel, setCustomModel] = useState('');
-  const [customUrl, setCustomUrl] = useState('');
-  const [customKey, setCustomKey] = useState('');
 
   useEffect(() => {
     const loadConfig = async () => {
       const openRouterApiConfig = await storage.openRouterApiConfig.get();
-      const customApiConfig = await storage.customApiConfig.get();
       const apiProvider = await storage.apiProvider.get();
 
       if (apiProvider) {
@@ -58,25 +35,13 @@ export function ApiConfiguration() {
       if (openRouterApiConfig?.key) {
         setOpenRouterKey(openRouterApiConfig.key);
       }
-
-      if (customApiConfig) {
-        setCustomModel(customApiConfig.model);
-        setCustomUrl(customApiConfig.url);
-        setCustomKey(customApiConfig.key);
-      }
     };
     void loadConfig();
   }, []);
 
-  const [showCustomKey, setShowCustomKey] = useState(false);
-
   useEffect(() => {
     return createDebounce(() => processOpenRouterConfigChange(openRouterKey));
   }, [openRouterKey]);
-
-  useEffect(() => {
-    return createDebounce(() => processCustomConfigChange(customModel, customUrl, customKey));
-  }, [customModel, customUrl, customKey]);
 
   useEffect(() => {
     return createDebounce(() => processProviderChange(selectedProvider));
@@ -85,8 +50,8 @@ export function ApiConfiguration() {
   return (
     <div>
       <RadioOption
-        id="open router"
-        label="Open Router"
+        id="openRouter"
+        label="OpenRouter"
         selected={selectedProvider === APIProvider.OPEN_ROUTER}
         onSelect={() => {
           setSelectedProvider(APIProvider.OPEN_ROUTER);
@@ -122,44 +87,28 @@ export function ApiConfiguration() {
           setSelectedProvider(APIProvider.CUSTOM);
         }}
       >
-        <div style={{ marginBottom: '12px' }}>
-          <label style={fieldLabelStyle}>Model</label>
-          <Input
-            type="text"
-            placeholder={DEFAULT_MODEL}
-            value={customModel}
-            onChange={(val: string) => {
-              setCustomModel(val);
-            }}
-          />
+        <div style={{ padding: '12px 0', display: 'flex', alignItems: 'center' }}>
+          <Button
+            onClick={() => void browser.runtime.openOptionsPage()}
+            icon={
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            }
+          >
+            Configure
+          </Button>
         </div>
-        <div style={{ marginBottom: '12px' }}>
-          <label style={fieldLabelStyle}>API URL</label>
-          <Input
-            type="text"
-            placeholder={OPEN_ROUTER_API_URL}
-            value={customUrl}
-            onChange={(val: string) => {
-              setCustomUrl(val);
-            }}
-          />
-        </div>
-        <div style={{ marginBottom: '12px' }}>
-          <label style={fieldLabelStyle}>API Key</label>
-          <PasswordInput
-            placeholder="Your API key"
-            value={customKey}
-            onChange={(val: string) => {
-              setCustomKey(val);
-            }}
-            onShowChange={setShowCustomKey}
-          />
-        </div>
-        <CodeExample
-          apiKey={showCustomKey ? customKey : customKey ? '•'.repeat(customKey.length) : ''}
-          baseURL={customUrl}
-          model={customModel}
-        />
       </RadioOption>
     </div>
   );

@@ -7,6 +7,10 @@
     "default_popup": "index.html",
     "default_title": "Vibey LSP"
   },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "service_worker": "src/colorFunctionality/serviceWorker/serviceWorker.ts",
     "type": "module"

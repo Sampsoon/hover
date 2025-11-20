@@ -2,6 +2,7 @@ export interface CustomAPIConfig {
   model: string;
   url: string;
   key: string;
+  additionalArguments?: Record<string, unknown>;
 }
 
 export interface OpenRouterAPIConfig {
@@ -11,6 +12,6 @@ export interface OpenRouterAPIConfig {
 export type APIConfig = CustomAPIConfig;
 
 export enum APIProvider {
-  OPEN_ROUTER = 'open router',
-  CUSTOM = 'custom',
+  OPEN_ROUTER = 'OpenRouter',
+  CUSTOM = 'Custom',
 }

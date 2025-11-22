@@ -61,7 +61,7 @@ export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chu
         schema: jsonSchema,
       },
     },
-    ...apiKeyConfig.additionalArguments,
+    ...(apiKeyConfig.additionalArguments ?? {}),
   };
 
   await invokeOpenRouterClient(client, params, onChunk);

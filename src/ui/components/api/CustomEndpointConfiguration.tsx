@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Input, PasswordInput, fieldLabelStyle, TextArea, AlertIcon } from '../common';
 import { ApiPreview } from './ApiPreview';
-import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage } from '../../../storage';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, OPEN_ROUTER_DEFAULT_PARAMS, storage } from '../../../storage';
 import { createDebounce } from '../../utils';
 import { Json } from '../../../shared';
 
@@ -34,11 +34,15 @@ async function processCustomConfigChange(
   });
 }
 
+function getAdditionalArgumentsRows(additionalArguments: Json): number {
+  return formatJson(additionalArguments).split('\n').length;
+}
+
 export function CustomEndpointConfiguration() {
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customKey, setCustomKey] = useState('');
-  const [additionalArguments, setAdditionalArguments] = useState<Json>({});
+  const [additionalArguments, setAdditionalArguments] = useState<Json | undefined>(undefined);
   const [argumentsString, setArgumentsString] = useState('');
   const [showCustomKey, setShowCustomKey] = useState(false);
   const [isValidJson, setIsValidJson] = useState(true);
@@ -52,9 +56,10 @@ export function CustomEndpointConfiguration() {
         setCustomUrl(customApiConfig.url);
         setCustomKey(customApiConfig.key);
 
-        const additionalArguments = customApiConfig.additionalArguments ?? {};
-        setAdditionalArguments(additionalArguments);
-        setArgumentsString(formatJson(additionalArguments));
+        if (customApiConfig.additionalArguments) {
+          setAdditionalArguments(customApiConfig.additionalArguments);
+          setArgumentsString(formatJson(customApiConfig.additionalArguments));
+        }
       }
     };
     void loadConfig();
@@ -68,7 +73,7 @@ export function CustomEndpointConfiguration() {
     const parsed = value.trim() === '' ? {} : parseJsonOrUndefined(value);
 
     if (!parsed) {
-      setAdditionalArguments({});
+      setAdditionalArguments(undefined);
       setArgumentsString(value);
       setIsValidJson(false);
       return;
@@ -120,9 +125,10 @@ export function CustomEndpointConfiguration() {
       <div style={{ marginBottom: '12px' }}>
         <label style={fieldLabelStyle}>Additional Arguments</label>
         <TextArea
-          placeholder={formatJson({ temperature: 0.7 })}
+          placeholder={formatJson(OPEN_ROUTER_DEFAULT_PARAMS)}
           value={argumentsString}
           onChange={handleArgumentsChange}
+          rows={getAdditionalArgumentsRows(OPEN_ROUTER_DEFAULT_PARAMS)}
         />
         {!isValidJson && (
           <div

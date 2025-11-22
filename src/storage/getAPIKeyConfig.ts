@@ -18,7 +18,7 @@ interface OpenRouterChatCompletionCreateParams extends Json {
   };
 }
 
-const OPEN_ROUTER_DEFAULT_PARAMS: OpenRouterChatCompletionCreateParams = {
+export const OPEN_ROUTER_DEFAULT_PARAMS: OpenRouterChatCompletionCreateParams = {
   provider: {
     sort: 'throughput',
     require_parameters: true,

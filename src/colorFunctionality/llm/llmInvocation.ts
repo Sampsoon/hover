@@ -2,29 +2,17 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import { getAPIKeyConfig, OPEN_ROUTER_API_URL } from '../../storage';
+import { getAPIKeyConfig } from '../../storage';
+import { Json } from '../../shared';
 
 export interface LlmParams {
   prompt: string;
   schema: z.ZodSchema;
 }
 
-interface OpenRouterChatCompletionCreateParams {
-  provider?: {
-    sort?: string;
-    require_parameters?: boolean;
-  };
-  reasoning?: {
-    effort?: 'high' | 'medium' | 'low';
-    max_tokens?: number;
-    exclude?: boolean;
-    enabled?: boolean;
-  };
-}
-
 async function invokeOpenRouterClient(
   client: OpenAI,
-  params: OpenRouterChatCompletionCreateParams & ChatCompletionCreateParams,
+  params: Json & ChatCompletionCreateParams,
   onChunk: (chunk: string) => void,
 ) {
   const response = await client.chat.completions.create({
@@ -48,28 +36,12 @@ export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chu
 
   const apiKeyConfig = await getAPIKeyConfig();
 
-  if (!apiKeyConfig) {
-    throw new Error('No API configuration found');
-  }
-
   const client = new OpenAI({
     apiKey: apiKeyConfig.key,
     baseURL: apiKeyConfig.url,
   });
 
-  const openRouterParams: OpenRouterChatCompletionCreateParams = {
-    provider: {
-      sort: 'throughput',
-      require_parameters: true,
-    },
-    reasoning: {
-      exclude: true,
-      effort: 'low',
-      enabled: false,
-    },
-  };
-
-  const params: ChatCompletionCreateParams = {
+  const params: Json & ChatCompletionCreateParams = {
     model: apiKeyConfig.model,
     messages: [
       {
@@ -89,9 +61,8 @@ export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chu
         schema: jsonSchema,
       },
     },
+    ...apiKeyConfig.additionalArguments,
   };
 
-  const allParams = apiKeyConfig.url === OPEN_ROUTER_API_URL ? { ...openRouterParams, ...params } : params;
-
-  await invokeOpenRouterClient(client, allParams, onChunk);
+  await invokeOpenRouterClient(client, params, onChunk);
 }

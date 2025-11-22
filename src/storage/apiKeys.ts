@@ -1,30 +1,56 @@
+import { Json } from '../shared';
 import { storage } from './storage';
 import { APIConfig, APIProvider, OpenRouterAPIConfig, CustomAPIConfig } from './types';
 
 export const DEFAULT_MODEL = 'x-ai/grok-4-fast';
 export const OPEN_ROUTER_API_URL = 'https://openrouter.ai/api/v1';
 
+interface OpenRouterChatCompletionCreateParams extends Json {
+  provider?: {
+    sort?: string;
+    require_parameters?: boolean;
+  };
+  reasoning?: {
+    effort?: 'high' | 'medium' | 'low';
+    max_tokens?: number;
+    exclude?: boolean;
+    enabled?: boolean;
+  };
+}
+
+const OPEN_ROUTER_DEFAULT_PARAMS: OpenRouterChatCompletionCreateParams = {
+  provider: {
+    sort: 'throughput',
+    require_parameters: true,
+  },
+  reasoning: {
+    exclude: true,
+    effort: 'low',
+    enabled: false,
+  },
+};
+
 const DEV_ENVIRONMENT_API_KEYS = {
   OPEN_ROUTER: import.meta.env.VITE_OPEN_ROUTER_API_KEY,
 } as const;
 
 function isValidCustomAPIConfig(config: CustomAPIConfig | undefined): config is CustomAPIConfig {
-  if (!config) {
-    return false;
+  if (config?.model && config.url && config.key) {
+    return true;
   }
 
-  return !!(config.model && config.url && config.key);
+  return false;
 }
 
 function isValidOpenRouterAPIConfig(config: OpenRouterAPIConfig | undefined): config is OpenRouterAPIConfig {
-  if (!config) {
-    return false;
+  if (config?.key) {
+    return true;
   }
 
-  return !!config.key;
+  return false;
 }
 
-export async function getAPIKeyConfig(): Promise<APIConfig | undefined> {
+export async function getAPIKeyConfig(): Promise<APIConfig> {
   const provider = await storage.apiProvider.get();
 
   const openRouterApiConfig = await storage.openRouterApiConfig.get();
@@ -34,6 +60,7 @@ export async function getAPIKeyConfig(): Promise<APIConfig | undefined> {
     model: DEFAULT_MODEL,
     url: OPEN_ROUTER_API_URL,
     key: DEV_ENVIRONMENT_API_KEYS.OPEN_ROUTER,
+    additionalArguments: OPEN_ROUTER_DEFAULT_PARAMS,
   };
 
   if (!provider) {
@@ -45,6 +72,7 @@ export async function getAPIKeyConfig(): Promise<APIConfig | undefined> {
       model: DEFAULT_MODEL,
       url: OPEN_ROUTER_API_URL,
       key: openRouterApiConfig.key,
+      additionalArguments: OPEN_ROUTER_DEFAULT_PARAMS,
     };
   }
 

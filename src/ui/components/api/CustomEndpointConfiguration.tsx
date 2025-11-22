@@ -24,13 +24,13 @@ async function processCustomConfigChange(
   customModel: string,
   customUrl: string,
   customKey: string,
-  customArguments: Json | undefined,
+  additionalArguments: Json | undefined,
 ) {
   await storage.customApiConfig.set({
     model: customModel,
     url: customUrl,
     key: customKey,
-    additionalArguments: customArguments,
+    additionalArguments: additionalArguments,
   });
 }
 
@@ -38,7 +38,7 @@ export function CustomEndpointConfiguration() {
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');
   const [customKey, setCustomKey] = useState('');
-  const [customArguments, setCustomArguments] = useState<Json>({});
+  const [additionalArguments, setAdditionalArguments] = useState<Json>({});
   const [argumentsString, setArgumentsString] = useState('');
   const [showCustomKey, setShowCustomKey] = useState(false);
   const [isValidJson, setIsValidJson] = useState(true);
@@ -53,7 +53,7 @@ export function CustomEndpointConfiguration() {
         setCustomKey(customApiConfig.key);
 
         const additionalArguments = customApiConfig.additionalArguments ?? {};
-        setCustomArguments(additionalArguments);
+        setAdditionalArguments(additionalArguments);
         setArgumentsString(formatJson(additionalArguments));
       }
     };
@@ -61,21 +61,21 @@ export function CustomEndpointConfiguration() {
   }, []);
 
   useEffect(() => {
-    return createDebounce(() => processCustomConfigChange(customModel, customUrl, customKey, customArguments));
-  }, [customModel, customUrl, customKey, customArguments]);
+    return createDebounce(() => processCustomConfigChange(customModel, customUrl, customKey, additionalArguments));
+  }, [customModel, customUrl, customKey, additionalArguments]);
 
   const handleArgumentsChange = (value: string) => {
     const parsed = value.trim() === '' ? {} : parseJsonOrUndefined(value);
 
     if (!parsed) {
-      setCustomArguments({});
+      setAdditionalArguments({});
       setArgumentsString(value);
       setIsValidJson(false);
       return;
     }
 
     setIsValidJson(true);
-    setCustomArguments(parsed);
+    setAdditionalArguments(parsed);
 
     // The check for the number of keys is necessary because we don't want to auto format an empty object as
     // this will result in the string "{}".
@@ -145,6 +145,7 @@ export function CustomEndpointConfiguration() {
         apiKey={showCustomKey ? customKey : customKey ? '•'.repeat(customKey.length) : ''}
         baseURL={customUrl}
         model={customModel}
+        additionalArguments={argumentsString}
       />
     </div>
   );

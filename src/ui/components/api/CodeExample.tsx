@@ -4,12 +4,15 @@ interface CodeExampleProps {
   apiKey: string;
   baseURL: string;
   model: string;
+  additionalArguments?: string;
 }
 
-export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
+export function CodeExample({ apiKey, baseURL, model, additionalArguments }: CodeExampleProps) {
   const displayKey = apiKey || 'Your API key';
   const displayURL = baseURL || OPEN_ROUTER_API_URL;
   const displayModel = model || DEFAULT_MODEL;
+  const hasAdditionalArgs =
+    additionalArguments && additionalArguments.trim().length > 0 && additionalArguments !== '{}';
 
   return (
     <div
@@ -58,6 +61,16 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
           {'\n'}
           <span style={{ color: 'var(--code-operator)' }}>&#125;);</span>
           {'\n\n'}
+          {hasAdditionalArgs && (
+            <>
+              <span style={{ color: 'var(--code-keyword)' }}>const</span>{' '}
+              <span style={{ color: 'var(--code-variable)' }}>additionalArguments</span>{' '}
+              <span style={{ color: 'var(--code-operator)' }}>=</span>{' '}
+              <span style={{ color: 'var(--text-primary)' }}>{additionalArguments}</span>
+              <span style={{ color: 'var(--code-operator)' }}>;</span>
+              {'\n\n'}
+            </>
+          )}
           <span style={{ color: 'var(--code-keyword)' }}>const</span>{' '}
           <span style={{ color: 'var(--code-variable)' }}>params</span>{' '}
           <span style={{ color: 'var(--code-operator)' }}>=</span>{' '}
@@ -69,6 +82,15 @@ export function CodeExample({ apiKey, baseURL, model }: CodeExampleProps) {
           <span style={{ color: 'var(--code-string)' }}>&apos;{displayModel}&apos;</span>
           <span style={{ color: 'var(--code-operator)' }}>,</span>
           {'\n'}
+          {hasAdditionalArgs && (
+            <>
+              {'  '}
+              <span style={{ color: 'var(--code-operator)' }}>...</span>
+              <span style={{ color: 'var(--code-variable)' }}>additionalArguments</span>
+              <span style={{ color: 'var(--code-operator)' }}>,</span>
+              {'\n'}
+            </>
+          )}
           {'  '}
           <span style={{ color: 'var(--code-comment)' }}>{'// ... other parameters'}</span>
           {'\n'}

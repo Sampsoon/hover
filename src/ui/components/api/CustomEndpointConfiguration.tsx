@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Input, PasswordInput, fieldLabelStyle, TextArea } from '../common';
+import { Input, PasswordInput, fieldLabelStyle, TextArea, AlertIcon } from '../common';
 import { CodeExample } from './CodeExample';
 import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, storage } from '../../../storage';
 import { createDebounce } from '../../utils';
@@ -41,6 +41,7 @@ export function CustomEndpointConfiguration() {
   const [customArguments, setCustomArguments] = useState<Json>({});
   const [argumentsString, setArgumentsString] = useState('');
   const [showCustomKey, setShowCustomKey] = useState(false);
+  const [isValidJson, setIsValidJson] = useState(true);
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -64,14 +65,16 @@ export function CustomEndpointConfiguration() {
   }, [customModel, customUrl, customKey, customArguments]);
 
   const handleArgumentsChange = (value: string) => {
-    const parsed = parseJsonOrUndefined(value);
+    const parsed = value.trim() === '' ? {} : parseJsonOrUndefined(value);
 
     if (!parsed) {
       setCustomArguments({});
       setArgumentsString(value);
+      setIsValidJson(false);
       return;
     }
 
+    setIsValidJson(true);
     setCustomArguments(parsed);
 
     // The check for the number of keys is necessary because we don't want to auto format an empty object as
@@ -121,6 +124,22 @@ export function CustomEndpointConfiguration() {
           value={argumentsString}
           onChange={handleArgumentsChange}
         />
+        {!isValidJson && (
+          <div
+            style={{
+              ...fieldLabelStyle,
+              color: 'var(--alert-color)',
+              marginTop: '4px',
+              marginBottom: '0px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <AlertIcon width={14} height={14} />
+            Invalid JSON
+          </div>
+        )}
       </div>
       <CodeExample
         apiKey={showCustomKey ? customKey : customKey ? '•'.repeat(customKey.length) : ''}

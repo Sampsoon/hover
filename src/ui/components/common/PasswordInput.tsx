@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Input } from './Input';
+import { EyeIcon } from './Icons';
 
 interface PasswordInputProps {
   value: string;
@@ -45,31 +46,7 @@ export function PasswordInput({ value, onChange, placeholder, onShowChange }: Pa
           transition: 'opacity 0.2s',
         }}
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ display: 'block' }}
-        >
-          <path
-            d="M12 5C7 5 2.73 8.11 1 12.5C2.73 16.89 7 20 12 20C17 20 21.27 16.89 23 12.5C21.27 8.11 17 5 12 5Z"
-            stroke="var(--text-primary)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle
-            cx="12"
-            cy="12.5"
-            r="3.5"
-            stroke="var(--text-primary)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+        <EyeIcon />
       </button>
     </div>
   );

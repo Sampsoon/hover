@@ -11,8 +11,7 @@ export function ApiPreview({ apiKey, baseURL, model, additionalArguments }: ApiP
   const displayKey = apiKey || 'Your API key';
   const displayURL = baseURL || OPEN_ROUTER_API_URL;
   const displayModel = model || DEFAULT_MODEL;
-  const hasAdditionalArgs =
-    additionalArguments && additionalArguments.trim().length > 0 && additionalArguments !== '{}';
+  const hasAdditionalArgs = additionalArguments && additionalArguments.trim().length > 0;
 
   return (
     <div

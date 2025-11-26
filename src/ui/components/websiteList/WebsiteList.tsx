@@ -3,7 +3,7 @@ import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../co
 import { storage, WebsiteFilterMode } from '../../../storage';
 
 export function WebsiteList() {
-  const [filterMode, setFilterMode] = useState<WebsiteFilterMode>('allow-all');
+  const [filterMode, setFilterMode] = useState<WebsiteFilterMode>(WebsiteFilterMode.ALLOW_ALL);
   const [blockList, setBlockList] = useState<string[]>([]);
   const [allowList, setAllowList] = useState<string[]>([]);
   const [newRegex, setNewRegex] = useState('');
@@ -11,17 +11,14 @@ export function WebsiteList() {
   const [editValue, setEditValue] = useState('');
   const [animate, setAnimate] = useState(false);
 
-  const regexes = filterMode === 'allow-all' ? blockList : allowList;
-  const setRegexes = filterMode === 'allow-all' ? setBlockList : setAllowList;
+  const regexes = filterMode === WebsiteFilterMode.ALLOW_ALL ? blockList : allowList;
+  const setRegexes = filterMode === WebsiteFilterMode.ALLOW_ALL ? setBlockList : setAllowList;
 
   useEffect(() => {
-    void storage.websiteFilter.get().then((config) => {
-      if (config) {
-        setFilterMode(config.mode);
-        setBlockList(config.blockList);
-        setAllowList(config.allowList);
-      }
-
+    void storage.websiteFilter.get().then(({ mode, blockList, allowList }) => {
+      setFilterMode(mode);
+      setBlockList(blockList);
+      setAllowList(allowList);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimate(true);
@@ -34,7 +31,7 @@ export function WebsiteList() {
     (newRegexes: string[]) => {
       setRegexes(newRegexes);
       void storage.websiteFilter.set(
-        filterMode === 'allow-all'
+        filterMode === WebsiteFilterMode.ALLOW_ALL
           ? { mode: filterMode, blockList: newRegexes, allowList }
           : { mode: filterMode, blockList, allowList: newRegexes },
       );
@@ -88,7 +85,7 @@ export function WebsiteList() {
   }, []);
 
   const emptyStateMessage =
-    filterMode === 'block-all'
+    filterMode === WebsiteFilterMode.BLOCK_ALL
       ? 'Add regex patterns to allow specific sites while blocking all others'
       : 'Add regex patterns to block specific sites while allowing all others';
 
@@ -199,7 +196,7 @@ export function WebsiteList() {
         <ToggleSwitch
           value={filterMode}
           onChange={handleFilterModeChange}
-          options={['allow-all', 'block-all']}
+          options={[WebsiteFilterMode.ALLOW_ALL, WebsiteFilterMode.BLOCK_ALL]}
           labels={['Run on all websites', 'Block all websites']}
           animate={animate}
         />

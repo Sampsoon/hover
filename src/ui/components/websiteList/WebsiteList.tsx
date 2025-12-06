@@ -42,14 +42,17 @@ export function WebsiteList() {
   }, []);
 
   const updatePatterns = useCallback(
-    (newPatterns: string[]) => {
-      setPatterns(newPatterns);
+    async (newPatterns: string[]) => {
       const config =
         filterMode === WebsiteFilterMode.ALLOW_ALL
           ? { mode: filterMode, blockList: newPatterns, allowList }
           : { mode: filterMode, blockList, allowList: newPatterns };
       const matchConfig = getMatchConfigFromWebsiteFilter(config);
-      void requestPermissionsForMatchConfig(matchConfig);
+      const granted = await requestPermissionsForMatchConfig(matchConfig);
+      if (!granted) {
+        return;
+      }
+      setPatterns(newPatterns);
       void storage.websiteFilter.set(config);
     },
     [setPatterns, filterMode, blockList, allowList],
@@ -78,17 +81,10 @@ export function WebsiteList() {
       return;
     }
 
-    if (filterMode === WebsiteFilterMode.BLOCK_ALL) {
-      const granted = await browser.permissions.request({ origins: [trimmed] });
-      if (!granted) {
-        return;
-      }
-    }
-
     setError(null);
-    updatePatterns([trimmed, ...patterns]);
+    await updatePatterns([trimmed, ...patterns]);
     setNewPattern('');
-  }, [newPattern, patterns, updatePatterns, filterMode]);
+  }, [newPattern, patterns, updatePatterns]);
 
   const removePattern = useCallback(
     (index: number) => {

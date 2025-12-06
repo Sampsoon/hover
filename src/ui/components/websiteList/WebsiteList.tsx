@@ -78,10 +78,17 @@ export function WebsiteList() {
       return;
     }
 
+    if (filterMode === WebsiteFilterMode.BLOCK_ALL) {
+      const granted = await browser.permissions.request({ origins: [trimmed] });
+      if (!granted) {
+        return;
+      }
+    }
+
     setError(null);
     updatePatterns([trimmed, ...patterns]);
     setNewPattern('');
-  }, [newPattern, patterns, updatePatterns]);
+  }, [newPattern, patterns, updatePatterns, filterMode]);
 
   const removePattern = useCallback(
     (index: number) => {

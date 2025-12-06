@@ -78,6 +78,19 @@ export function WebsiteList() {
       return;
     }
 
+    const newPatterns = [trimmed, ...patterns];
+    const config =
+      filterMode === WebsiteFilterMode.ALLOW_ALL
+        ? { mode: filterMode, blockList: newPatterns, allowList }
+        : { mode: filterMode, blockList, allowList: newPatterns };
+
+    const matchConfig = getMatchConfigFromWebsiteFilter(config);
+    const granted = await requestPermissionsForMatchConfig(matchConfig);
+
+    if (!granted) {
+      return;
+    }
+
     const validPattern = await isValidatePattern(trimmed);
     if (!validPattern) {
       setError('Invalid pattern');
@@ -85,9 +98,10 @@ export function WebsiteList() {
     }
 
     setError(null);
-    await updatePatterns([trimmed, ...patterns]);
+    setPatterns(newPatterns);
+    void storage.websiteFilter.set(config);
     setNewPattern('');
-  }, [newPattern, patterns, updatePatterns]);
+  }, [newPattern, patterns, filterMode, blockList, allowList, setPatterns]);
 
   const removePattern = useCallback(
     (index: number) => {

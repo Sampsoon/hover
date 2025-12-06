@@ -5,11 +5,13 @@ import { registerProcessCodeBlocksScript } from './processCodeBlocksRegistration
 import { getMatchConfigFromWebsiteFilter } from '../../permissions';
 import { storage } from '../../storage';
 
-void (async () => {
+async function initializeServiceWorker() {
   const config = await storage.websiteFilter.get();
   const matchConfig = getMatchConfigFromWebsiteFilter(config);
   await registerProcessCodeBlocksScript(matchConfig);
-})();
+}
+
+void initializeServiceWorker();
 
 storage.websiteFilter.onChange((newConfig) => {
   const matchConfig = getMatchConfigFromWebsiteFilter(newConfig);

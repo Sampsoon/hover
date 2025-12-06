@@ -47,11 +47,14 @@ export function WebsiteList() {
         filterMode === WebsiteFilterMode.ALLOW_ALL
           ? { mode: filterMode, blockList: newPatterns, allowList }
           : { mode: filterMode, blockList, allowList: newPatterns };
+
       const matchConfig = getMatchConfigFromWebsiteFilter(config);
       const granted = await requestPermissionsForMatchConfig(matchConfig);
+
       if (!granted) {
         return;
       }
+
       setPatterns(newPatterns);
       void storage.websiteFilter.set(config);
     },

@@ -42,14 +42,20 @@ export function WebsiteList() {
   }, []);
 
   const updatePatterns = useCallback(
-    (newPatterns: string[]) => {
-      setPatterns(newPatterns);
+    async (newPatterns: string[]) => {
       const config =
         filterMode === WebsiteFilterMode.ALLOW_ALL
           ? { mode: filterMode, blockList: newPatterns, allowList }
           : { mode: filterMode, blockList, allowList: newPatterns };
+
       const matchConfig = getMatchConfigFromWebsiteFilter(config);
-      void requestPermissionsForMatchConfig(matchConfig);
+      const granted = await requestPermissionsForMatchConfig(matchConfig);
+
+      if (!granted) {
+        return;
+      }
+
+      setPatterns(newPatterns);
       void storage.websiteFilter.set(config);
     },
     [setPatterns, filterMode, blockList, allowList],
@@ -72,20 +78,34 @@ export function WebsiteList() {
       return;
     }
 
+    const newPatterns = [trimmed, ...patterns];
+    const config =
+      filterMode === WebsiteFilterMode.ALLOW_ALL
+        ? { mode: filterMode, blockList: newPatterns, allowList }
+        : { mode: filterMode, blockList, allowList: newPatterns };
+
+    const matchConfig = getMatchConfigFromWebsiteFilter(config);
+    const granted = await requestPermissionsForMatchConfig(matchConfig);
+
+    if (!granted) {
+      return;
+    }
+
     const validPattern = await isValidatePattern(trimmed);
-    if (validPattern) {
+    if (!validPattern) {
       setError('Invalid pattern');
       return;
     }
 
     setError(null);
-    updatePatterns([trimmed, ...patterns]);
+    setPatterns(newPatterns);
+    void storage.websiteFilter.set(config);
     setNewPattern('');
-  }, [newPattern, patterns, updatePatterns]);
+  }, [newPattern, patterns, filterMode, blockList, allowList, setPatterns]);
 
   const removePattern = useCallback(
     (index: number) => {
-      updatePatterns(patterns.filter((_, i) => i !== index));
+      void updatePatterns(patterns.filter((_, i) => i !== index));
     },
     [patterns, updatePatterns],
   );
@@ -102,7 +122,7 @@ export function WebsiteList() {
     if (editingIndex !== null && editValue.trim()) {
       const newPatterns = [...patterns];
       newPatterns[editingIndex] = editValue.trim();
-      updatePatterns(newPatterns);
+      void updatePatterns(newPatterns);
     }
     setEditingIndex(null);
     setEditValue('');

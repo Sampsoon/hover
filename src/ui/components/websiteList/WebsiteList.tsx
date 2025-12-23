@@ -1,7 +1,11 @@
 import { useState, useCallback, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../common';
 import { storage, WebsiteFilterMode } from '../../../storage';
-import { getMatchConfigFromWebsiteFilter, requestPermissionsForMatchConfig } from '../../../permissions';
+import {
+  getMatchConfigFromWebsiteFilter,
+  requestPermissionsForMatchConfig,
+  revokePermissions,
+} from '../../../permissions';
 import browser from 'webextension-polyfill';
 
 async function isValidPattern(pattern: string): Promise<boolean> {
@@ -17,7 +21,8 @@ type UpdateResult = { success: true } | { success: false; error?: string };
 
 export function WebsiteList() {
   const [filterMode, setFilterMode] = useState<WebsiteFilterMode>(WebsiteFilterMode.ALLOW_ALL);
-  const [patterns, setPatterns] = useState<string[]>([]);
+  const [blockList, setBlockList] = useState<string[]>([]);
+  const [allowList, setAllowList] = useState<string[]>([]);
 
   const [newPattern, setNewPattern] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -26,10 +31,14 @@ export function WebsiteList() {
 
   const [error, setError] = useState<string | null>(null);
 
+  const patterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? blockList : allowList;
+  const setPatterns = filterMode === WebsiteFilterMode.ALLOW_ALL ? setBlockList : setAllowList;
+
   useEffect(() => {
-    void storage.websiteFilter.get().then(({ mode, patternList }) => {
-      setFilterMode(mode);
-      setPatterns(patternList);
+    void storage.websiteFilter.get().then((config) => {
+      setFilterMode(config.mode);
+      setBlockList(config.blockList);
+      setAllowList(config.allowList);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setAnimate(true);
@@ -38,8 +47,8 @@ export function WebsiteList() {
     });
   }, []);
 
-  const updateConfig = useCallback(
-    async (newMode: WebsiteFilterMode, newPatterns: string[], patternToValidate?: string): Promise<UpdateResult> => {
+  const updatePatterns = useCallback(
+    async (newPatterns: string[], patternToValidate?: string): Promise<UpdateResult> => {
       if (patternToValidate) {
         const valid = await isValidPattern(patternToValidate);
         if (!valid) {
@@ -47,7 +56,10 @@ export function WebsiteList() {
         }
       }
 
-      const config = { mode: newMode, patternList: newPatterns };
+      const newBlockList = filterMode === WebsiteFilterMode.ALLOW_ALL ? newPatterns : blockList;
+      const newAllowList = filterMode === WebsiteFilterMode.BLOCK_ALL ? newPatterns : allowList;
+
+      const config = { mode: filterMode, blockList: newBlockList, allowList: newAllowList };
       const matchConfig = getMatchConfigFromWebsiteFilter(config);
       const granted = await requestPermissionsForMatchConfig(matchConfig);
 
@@ -55,26 +67,47 @@ export function WebsiteList() {
         return { success: false };
       }
 
-      setFilterMode(newMode);
       setPatterns(newPatterns);
       void storage.websiteFilter.set(config);
       return { success: true };
     },
-    [],
+    [filterMode, blockList, allowList, setPatterns],
   );
 
-  const updatePatterns = useCallback(
-    (newPatterns: string[], patternToValidate?: string): Promise<UpdateResult> => {
-      return updateConfig(filterMode, newPatterns, patternToValidate);
+  const switchMode = useCallback(
+    async (newMode: WebsiteFilterMode): Promise<UpdateResult> => {
+      if (newMode === WebsiteFilterMode.BLOCK_ALL) {
+        await revokePermissions(['<all_urls>']);
+      }
+
+      const config = { mode: newMode, blockList, allowList };
+      const matchConfig = getMatchConfigFromWebsiteFilter(config);
+      const granted = await requestPermissionsForMatchConfig(matchConfig);
+
+      if (!granted && newMode === WebsiteFilterMode.BLOCK_ALL) {
+        const emptyConfig = { mode: newMode, blockList, allowList: [] };
+        setFilterMode(newMode);
+        setAllowList([]);
+        void storage.websiteFilter.set(emptyConfig);
+        return { success: false };
+      }
+
+      if (!granted && newMode === WebsiteFilterMode.ALLOW_ALL) {
+        return { success: false };
+      }
+
+      setFilterMode(newMode);
+      void storage.websiteFilter.set(config);
+      return { success: true };
     },
-    [filterMode, updateConfig],
+    [blockList, allowList],
   );
 
   const handleFilterModeChange = useCallback(
-    (mode: WebsiteFilterMode) => {
-      void updateConfig(mode, patterns);
+    (newMode: WebsiteFilterMode) => {
+      void switchMode(newMode);
     },
-    [patterns, updateConfig],
+    [switchMode],
   );
 
   const clearEditState = useCallback(() => {
@@ -99,10 +132,21 @@ export function WebsiteList() {
   }, [newPattern, patterns, updatePatterns]);
 
   const removePattern = useCallback(
-    (index: number) => {
-      void updatePatterns(patterns.filter((_, i) => i !== index));
+    async (index: number) => {
+      const patternToRemove = patterns[index];
+      const newPatterns = patterns.filter((_, i) => i !== index);
+
+      if (filterMode === WebsiteFilterMode.BLOCK_ALL) {
+        await revokePermissions([patternToRemove]);
+      }
+
+      const newBlockList = filterMode === WebsiteFilterMode.ALLOW_ALL ? newPatterns : blockList;
+      const newAllowList = filterMode === WebsiteFilterMode.BLOCK_ALL ? newPatterns : allowList;
+
+      setPatterns(newPatterns);
+      void storage.websiteFilter.set({ mode: filterMode, blockList: newBlockList, allowList: newAllowList });
     },
-    [patterns, updatePatterns],
+    [patterns, filterMode, blockList, allowList, setPatterns],
   );
 
   const startEditing = useCallback(
@@ -313,7 +357,7 @@ export function WebsiteList() {
                     </div>
                     <IconButton
                       onClick={() => {
-                        removePattern(index);
+                        void removePattern(index);
                       }}
                     >
                       <TrashIcon />

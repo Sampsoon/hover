@@ -32,10 +32,12 @@ export enum WebsiteFilterMode {
 
 export interface WebsiteFilterConfig {
   mode: WebsiteFilterMode;
-  patternList: string[];
+  blockList: string[]; // Sites to block when in ALLOW_ALL mode
+  allowList: string[]; // Sites to allow when in BLOCK_ALL mode
 }
 
 export const DEFAULT_WEBSITE_FILTER_CONFIG: WebsiteFilterConfig = {
   mode: WebsiteFilterMode.BLOCK_ALL,
-  patternList: [],
+  blockList: [],
+  allowList: [],
 };

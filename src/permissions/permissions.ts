@@ -6,11 +6,11 @@ export function getMatchConfigFromWebsiteFilter(config: WebsiteFilterConfig): Co
   if (config.mode === WebsiteFilterMode.ALLOW_ALL) {
     return {
       matches: ['<all_urls>'],
-      excludeMatches: config.patternList,
+      excludeMatches: config.blockList,
     };
   }
   return {
-    matches: config.patternList,
+    matches: config.allowList,
     excludeMatches: [],
   };
 }
@@ -33,4 +33,12 @@ export async function requestPermissionsForMatchConfig(matchConfig: ContentScrip
   } finally {
     isRequesting = false;
   }
+}
+
+export async function revokePermissions(origins: string[]): Promise<boolean> {
+  if (origins.length === 0) {
+    return true;
+  }
+
+  return await browser.permissions.remove({ origins });
 }

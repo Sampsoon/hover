@@ -23,7 +23,7 @@ async function checkSetupStatus(): Promise<SetupStatus> {
 
   const hasApiKey = apiProvider === APIProvider.CUSTOM ? Boolean(customConfig?.key) : Boolean(openRouterConfig?.key);
 
-  const hasWebsites = websiteFilter.mode === WebsiteFilterMode.ALLOW_ALL || websiteFilter.patternList.length > 0;
+  const hasWebsites = websiteFilter.mode === WebsiteFilterMode.ALLOW_ALL || websiteFilter.allowList.length > 0;
 
   return { hasApiKey, hasWebsites };
 }

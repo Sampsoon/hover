@@ -433,8 +433,8 @@ export function WebsiteList() {
 
         <InfoBox title="Chrome Permission Caching">
           <p style={{ margin: 0 }}>
-            Chrome caches previously granted permissions and will silently approve them again without prompting. Your
-            permissions are still being applied—Chrome just skips the dialog.
+            Chrome caches previously granted permissions and will silently re-approve them without prompting. The
+            extension&apos;s permissions are still being changed — Chrome just skips the dialog.
           </p>
         </InfoBox>
 

@@ -21,7 +21,7 @@ export function InfoBox({ title, children, style }: InfoBoxProps) {
     >
       <div
         style={{
-          padding: '12px 14px',
+          padding: '8px 14px',
           borderBottom: '1px solid var(--border-color)',
           ...smallHeadingStyle,
         }}

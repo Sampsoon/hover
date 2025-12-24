@@ -2,7 +2,7 @@ import { Json } from '../shared';
 import { storage } from './storage';
 import { APIConfig, APIProvider, OpenRouterAPIConfig, CustomAPIConfig } from './types';
 
-export const DEFAULT_MODEL = 'x-ai/grok-4-fast';
+export const DEFAULT_MODEL = 'x-ai/grok-4.1-fast';
 export const OPEN_ROUTER_API_URL = 'https://openrouter.ai/api/v1';
 
 interface OpenRouterChatCompletionCreateParams extends Json {
@@ -15,6 +15,11 @@ interface OpenRouterChatCompletionCreateParams extends Json {
     max_tokens?: number;
     exclude?: boolean;
     enabled?: boolean;
+  };
+  thinking?: {
+    type: 'enabled' | 'disabled';
+    budget_tokens?: number;
+    thinking_level?: 'minimal' | 'low' | 'medium' | 'high';
   };
 }
 

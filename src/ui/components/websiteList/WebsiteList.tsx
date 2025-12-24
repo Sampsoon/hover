@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
-import { ToggleSwitch, Input, IconButton, bodyTextStyle, TrashIcon } from '../common';
+import { ToggleSwitch, Input, IconButton, InfoBox, bodyTextStyle, TrashIcon } from '../common';
 import { storage, WebsiteFilterMode } from '../../../storage';
 import {
   getMatchConfigFromWebsiteFilter,
@@ -219,16 +219,32 @@ export function WebsiteList() {
       </>
     );
 
-  const permissionNote =
-    filterMode === WebsiteFilterMode.ALLOW_ALL
-      ? 'This extension won\'t run on blocked sites, but due to Chrome API restrictions, it still has access to blocked sites. Use "Block all websites" to limit Chrome permissions to only the sites you choose.'
-      : null;
+  const wrapperStyle = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '24px',
+  };
 
-  const containerStyle = {
+  const leftColumnStyle = {
+    width: '760px',
+    flexShrink: 0,
     display: 'flex',
     flexDirection: 'column' as const,
     gap: '16px',
   };
+
+  const rightColumnStyle = {
+    width: '420px',
+    flexShrink: 0,
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '16px',
+  };
+
+  // Shared styles for info box content
+  const infoSectionStyle = { marginBottom: '10px' };
+  const infoLabelStyle = { marginBottom: '6px' };
+  const infoIndentStyle = { marginLeft: '14px' };
 
   const tableContainerStyle = {
     border: '1px solid var(--border-color)',
@@ -293,15 +309,6 @@ export function WebsiteList() {
     fontStyle: 'italic',
   };
 
-  const permissionNoteStyle = {
-    ...bodyTextStyle,
-    padding: '14px 16px',
-    textAlign: 'center' as const,
-    color: 'var(--text-secondary)',
-    fontSize: '13px',
-    borderTop: '1px solid var(--border-color)',
-  };
-
   const errorStyle = {
     padding: '8px 12px',
     color: 'var(--error-color, #ef4444)',
@@ -311,71 +318,139 @@ export function WebsiteList() {
   };
 
   return (
-    <div style={containerStyle}>
-      <ToggleSwitch
-        value={filterMode}
-        onChange={handleFilterModeChange}
-        options={[WebsiteFilterMode.ALLOW_ALL, WebsiteFilterMode.BLOCK_ALL]}
-        labels={['Run on all websites', 'Block all websites']}
-        animate={animate}
-      />
+    <div style={wrapperStyle}>
+      <div style={leftColumnStyle}>
+        <ToggleSwitch
+          value={filterMode}
+          onChange={handleFilterModeChange}
+          options={[WebsiteFilterMode.ALLOW_ALL, WebsiteFilterMode.BLOCK_ALL]}
+          labels={['Run on all websites', 'Block all websites']}
+          animate={animate}
+        />
 
-      <div style={tableContainerStyle}>
-        <div style={tableHeaderStyle}>
-          <Input
-            value={newPattern}
-            onChange={handleNewPatternChange}
-            onSubmit={handleNewPatternSubmit}
-            placeholder="*://*.example.com/*"
-          />
+        <div style={tableContainerStyle}>
+          <div style={tableHeaderStyle}>
+            <Input
+              value={newPattern}
+              onChange={handleNewPatternChange}
+              onSubmit={handleNewPatternSubmit}
+              placeholder="*://*.example.com/*"
+            />
+          </div>
+          {error && <div style={errorStyle}>{error}</div>}
+          {patterns.length > 0 ? (
+            <div style={tableBodyStyle} className="table-body">
+              {patterns.map((pattern, index) => (
+                <div key={index} style={tableRowStyle} className="table-row">
+                  {editingIndex === index ? (
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={handleEditChange}
+                      onKeyDown={handleEditKeyDown}
+                      onBlur={handleEditBlur}
+                      autoFocus
+                      style={editInputStyle}
+                    />
+                  ) : (
+                    <>
+                      <div
+                        style={cellStyle}
+                        title={pattern}
+                        onClick={() => {
+                          startEditing(index);
+                        }}
+                      >
+                        {pattern}
+                      </div>
+                      <IconButton onClick={() => void removePattern(index)}>
+                        <TrashIcon />
+                      </IconButton>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={emptyStateStyle}>{emptyStateMessage}</div>
+          )}
         </div>
-        {error && <div style={errorStyle}>{error}</div>}
-        {patterns.length > 0 ? (
-          <div style={tableBodyStyle} className="table-body">
-            {patterns.map((pattern, index) => (
-              <div key={index} style={tableRowStyle} className="table-row">
-                {editingIndex === index ? (
-                  <input
-                    type="text"
-                    value={editValue}
-                    onChange={handleEditChange}
-                    onKeyDown={handleEditKeyDown}
-                    onBlur={handleEditBlur}
-                    autoFocus
-                    style={editInputStyle}
-                  />
-                ) : (
-                  <>
-                    <div
-                      style={cellStyle}
-                      title={pattern}
-                      onClick={() => {
-                        startEditing(index);
-                      }}
-                    >
-                      {pattern}
-                    </div>
-                    <IconButton
-                      onClick={() => {
-                        void removePattern(index);
-                      }}
-                    >
-                      <TrashIcon />
-                    </IconButton>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={emptyStateStyle}>{emptyStateMessage}</div>
-        )}
-        {permissionNote && (
-          <div style={permissionNoteStyle}>
-            <strong>Note:</strong> {permissionNote.replace('Note: ', '')}
-          </div>
-        )}
       </div>
+
+      <aside style={rightColumnStyle}>
+        <InfoBox title="URL Pattern Guide">
+          <p style={{ margin: '0 0 8px 0' }}>
+            Pattern format: <code>scheme://host/path</code>
+          </p>
+
+          <div style={infoSectionStyle}>
+            <div style={infoLabelStyle}>
+              <strong>Scheme</strong>
+            </div>
+            <div style={infoIndentStyle}>
+              <div>
+                <code>*://</code> — http + https
+              </div>
+              <div>
+                <code>https://</code> — HTTPS only
+              </div>
+            </div>
+          </div>
+
+          <div style={infoSectionStyle}>
+            <div style={infoLabelStyle}>
+              <strong>Host</strong>
+            </div>
+            <div style={infoIndentStyle}>
+              <div>
+                <code>*.google.com</code> — includes subdomains
+              </div>
+              <div>
+                <code>google.com</code> — root domain only
+              </div>
+            </div>
+          </div>
+
+          <div style={infoSectionStyle}>
+            <div style={infoLabelStyle}>
+              <strong>Path</strong>
+            </div>
+            <div style={infoIndentStyle}>
+              <code>{'/*'}</code> — all pages
+            </div>
+          </div>
+
+          <div>
+            <strong>Examples</strong>
+            <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <code>*://*.example.com/*</code>
+              <code>https://github.com/*</code>
+              <code>*://*.google.com/*</code>
+              <code>http://localhost:*/*</code>
+            </div>
+          </div>
+        </InfoBox>
+
+        <InfoBox title="Chrome Permission Caching">
+          <p style={{ margin: 0 }}>
+            Chrome caches previously granted permissions and will silently approve them again without prompting. Your
+            permissions are still being applied—Chrome just skips the dialog.
+          </p>
+        </InfoBox>
+
+        {filterMode === WebsiteFilterMode.ALLOW_ALL && (
+          <InfoBox title="Blocked Site Access">
+            <p style={{ margin: '0 0 8px 0' }}>
+              In <strong>&quot;Run on all websites&quot;</strong> mode, blocked sites are enforced programmatically, not
+              via Chrome permissions. This is due to a Chrome API limitation.
+            </p>
+            <p style={{ margin: 0 }}>
+              To enforce blocking via Chrome permissions, switch to <strong>&quot;Block all websites&quot;</strong>{' '}
+              above.
+            </p>
+          </InfoBox>
+        )}
+      </aside>
     </div>
   );
 }

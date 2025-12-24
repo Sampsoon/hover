@@ -45,7 +45,8 @@ function OptionsApp() {
         style={{
           flex: 1,
           padding: '32px 48px',
-          maxWidth: '900px',
+          width: '100%',
+          maxWidth: selectedTab === SettingsTab.WEBSITES ? 'none' : '900px',
         }}
       >
         <h1 style={{ color: 'var(--text-primary)', margin: '0 0 20px 0', fontSize: '22px' }}>

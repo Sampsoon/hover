@@ -30,3 +30,19 @@ export const fieldLabelStyle = {
   marginBottom: '6px',
   color: 'var(--text-primary)',
 };
+
+export const smallTextStyle = {
+  fontFamily: 'var(--font-family)',
+  fontSize: '13px',
+  lineHeight: '1.5',
+  fontWeight: 400,
+  color: 'var(--text-primary)',
+};
+
+export const smallHeadingStyle = {
+  fontFamily: 'var(--font-family)',
+  fontSize: '13px',
+  lineHeight: '1.5',
+  fontWeight: 600,
+  color: 'var(--text-primary)',
+};

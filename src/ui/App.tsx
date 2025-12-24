@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import { Button, GithubIcon, SettingsIcon, SetupChecklist } from './components';
+import iconUrl from '/icons/icon.svg';
 
 const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
 
@@ -22,18 +23,27 @@ function App() {
         gap: '20px',
       }}
     >
-      <h1
+      <div
         style={{
-          margin: 0,
-          fontSize: '20px',
-          fontWeight: 650,
-          color: 'var(--text-primary)',
-          textAlign: 'center',
-          letterSpacing: '-0.01em',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
         }}
       >
-        Vibey LSP
-      </h1>
+        <h1
+          style={{
+            margin: 0,
+            fontSize: '20px',
+            fontWeight: 650,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Vibey LSP
+        </h1>
+        <img src={iconUrl} alt="" width={24} height={24} />
+      </div>
 
       <SetupChecklist />
 

@@ -10,12 +10,11 @@ interface SettingsMenuProps {
 
 const BUTTON_HEIGHT = 48;
 const ITEM_GAP = 4;
-const SIDEBAR_WIDTH = 200;
-const SIDEBAR_PADDING = 16;
+const SIDEBAR_PADDING = 24;
 
 const tabs: { id: SettingsTab; title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
-  { id: SettingsTab.API, title: 'API Key', icon: ApiKeyIcon },
-  { id: SettingsTab.WEBSITES, title: 'Websites', icon: GlobeIcon },
+  { id: SettingsTab.API, title: 'API Key Configuration', icon: ApiKeyIcon },
+  { id: SettingsTab.WEBSITES, title: 'Website Permissions', icon: GlobeIcon },
 ];
 
 export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps) {
@@ -74,7 +73,6 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
       ref={containerRef}
       onMouseDown={handleMouseDown}
       style={{
-        width: SIDEBAR_WIDTH,
         flexShrink: 0,
         padding: SIDEBAR_PADDING,
         borderRight: '1px solid var(--border-color)',
@@ -113,17 +111,16 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
             zIndex: 1,
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
-            width: '100%',
+            gap: 16,
             height: BUTTON_HEIGHT,
-            padding: '0 14px',
+            padding: '0 18px',
             border: 'none',
             borderRadius: 8,
             backgroundColor: 'transparent',
             color: selected === id ? 'var(--primary-color)' : 'var(--text-secondary)',
             cursor: 'pointer',
             transition: 'color 0.15s ease',
-            textAlign: 'left',
+            whiteSpace: 'nowrap',
           }}
         >
           <Icon width={20} height={20} style={{ flexShrink: 0 }} />

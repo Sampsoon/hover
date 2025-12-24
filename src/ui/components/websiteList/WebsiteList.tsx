@@ -439,7 +439,7 @@ export function WebsiteList() {
         </InfoBox>
 
         {filterMode === WebsiteFilterMode.ALLOW_ALL && (
-          <InfoBox title="Blocked Site Access">
+          <InfoBox title="Chrome permission limitations">
             <p style={{ margin: '0 0 8px 0' }}>
               In <strong>&quot;Run on all websites&quot;</strong> mode, blocked sites are enforced programmatically, not
               via Chrome permissions. This is due to a Chrome API limitation.

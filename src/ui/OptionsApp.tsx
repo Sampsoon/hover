@@ -63,9 +63,6 @@ function OptionsApp() {
           maxWidth: selectedTab === SettingsTab.WEBSITES ? 'none' : '900px',
         }}
       >
-        <h1 style={{ color: 'var(--text-primary)', margin: '0 0 20px 0', fontSize: '22px' }}>
-          {selectedTab === SettingsTab.API ? 'API Configuration' : 'Website Settings'}
-        </h1>
         {selectedTab === SettingsTab.API && <ApiConfiguration />}
         {selectedTab === SettingsTab.WEBSITES && <WebsiteList />}
       </main>

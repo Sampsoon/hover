@@ -26,3 +26,6 @@ export {
 } from './codeBlocks';
 
 export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';
+
+export { tokenizeElement, wrapTokensInSpans, getDomLeaves } from './tokenization';
+export type { TokenizationOptions } from './tokenization';

@@ -8,125 +8,15 @@ import {
   CodeTokenId,
   IdMappings,
 } from './types';
+import { CODE_TOKEN_ID_NAME } from './constants';
+import { wrapTokensInSpans, getDomLeaves } from './tokenization';
+
+export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, CODE_DELIMITERS } from './constants';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
-export const CODE_TOKEN_ID_NAME = 'tokenId';
-
-export const PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME = 'programmatically-added-element';
-
-export const CODE_DELIMITERS = new Set<string>([
-  // Whitespace
-  ' ',
-  '\t',
-  '\n',
-  '\r',
-  '\v',
-  '\f',
-  // Structural punctuation
-  '.',
-  ',',
-  ';',
-  ':',
-  '(',
-  ')',
-  '[',
-  ']',
-  '{',
-  '}',
-  // Comparison/assignment operators
-  '>',
-  '<',
-  '=',
-  // Arithmetic operators
-  '+',
-  '*',
-  '/',
-  '%',
-  // Bitwise/logical operators
-  '&',
-  '|',
-  '^',
-  '~',
-  // String delimiters
-  '"',
-  "'",
-  '`',
-  // Escape character
-  '\\',
-]);
-
-function getDomLeaves(element: HTMLElement): HTMLElement[] {
-  return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
-}
-
 function generateRandomId(): string {
   return ((Math.random() * 0x100000000) | 0).toString(36);
-}
-
-function createProgrammaticallyAddedSpan(content: string) {
-  const span = document.createElement('span');
-  span.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
-  span.textContent = content;
-  return span;
-}
-
-function breakIntoTokens(elementContent: string) {
-  const fragment = document.createDocumentFragment();
-
-  if (!elementContent.trim()) {
-    fragment.appendChild(document.createTextNode(elementContent));
-    return fragment;
-  }
-
-  let currentToken = [];
-  let isTraversingDelimiters = CODE_DELIMITERS.has(elementContent[0]);
-
-  for (const char of elementContent) {
-    const stateChanged = isTraversingDelimiters !== CODE_DELIMITERS.has(char);
-
-    if (stateChanged && isTraversingDelimiters) {
-      fragment.appendChild(document.createTextNode(currentToken.join('')));
-    } else if (stateChanged && !isTraversingDelimiters) {
-      const newSpan = createProgrammaticallyAddedSpan(currentToken.join(''));
-      fragment.appendChild(newSpan);
-    }
-
-    if (stateChanged) {
-      isTraversingDelimiters = !isTraversingDelimiters;
-      currentToken = [];
-    }
-
-    currentToken.push(char);
-  }
-
-  if (currentToken.length > 0 && isTraversingDelimiters) {
-    fragment.appendChild(document.createTextNode(currentToken.join('')));
-  }
-
-  if (currentToken.length > 0 && !isTraversingDelimiters) {
-    const newSpan = createProgrammaticallyAddedSpan(currentToken.join(''));
-    fragment.appendChild(newSpan);
-  }
-
-  return fragment;
-}
-
-function wrapTokensInSpans(element: HTMLElement) {
-  const childNodes = Array.from(element.childNodes);
-
-  childNodes.forEach((node) => {
-    if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
-      const originalText = node.textContent;
-      const tokens = breakIntoTokens(originalText);
-
-      if (tokens.childNodes.length > 1) {
-        element.replaceChild(tokens, node);
-      }
-    } else if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== 'SPAN') {
-      wrapTokensInSpans(node as HTMLElement);
-    }
-  });
 }
 
 export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
@@ -134,7 +24,7 @@ export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const { codeTokenElementMap } = idMappings;
   const { parentCodeBlockMap } = idMappings;
 
-  wrapTokensInSpans(html);
+  wrapTokensInSpans(document, html);
 
   const codeTokens = getDomLeaves(html);
 

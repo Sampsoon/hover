@@ -33,9 +33,10 @@ export const OPEN_ROUTER_DEFAULT_PARAMS: OpenRouterChatCompletionCreateParams = 
   },
 };
 
-const DEV_ENVIRONMENT_API_KEYS = {
-  OPEN_ROUTER: import.meta.env.VITE_OPEN_ROUTER_API_KEY,
-} as const;
+function getDevEnvironmentApiKey() {
+  const env = import.meta.env;
+  return env.VITE_OPEN_ROUTER_API_KEY;
+}
 
 function isValidCustomAPIConfig(config: CustomAPIConfig | undefined): config is CustomAPIConfig {
   if (config?.model && config.url && config.key) {
@@ -62,7 +63,7 @@ export async function getAPIKeyConfig(): Promise<APIConfig> {
   const devEnvironmentConfig = {
     model: DEFAULT_MODEL,
     url: OPEN_ROUTER_API_URL,
-    key: DEV_ENVIRONMENT_API_KEYS.OPEN_ROUTER,
+    key: getDevEnvironmentApiKey(),
     additionalArguments: OPEN_ROUTER_DEFAULT_PARAMS,
   };
 

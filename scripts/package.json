@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scrapeCodeExamples.ts",
-    "evaluate": "tsx evaluatePrompt.ts",
+    "evaluate": "tsx --env-file=.env evaluatePrompt.ts",
     "tokenize": "tsx tokenizeCodeExamples.ts",
     "migrate": "tsx migrateAnnotations.ts",
     "workbench": "tsx annotationWorkbench.ts"

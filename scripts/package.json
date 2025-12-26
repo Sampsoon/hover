@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scrapeCodeExamples.ts",
-    "manual": "tsx manualCodeEntry.ts",
     "evaluate": "tsx evaluatePrompt.ts",
     "tokenize": "tsx tokenizeCodeExamples.ts",
     "migrate": "tsx migrateAnnotations.ts",

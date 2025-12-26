@@ -1,14 +1,29 @@
 import { createServer, IncomingMessage, ServerResponse } from 'http';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { JSDOM } from 'jsdom';
 
+const tokenizationDom = new JSDOM('<!DOCTYPE html><html><body></body></html>');
+(global as any).document = tokenizationDom.window.document;
+(global as any).window = tokenizationDom.window;
+(global as any).HTMLElement = tokenizationDom.window.HTMLElement;
+(global as any).Node = tokenizationDom.window.Node;
+
+const { attachIdsToTokens, setupIdToElementMapping } = await import('../src/coreFunctionality/htmlProcessing');
+import type { CodeBlock } from '../src/coreFunctionality/htmlProcessing';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const CODE_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'code-examples.json');
 const TOKENIZED_EXAMPLES_PATH = join(__dirname, '..', 'test-data', 'tokenized-examples.json');
 const ANNOTATIONS_PATH = join(__dirname, '..', 'test-data', 'annotated-examples.json');
 const EVAL_REPORT_PATH = join(__dirname, '..', 'test-data', 'eval-report.json');
 const PORT = 3459;
+
+interface CodeExample {
+  url: string;
+  html: string;
+}
 
 interface TokenizedExample {
   url: string;
@@ -87,6 +102,45 @@ function saveAnnotationsToFile(annotations: AnnotationEntry[]): void {
   writeFileSync(ANNOTATIONS_PATH, JSON.stringify(annotations, null, 2));
 }
 
+function ensureDataFile(path: string): void {
+  const dir = dirname(path);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
+  if (!existsSync(path)) {
+    writeFileSync(path, '[]');
+  }
+}
+
+function readCodeExamples(): CodeExample[] {
+  ensureDataFile(CODE_EXAMPLES_PATH);
+  return JSON.parse(readFileSync(CODE_EXAMPLES_PATH, 'utf-8'));
+}
+
+function writeCodeExamples(examples: CodeExample[]): void {
+  ensureDataFile(CODE_EXAMPLES_PATH);
+  writeFileSync(CODE_EXAMPLES_PATH, JSON.stringify(examples, null, 2));
+}
+
+function saveTokenizedExamples(examples: TokenizedExample[]): void {
+  writeFileSync(TOKENIZED_EXAMPLES_PATH, JSON.stringify(examples, null, 2));
+}
+
+function tokenizeHtml(html: string): string {
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  const codeBlock: CodeBlock = {
+    html: container as unknown as HTMLElement,
+    codeBlockId: 'test',
+  };
+
+  const idMappings = setupIdToElementMapping();
+  attachIdsToTokens(codeBlock, idMappings);
+
+  return container.innerHTML;
+}
+
 function processTokenizedHtml(tokenizedHtml: string, annotations: Annotation[] = [], comparison?: Comparison): string {
   const dom = new JSDOM(`<div id="root">${tokenizedHtml}</div>`);
   const document = dom.window.document;
@@ -149,436 +203,145 @@ const HTML = `<!DOCTYPE html>
       --bg-primary: #fffefc;
       --text-primary: #1b1730;
       --text-secondary: #6a7082;
-      --text-disabled: #9aa1af;
       --border-color: rgba(27, 23, 48, 0.12);
       --input-bg: #ffffff;
       --code-bg: #f6f8ff;
-      --card-bg: #fffefc;
-      --card-bg-hover: #f8f4f0;
       --primary-color: #5f6be1;
       --success-color: #1fb67e;
-      --warning-color: #e88888;
+      --warning-color: #d08850;
       --alert-color: #e03d63;
-      --shadow-base: 47, 43, 72;
-      --shadow-sm: 0 1px 3px 0 rgba(var(--shadow-base), 0.08), 0 1px 2px 0 rgba(var(--shadow-base), 0.06);
-      --shadow-md: 0 4px 6px -1px rgba(var(--shadow-base), 0.12), 0 2px 4px -1px rgba(var(--shadow-base), 0.08);
+      --invite-color: #5bb3d8;
       --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --font-monospace: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+      --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
     }
-    * { box-sizing: border-box; }
-    body {
-      font-family: var(--font-family);
-      font-size: 16px;
-      line-height: 1.6;
-      margin: 0;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-    }
-    .container {
-      max-width: 1800px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    h1 { color: var(--text-primary); margin-bottom: 8px; font-size: 20px; font-weight: 600; }
-    .subtitle { color: var(--text-secondary); margin-bottom: 16px; font-size: 14px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background: var(--bg-primary); color: var(--text-primary); font-size: 13px; }
     
-    .header {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow-sm);
-    }
-    .header h1 { margin: 0 0 8px 0; }
-    .model-info { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
-    .aggregate-stats {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .stat-card {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px 16px;
-      text-align: center;
-      min-width: 100px;
-    }
-    .stat-value {
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-    .stat-value.good { color: var(--success-color); }
-    .stat-value.warning { color: var(--warning-color); }
-    .stat-value.bad { color: var(--alert-color); }
-    .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-
-    .main-content {
+    .layout {
       display: grid;
-      grid-template-columns: 300px 1fr 320px;
-      gap: 16px;
-      height: calc(100vh - 180px);
+      grid-template-columns: 240px 1fr 280px;
+      height: 100vh;
     }
+    .layout > * { border-right: 1px solid var(--border-color); }
+    .layout > *:last-child { border-right: none; }
 
-    .examples-list {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      overflow-y: auto;
-      box-shadow: var(--shadow-sm);
-    }
-    .examples-header {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      font-weight: 600;
-      font-size: 13px;
-      position: sticky;
-      top: 0;
-      background: var(--card-bg);
-      z-index: 10;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .examples-panel { overflow: hidden; display: flex; flex-direction: column; }
+    .examples-header { padding: 12px; border-bottom: 1px solid var(--border-color); }
+    .examples-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .examples-title-row h2 { font-size: 13px; font-weight: 600; margin: 0; }
+    .add-btn { width: 24px; height: 24px; border: none; border-radius: 4px; background: var(--primary-color); color: white; font-size: 16px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .add-btn:hover { background: #4f5bd1; }
+    .progress { font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; }
+    .progress strong { color: var(--success-color); }
     .filter-select {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-size: 11px;
+      width: 100%; padding: 6px 8px; font-size: 12px;
+      border: 1px solid var(--border-color); border-radius: 4px;
+      background: var(--input-bg); color: var(--text-primary);
     }
-    .example-item {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .example-item:hover { background: var(--card-bg-hover); }
-    .example-item.selected { background: rgba(95, 107, 225, 0.1); border-left: 3px solid var(--primary-color); }
-    .example-item.has-annotations { border-left: 3px solid var(--success-color); }
-    .example-item.selected.has-annotations { border-left: 3px solid var(--primary-color); }
-    .example-url {
-      font-size: 12px;
-      color: var(--primary-color);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 4px;
-    }
-    .example-metrics {
-      display: flex;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--text-secondary);
-    }
-    .example-f1 { font-weight: 600; }
-    .example-f1.good { color: var(--success-color); }
-    .example-f1.warning { color: var(--warning-color); }
-    .example-f1.bad { color: var(--alert-color); }
-    .f1-bar {
-      height: 3px;
-      background: var(--border-color);
-      border-radius: 2px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .f1-bar-fill {
-      height: 100%;
-      border-radius: 2px;
-    }
-    .annotation-badge {
-      font-size: 10px;
-      padding: 1px 4px;
-      border-radius: 3px;
-      background: var(--success-color);
-      color: white;
-      margin-left: 4px;
-    }
+    .add-form { display: flex; flex-direction: column; gap: 6px; }
+    .add-form input, .add-form textarea { padding: 6px 8px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 4px; }
+    .add-form textarea { font-family: var(--font-mono); height: 50px; resize: none; }
+    .examples-list { flex: 1; overflow-y: auto; }
+    .example-item { padding: 10px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+    .example-item:hover { background: rgba(95, 107, 225, 0.04); }
+    .example-item.active { background: rgba(95, 107, 225, 0.08); border-left: 3px solid var(--primary-color); padding-left: 9px; }
+    .example-url { font-size: 11px; color: var(--primary-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+    .example-status { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot.reviewed { background: var(--success-color); }
+    .status-dot.pending { background: var(--text-secondary); opacity: 0.4; }
+    .f1-score { font-weight: 600; }
+    .f1-score.good { color: var(--success-color); }
+    .f1-score.mid { color: var(--warning-color); }
+    .f1-score.bad { color: var(--alert-color); }
+    .ann-count { color: var(--text-secondary); }
 
-    .code-section {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-    .code-header {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .code-url {
-      color: var(--primary-color);
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
-    }
-    .code-stats {
-      display: flex;
-      gap: 12px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-left: 16px;
-    }
-    .code-stats strong { color: var(--text-primary); }
-    .code-block-wrapper {
-      flex: 1;
-      overflow: auto;
-      padding: 16px;
-      background: var(--code-bg);
-    }
-    .code-block {
-      font-family: var(--font-monospace);
-      font-size: 12px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-    }
-    .code-block * {
-      color: inherit !important;
-      background: inherit !important;
-    }
-    .code-block .token {
-      cursor: pointer;
-      padding: 1px 2px;
-      border-radius: 2px;
-      color: var(--text-primary) !important;
-      background: transparent !important;
-    }
-    .code-block .token:hover {
-      background: rgba(95, 107, 225, 0.15);
-    }
-    .code-block .token.selected {
-      background: rgba(31, 182, 126, 0.3) !important;
-      outline: 2px solid var(--success-color);
-    }
-    .code-block .token.annotated {
-      text-decoration: underline dotted var(--text-secondary);
-    }
-    .code-block .token.annotated-function {
-      background: rgba(95, 107, 225, 0.15) !important;
-      text-decoration: underline solid var(--primary-color);
-    }
-    .code-block .token.annotated-variable {
-      background: rgba(91, 179, 216, 0.15) !important;
-      text-decoration: underline solid #5bb3d8;
-    }
-    .code-block .token.annotated-object {
-      background: rgba(232, 136, 136, 0.15) !important;
-      text-decoration: underline solid var(--warning-color);
-    }
-    .code-block .token.eval-correct {
-      outline: 2px solid var(--success-color);
-    }
-    .code-block .token.eval-type-mismatch {
-      outline: 2px solid var(--warning-color);
-    }
-    .code-block .token.eval-false-positive {
-      outline: 2px solid var(--alert-color);
-    }
-    .code-block .token.eval-false-negative {
-      outline: 2px solid #d08850;
-    }
+    .code-panel { display: flex; flex-direction: column; overflow: hidden; }
+    .code-header { padding: 10px 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .code-url { font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+    .code-metrics { display: flex; gap: 12px; font-size: 12px; margin-left: 16px; }
+    .code-metrics span { color: var(--text-secondary); }
+    .code-metrics strong { color: var(--text-primary); }
+    .code-area { flex: 1; overflow: auto; padding: 16px; background: var(--code-bg); }
+    .code-block { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+    .code-block .token { cursor: pointer; padding: 1px 2px; border-radius: 2px; }
+    .code-block .token:hover { background: rgba(95, 107, 225, 0.15); }
+    .code-block .token.selected { background: rgba(31, 182, 126, 0.25); outline: 2px solid var(--success-color); }
+    .code-block .token.annotated-function { text-decoration: underline; text-decoration-color: var(--primary-color); text-underline-offset: 2px; }
+    .code-block .token.annotated-variable { text-decoration: underline; text-decoration-color: var(--invite-color); text-underline-offset: 2px; }
+    .code-block .token.annotated-object { text-decoration: underline; text-decoration-color: var(--warning-color); text-underline-offset: 2px; }
+    .code-block .token.eval-correct { outline: 2px solid var(--success-color); }
+    .code-block .token.eval-type-mismatch { outline: 2px solid var(--warning-color); }
+    .code-block .token.eval-false-positive { outline: 2px solid var(--alert-color); }
+    .code-block .token.eval-false-negative { outline: 2px dashed var(--warning-color); }
+    .code-legend { padding: 8px 16px; border-top: 1px solid var(--border-color); display: flex; gap: 16px; font-size: 11px; color: var(--text-secondary); }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
-    .legend {
-      display: flex;
-      gap: 12px;
-      padding: 8px 16px;
-      border-top: 1px solid var(--border-color);
-      font-size: 11px;
-      flex-wrap: wrap;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-    }
-    .legend-dot.correct { background: var(--success-color); }
-    .legend-dot.type-mismatch { background: var(--warning-color); }
-    .legend-dot.false-positive { background: var(--alert-color); }
-    .legend-dot.false-negative { background: #d08850; }
+    .sidebar { overflow-y: auto; display: flex; flex-direction: column; }
+    .tabs { display: flex; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .tab { flex: 1; padding: 10px; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text-secondary); }
+    .tab:hover { color: var(--text-primary); }
+    .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+    .tab-content { display: none; padding: 12px; flex: 1; overflow-y: auto; }
+    .tab-content.active { display: block; }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-    }
-    .panel {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 12px;
-      box-shadow: var(--shadow-sm);
-    }
-    .panel-title {
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 10px;
-      color: var(--text-primary);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .section { margin-bottom: 16px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-title { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    
+    .selection-tokens { display: flex; flex-wrap: wrap; gap: 4px; min-height: 28px; padding: 8px; background: var(--code-bg); border-radius: 6px; margin-bottom: 10px; }
+    .selection-token { background: var(--success-color); color: white; padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; }
+    .selection-empty { color: var(--text-secondary); font-size: 11px; }
+    
+    .type-btns { display: flex; gap: 4px; margin-bottom: 10px; }
+    .type-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-secondary); cursor: pointer; }
+    .type-btn:hover { border-color: var(--text-secondary); }
+    .type-btn.active.function { border-color: var(--primary-color); background: rgba(95, 107, 225, 0.08); color: var(--primary-color); }
+    .type-btn.active.variable { border-color: var(--invite-color); background: rgba(91, 179, 216, 0.08); color: var(--invite-color); }
+    .type-btn.active.object { border-color: var(--warning-color); background: rgba(208, 136, 80, 0.08); color: var(--warning-color); }
 
-    .btn {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      transition: background 0.2s;
-    }
+    .btn { padding: 6px 10px; font-size: 11px; font-weight: 500; border: none; border-radius: 4px; cursor: pointer; }
     .btn-primary { background: var(--primary-color); color: white; }
     .btn-primary:hover { background: #4f5bd1; }
-    .btn-secondary { background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); }
-    .btn-secondary:hover { background: var(--card-bg-hover); }
-    .btn-danger { background: var(--alert-color); color: white; }
-    .btn-danger:hover { background: #c0334f; }
-    .btn-warning { background: var(--warning-color); color: white; }
-    .btn-warning:hover { background: #d07878; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-sm { padding: 4px 8px; font-size: 11px; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: var(--code-bg); color: var(--text-primary); }
+    .btn-secondary:hover { background: var(--border-color); }
+    .btn-row { display: flex; gap: 6px; }
+    .btn-row .btn { flex: 1; }
 
-    .llm-results {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .llm-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 0;
-      font-size: 12px;
-    }
-    .type-badge {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: 500;
-    }
-    .type-badge.function { background: var(--primary-color); color: white; }
-    .type-badge.variable { background: #5bb3d8; color: white; }
-    .type-badge.object { background: var(--warning-color); color: white; }
+    .annotations-list { display: flex; flex-direction: column; gap: 4px; }
+    .annotation-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--code-bg); border-radius: 4px; }
+    .annotation-type { font-size: 9px; font-weight: 600; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; }
+    .annotation-type.function { background: var(--primary-color); color: white; }
+    .annotation-type.variable { background: var(--invite-color); color: white; }
+    .annotation-type.object { background: var(--warning-color); color: white; }
+    .annotation-text { flex: 1; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .annotation-delete { background: none; border: none; color: var(--alert-color); cursor: pointer; font-size: 14px; padding: 2px 4px; opacity: 0.6; }
+    .annotation-delete:hover { opacity: 1; }
+    .empty-state { color: var(--text-secondary); font-size: 11px; padding: 12px; text-align: center; background: var(--code-bg); border-radius: 6px; }
 
-    .current-selection {
-      min-height: 50px;
-    }
-    .selected-tokens {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 8px;
-    }
-    .selected-token {
-      background: var(--success-color);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-family: var(--font-monospace);
-    }
+    .llm-list { display: flex; flex-direction: column; gap: 4px; }
+    .llm-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--code-bg); border-radius: 4px; }
+    .llm-text { flex: 1; font-family: var(--font-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .llm-accept { background: var(--success-color); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; cursor: pointer; }
+    .llm-accept:hover { background: #1a9d6d; }
+    
+    .diff-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
+    .diff-item { padding: 6px; background: var(--code-bg); border-radius: 4px; text-align: center; }
+    .diff-num { font-size: 16px; font-weight: 600; }
+    .diff-label { font-size: 9px; color: var(--text-secondary); }
 
-    .type-selector {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 8px;
-    }
-    .type-btn {
-      flex: 1;
-      padding: 6px;
-      border: 2px solid var(--border-color);
-      background: var(--input-bg);
-      color: var(--text-secondary);
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .type-btn:hover { border-color: var(--primary-color); }
-    .type-btn.active { border-color: var(--success-color); color: var(--text-primary); background: rgba(31, 182, 126, 0.1); }
-    .type-btn.function.active { border-color: var(--primary-color); background: rgba(95, 107, 225, 0.1); }
-    .type-btn.variable.active { border-color: #5bb3d8; background: rgba(91, 179, 216, 0.1); }
-    .type-btn.object.active { border-color: var(--warning-color); background: rgba(232, 136, 136, 0.1); }
-
-    .saved-annotations {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .annotation-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px;
-      background: var(--code-bg);
-      border-radius: 4px;
-      margin-bottom: 6px;
-    }
-    .annotation-tokens {
-      font-family: var(--font-monospace);
-      font-size: 11px;
-      color: var(--text-secondary);
-      flex: 1;
-      margin-left: 6px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .annotation-delete {
-      background: none;
-      border: none;
-      color: var(--alert-color);
-      cursor: pointer;
-      padding: 2px 4px;
-      font-size: 12px;
-    }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 10px 16px;
-      background: var(--success-color);
-      color: white;
-      border-radius: 6px;
-      display: none;
-      z-index: 1000;
-      font-size: 13px;
-      box-shadow: var(--shadow-md);
-    }
+    .toast { position: fixed; bottom: 16px; right: 16px; padding: 10px 16px; background: var(--success-color); color: white; border-radius: 6px; font-size: 12px; font-weight: 500; display: none; z-index: 1000; }
     .toast.error { background: var(--alert-color); }
     .toast.show { display: block; }
-
-    .no-data {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-secondary);
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="app"></div>
+  <div class="layout">
+    <div class="examples-panel" id="examplesPanel"></div>
+    <div class="code-panel" id="codePanel"></div>
+    <div class="sidebar" id="sidebar"></div>
   </div>
   <div class="toast" id="toast"></div>
 
@@ -591,6 +354,7 @@ const HTML = `<!DOCTYPE html>
     let selectedTokens = [];
     let selectedType = 'function';
     let filter = 'all';
+    let activeTab = 'annotate';
 
     async function loadData() {
       const res = await fetch('/api/data');
@@ -598,161 +362,75 @@ const HTML = `<!DOCTYPE html>
       examples = data.examples;
       annotations = data.annotations;
       evalReport = data.evalReport;
-      
       if (evalReport) {
-        evalReport.results.forEach(r => {
-          evalResultsMap[r.url] = r;
-        });
+        evalReport.results.forEach(r => { evalResultsMap[r.url] = r; });
       }
-      
       render();
     }
 
-    function getAnnotationsForUrl(url) {
-      return annotations[url] || [];
-    }
-
-    function setAnnotationsForUrl(url, anns) {
-      annotations[url] = anns;
-    }
-
-    function getEvalResultForUrl(url) {
-      return evalResultsMap[url] || null;
-    }
-
-    function getF1Class(f1) {
-      if (f1 >= 0.8) return 'good';
-      if (f1 >= 0.5) return 'warning';
-      return 'bad';
-    }
-
-    function getF1Color(f1) {
-      if (f1 >= 0.8) return '#1fb67e';
-      if (f1 >= 0.5) return '#e88888';
-      return '#e03d63';
-    }
-
-    function getFilteredExamples() {
+    function getFiltered() {
       return examples.filter(ex => {
         if (filter === 'all') return true;
-        if (filter === 'annotated') return annotations[ex.url] !== undefined;
-        if (filter === 'unannotated') return annotations[ex.url] === undefined;
-        if (filter === 'with-eval') return evalResultsMap[ex.url] !== undefined;
-        if (filter === 'low-f1') {
-          const evalResult = evalResultsMap[ex.url];
-          return evalResult?.metrics?.f1 < 0.5;
-        }
+        if (filter === 'reviewed') return annotations[ex.url] !== undefined;
+        if (filter === 'pending') return annotations[ex.url] === undefined;
+        if (filter === 'low-f1') return evalResultsMap[ex.url]?.metrics?.f1 < 0.5;
         return true;
       });
     }
 
+    function getF1Class(f1) {
+      if (f1 >= 0.8) return 'good';
+      if (f1 >= 0.5) return 'mid';
+      return 'bad';
+    }
+
     function render() {
-      const app = document.getElementById('app');
-      
-      if (examples.length === 0) {
-        app.innerHTML = '<div class="no-data"><h2>No examples found</h2><p>Run tokenization first.</p></div>';
-        return;
-      }
-
-      const filteredExamples = getFilteredExamples();
-      const example = filteredExamples[currentIndex] || filteredExamples[0];
-      if (!example) {
-        app.innerHTML = '<div class="no-data"><h2>No examples match filter</h2></div>';
-        return;
-      }
-
-      const evalResult = getEvalResultForUrl(example.url);
-      const savedAnns = getAnnotationsForUrl(example.url);
-
-      app.innerHTML = \`
-        \${renderHeader()}
-        <div class="main-content">
-          \${renderExamplesList(filteredExamples)}
-          \${renderCodeSection(example, evalResult, savedAnns)}
-          \${renderSidebar(example, evalResult, savedAnns)}
-        </div>
-      \`;
-
-      loadCodeBlock(example, evalResult, savedAnns);
-      updateTypeButtons();
+      renderExamples();
+      renderCode();
+      renderSidebar();
     }
 
-    function renderHeader() {
-      if (!evalReport) {
-        return \`
-          <div class="header">
-            <h1>Annotation Workbench</h1>
-            <p class="subtitle">No eval report loaded. Annotation mode only.</p>
-          </div>
-        \`;
-      }
+    let addOpen = false;
 
-      const agg = evalReport.aggregate;
-      return \`
-        <div class="header">
-          <h1>Annotation Workbench</h1>
-          <div class="model-info">
-            Model: \${evalReport.model} | \${new Date(evalReport.timestamp).toLocaleString()} | \${agg.successfulExamples}/\${agg.totalExamples} evaluated
+    function renderExamples() {
+      const filtered = getFiltered();
+      const reviewed = Object.keys(annotations).length;
+      document.getElementById('examplesPanel').innerHTML = \`
+        <div class="examples-header">
+          <div class="examples-title-row">
+            <h2>Examples</h2>
+            <button class="add-btn" onclick="toggleAdd()" title="Add example">\${addOpen ? '×' : '+'}</button>
           </div>
-          <div class="aggregate-stats">
-            <div class="stat-card">
-              <div class="stat-value \${getF1Class(agg.avgF1)}">\${(agg.avgF1 * 100).toFixed(1)}%</div>
-              <div class="stat-label">Avg F1</div>
+          <div class="progress"><strong>\${reviewed}</strong> / \${examples.length} reviewed</div>
+          \${addOpen ? \`
+            <div class="add-form">
+              <input type="url" id="addUrl" placeholder="URL">
+              <textarea id="addHtml" placeholder="<code>...</code>"></textarea>
+              <button class="btn btn-primary" onclick="submitAdd()">Add</button>
             </div>
-            <div class="stat-card">
-              <div class="stat-value">\${(agg.avgPrecision * 100).toFixed(1)}%</div>
-              <div class="stat-label">Precision</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">\${(agg.avgRecall * 100).toFixed(1)}%</div>
-              <div class="stat-label">Recall</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value \${getF1Class(agg.avgTypeAccuracy)}">\${(agg.avgTypeAccuracy * 100).toFixed(1)}%</div>
-              <div class="stat-label">Type Acc</div>
-            </div>
-          </div>
-        </div>
-      \`;
-    }
-
-    function renderExamplesList(filteredExamples) {
-      return \`
-        <div class="examples-list">
-          <div class="examples-header">
-            <span>Examples (\${filteredExamples.length})</span>
+          \` : \`
             <select class="filter-select" onchange="setFilter(this.value)">
-              <option value="all" \${filter === 'all' ? 'selected' : ''}>All</option>
-              <option value="annotated" \${filter === 'annotated' ? 'selected' : ''}>Annotated</option>
-              <option value="unannotated" \${filter === 'unannotated' ? 'selected' : ''}>Unannotated</option>
-              <option value="with-eval" \${filter === 'with-eval' ? 'selected' : ''}>With Eval</option>
-              <option value="low-f1" \${filter === 'low-f1' ? 'selected' : ''}>Low F1</option>
+              <option value="all" \${filter === 'all' ? 'selected' : ''}>All examples</option>
+              <option value="reviewed" \${filter === 'reviewed' ? 'selected' : ''}>Reviewed</option>
+              <option value="pending" \${filter === 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="low-f1" \${filter === 'low-f1' ? 'selected' : ''}>Low F1 (<50%)</option>
             </select>
-          </div>
-          \${filteredExamples.map((ex, i) => {
-            const evalResult = evalResultsMap[ex.url];
-            const hasAnns = annotations[ex.url] !== undefined;
+          \`}
+        </div>
+        <div class="examples-list">
+          \${filtered.map((ex, i) => {
+            const isReviewed = annotations[ex.url] !== undefined;
             const annCount = (annotations[ex.url] || []).length;
+            const evalResult = evalResultsMap[ex.url];
+            const f1 = evalResult?.metrics?.f1;
             return \`
-              <div class="example-item \${i === currentIndex ? 'selected' : ''} \${hasAnns ? 'has-annotations' : ''}" onclick="selectExample(\${i})">
-                <div class="example-url">
-                  \${ex.url}
-                  \${hasAnns ? \`<span class="annotation-badge">\${annCount}</span>\` : ''}
+              <div class="example-item \${i === currentIndex ? 'active' : ''}" onclick="selectExample(\${i})">
+                <div class="example-url">\${ex.url}</div>
+                <div class="example-status">
+                  <span class="status-dot \${isReviewed ? 'reviewed' : 'pending'}"></span>
+                  \${f1 !== undefined ? \`<span class="f1-score \${getF1Class(f1)}">\${(f1 * 100).toFixed(0)}%</span>\` : ''}
+                  \${annCount > 0 ? \`<span class="ann-count">\${annCount} annotations</span>\` : ''}
                 </div>
-                \${evalResult?.metrics ? \`
-                  <div class="example-metrics">
-                    <span class="example-f1 \${getF1Class(evalResult.metrics.f1)}">F1: \${(evalResult.metrics.f1 * 100).toFixed(0)}%</span>
-                    <span>P: \${(evalResult.metrics.precision * 100).toFixed(0)}%</span>
-                    <span>R: \${(evalResult.metrics.recall * 100).toFixed(0)}%</span>
-                  </div>
-                  <div class="f1-bar">
-                    <div class="f1-bar-fill" style="width: \${evalResult.metrics.f1 * 100}%; background: \${getF1Color(evalResult.metrics.f1)};"></div>
-                  </div>
-                \` : evalResult?.error ? \`
-                  <div class="example-metrics" style="color: var(--alert-color);">Error</div>
-                \` : \`
-                  <div class="example-metrics">No eval data</div>
-                \`}
               </div>
             \`;
           }).join('')}
@@ -760,157 +438,60 @@ const HTML = `<!DOCTYPE html>
       \`;
     }
 
-    function renderCodeSection(example, evalResult, savedAnns) {
+    function renderCode() {
+      const filtered = getFiltered();
+      const ex = filtered[currentIndex];
+      if (!ex) {
+        document.getElementById('codePanel').innerHTML = '<div class="empty-state">No examples match filter</div>';
+        return;
+      }
+      const evalResult = evalResultsMap[ex.url];
       const hasComparison = evalResult?.comparison;
-      return \`
-        <div class="code-section">
-          <div class="code-header">
-            <div class="code-url">\${example.url}</div>
+      document.getElementById('codePanel').innerHTML = \`
+        <div class="code-header">
+          <div class="code-url">\${ex.url}</div>
+          <div class="code-metrics">
             \${evalResult?.metrics ? \`
-              <div class="code-stats">
-                <span>F1: <strong>\${(evalResult.metrics.f1 * 100).toFixed(1)}%</strong></span>
-                <span>P: <strong>\${(evalResult.metrics.precision * 100).toFixed(1)}%</strong></span>
-                <span>R: <strong>\${(evalResult.metrics.recall * 100).toFixed(1)}%</strong></span>
-              </div>
+              <span>F1 <strong>\${(evalResult.metrics.f1 * 100).toFixed(0)}%</strong></span>
+              <span>P <strong>\${(evalResult.metrics.precision * 100).toFixed(0)}%</strong></span>
+              <span>R <strong>\${(evalResult.metrics.recall * 100).toFixed(0)}%</strong></span>
             \` : ''}
           </div>
-          <div class="code-block-wrapper">
-            <div class="code-block" id="codeBlock">Loading...</div>
-          </div>
-          \${hasComparison ? \`
-            <div class="legend">
-              <div class="legend-item"><div class="legend-dot correct"></div>Correct</div>
-              <div class="legend-item"><div class="legend-dot type-mismatch"></div>Type Mismatch</div>
-              <div class="legend-item"><div class="legend-dot false-positive"></div>False Positive</div>
-              <div class="legend-item"><div class="legend-dot false-negative"></div>False Negative</div>
-            </div>
-          \` : ''}
         </div>
-      \`;
-    }
-
-    function renderSidebar(example, evalResult, savedAnns) {
-      return \`
-        <div class="sidebar">
-          \${renderLlmResultsPanel(evalResult)}
-          \${renderCurrentSelectionPanel()}
-          \${renderSavedAnnotationsPanel(savedAnns)}
+        <div class="code-area">
+          <div class="code-block" id="codeBlock">Loading...</div>
         </div>
+        \${hasComparison ? \`
+          <div class="code-legend">
+            <div class="legend-item"><div class="legend-dot" style="background: var(--success-color)"></div>LLM correct</div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--warning-color)"></div>LLM wrong type</div>
+            <div class="legend-item"><div class="legend-dot" style="background: var(--alert-color)"></div>LLM extra (you didn't annotate)</div>
+            <div class="legend-item"><div class="legend-dot" style="border: 2px dashed var(--warning-color)"></div>LLM missed (you annotated)</div>
+          </div>
+        \` : ''}
       \`;
+      loadCodeBlock();
     }
 
-    function renderLlmResultsPanel(evalResult) {
-      if (!evalResult?.actual || evalResult.actual.length === 0) {
-        return \`
-          <div class="panel">
-            <div class="panel-title">LLM Results</div>
-            <div style="color: var(--text-secondary); font-size: 12px;">No LLM results available</div>
-          </div>
-        \`;
-      }
-
-      return \`
-        <div class="panel">
-          <div class="panel-title">
-            <span>LLM Results (\${evalResult.actual.length})</span>
-            <button class="btn btn-primary btn-sm" onclick="acceptLlmOutput()">Accept All</button>
-          </div>
-          <div class="llm-results">
-            \${evalResult.actual.map((act, i) => \`
-              <div class="llm-item">
-                <span class="type-badge \${act.documentation.type}">\${act.documentation.type}</span>
-                <span style="font-family: monospace; font-size: 11px;">\${act.ids.map(id => getTokenTextFromId(id)).join(' ')}</span>
-                <button class="btn btn-secondary btn-sm" onclick="acceptSingleLlmResult(\${i})" title="Accept this annotation">+</button>
-              </div>
-            \`).join('')}
-          </div>
-        </div>
-      \`;
-    }
-
-    function renderCurrentSelectionPanel() {
-      return \`
-        <div class="panel current-selection">
-          <div class="panel-title">Current Selection</div>
-          <div class="selected-tokens" id="selectedTokens">
-            \${selectedTokens.length === 0 
-              ? '<span style="color: var(--text-secondary); font-size: 11px;">Click tokens to select. Shift+click to add.</span>'
-              : selectedTokens.map(id => \`<span class="selected-token">\${getTokenTextFromId(id)}</span>\`).join('')
-            }
-          </div>
-          <div class="type-selector">
-            <button class="type-btn function" onclick="setType('function')">func</button>
-            <button class="type-btn variable" onclick="setType('variable')">var</button>
-            <button class="type-btn object" onclick="setType('object')">obj</button>
-          </div>
-          <div class="action-buttons">
-            <button class="btn btn-primary btn-sm" onclick="saveGroup()" \${selectedTokens.length === 0 ? 'disabled' : ''}>Save Group</button>
-            <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear</button>
-          </div>
-        </div>
-      \`;
-    }
-
-    function renderSavedAnnotationsPanel(savedAnns) {
-      const isReviewed = annotations[getFilteredExamples()[currentIndex]?.url] !== undefined;
-      
-      return \`
-        <div class="panel">
-          <div class="panel-title">
-            <span>Saved Annotations</span>
-            \${!isReviewed ? '<span style="color: var(--text-secondary); font-size: 11px;">(not reviewed)</span>' : ''}
-          </div>
-          <div class="saved-annotations" id="annotationsList">
-            \${!isReviewed 
-              ? '<div style="color: var(--text-secondary); font-size: 11px;">Not reviewed yet</div>'
-              : savedAnns.length === 0 
-                ? '<div style="color: var(--text-secondary); font-size: 11px;">No annotations (marked as none needed)</div>'
-                : savedAnns.map((ann, i) => \`
-                    <div class="annotation-item">
-                      <span class="type-badge \${ann.type}">\${ann.type}</span>
-                      <span class="annotation-tokens">\${ann.ids.map(id => getTokenTextFromId(id)).join(' ')}</span>
-                      <button class="annotation-delete" onclick="deleteAnnotation(\${i})">✕</button>
-                    </div>
-                  \`).join('')
-            }
-          </div>
-          <div style="margin-top: 8px; display: flex; gap: 6px;">
-            <button class="btn btn-secondary btn-sm" onclick="markAsNone()">Mark as None Needed</button>
-            \${isReviewed ? '<button class="btn btn-danger btn-sm" onclick="clearAllAnnotations()">Clear All</button>' : ''}
-          </div>
-        </div>
-      \`;
-    }
-
-    let tokenTextCache = {};
-
-    function getTokenTextFromId(id) {
-      if (tokenTextCache[id]) return tokenTextCache[id];
-      const el = document.querySelector(\`[data-token-id="\${id}"]\`);
-      return el ? el.textContent : id.slice(0, 8);
-    }
-
-    async function loadCodeBlock(example, evalResult, savedAnns) {
+    async function loadCodeBlock() {
+      const filtered = getFiltered();
+      const ex = filtered[currentIndex];
+      if (!ex) return;
+      const savedAnns = annotations[ex.url] || [];
+      const evalResult = evalResultsMap[ex.url];
       const res = await fetch('/api/process-html', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tokenizedHtml: example.tokenizedHtml,
-          annotations: savedAnns,
-          comparison: evalResult?.comparison
-        })
+        body: JSON.stringify({ tokenizedHtml: ex.tokenizedHtml, annotations: savedAnns, comparison: evalResult?.comparison })
       });
       const data = await res.json();
-      
       const codeBlock = document.getElementById('codeBlock');
       if (codeBlock) {
         codeBlock.innerHTML = data.html;
-        
         tokenTextCache = {};
         codeBlock.querySelectorAll('[data-token-id]').forEach(el => {
           tokenTextCache[el.getAttribute('data-token-id')] = el.textContent;
         });
-
         selectedTokens.forEach(id => {
           const el = document.querySelector(\`[data-token-id="\${id}"]\`);
           if (el) el.classList.add('selected');
@@ -918,33 +499,141 @@ const HTML = `<!DOCTYPE html>
       }
     }
 
+    function renderSidebar() {
+      const filtered = getFiltered();
+      const ex = filtered[currentIndex];
+      if (!ex) return;
+      const savedAnns = annotations[ex.url] || [];
+      const evalResult = evalResultsMap[ex.url];
+      const hasEval = evalResult?.actual?.length > 0;
+
+      document.getElementById('sidebar').innerHTML = \`
+        <div class="tabs">
+          <div class="tab \${activeTab === 'annotate' ? 'active' : ''}" onclick="setTab('annotate')">Annotate</div>
+          <div class="tab \${activeTab === 'compare' ? 'active' : ''}" onclick="setTab('compare')">\${hasEval ? 'Compare' : 'Compare'}</div>
+        </div>
+        <div class="tab-content \${activeTab === 'annotate' ? 'active' : ''}" id="annotateTab">
+          \${renderAnnotateTab(savedAnns)}
+        </div>
+        <div class="tab-content \${activeTab === 'compare' ? 'active' : ''}" id="compareTab">
+          \${renderCompareTab(evalResult)}
+        </div>
+      \`;
+      updateTypeButtons();
+    }
+
+    function renderAnnotateTab(savedAnns) {
+      return \`
+        <div class="section">
+          <div class="section-title">Selection</div>
+          <div class="selection-tokens">
+            \${selectedTokens.length === 0 
+              ? '<span class="selection-empty">Click tokens in code to select</span>'
+              : selectedTokens.map(id => \`<span class="selection-token">\${getTokenText(id)}</span>\`).join('')}
+          </div>
+          <div class="type-btns">
+            <button class="type-btn function" onclick="setType('function')">Function</button>
+            <button class="type-btn variable" onclick="setType('variable')">Variable</button>
+            <button class="type-btn object" onclick="setType('object')">Object</button>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addAnnotation()" \${selectedTokens.length === 0 ? 'disabled' : ''}>Add</button>
+            <button class="btn btn-secondary" onclick="clearSelection()">Clear</button>
+          </div>
+        </div>
+        <div class="section">
+          <div class="section-title">Annotations</div>
+          \${savedAnns.length === 0 
+            ? '<div class="empty-state">No annotations yet</div>'
+            : \`<div class="annotations-list">
+                \${savedAnns.map((ann, i) => \`
+                  <div class="annotation-item">
+                    <span class="annotation-type \${ann.type}">\${ann.type.slice(0,3)}</span>
+                    <span class="annotation-text">\${ann.ids.map(id => getTokenText(id)).join(' ')}</span>
+                    <button class="annotation-delete" onclick="deleteAnnotation(\${i})">×</button>
+                  </div>
+                \`).join('')}
+              </div>\`}
+        </div>
+      \`;
+    }
+
+    function renderCompareTab(evalResult) {
+      if (!evalResult?.actual || evalResult.actual.length === 0) {
+        return '<div class="empty-state">Run evaluation first to see LLM output</div>';
+      }
+      const comp = evalResult.comparison || {};
+      const correctIds = new Set((comp.correctMatches || []).map(m => m.id));
+      const missedAnns = comp.falseNegatives || [];
+      return \`
+        <div class="section">
+          <div class="section-title">LLM Output</div>
+          <button class="btn btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="acceptAllLlm()">Accept All</button>
+          <div class="llm-list">
+            \${evalResult.actual.map((act, i) => {
+              const isCorrect = act.ids.some(id => correctIds.has(id));
+              return \`
+                <div class="llm-item">
+                  <span class="annotation-type \${act.documentation.type}">\${act.documentation.type.slice(0,3)}</span>
+                  <span class="llm-text">\${act.ids.map(id => getTokenText(id)).join(' ')}</span>
+                  \${isCorrect ? '<span style="color: var(--success-color)">✓</span>' : \`<button class="llm-accept" onclick="acceptLlm(\${i})">+</button>\`}
+                </div>
+              \`;
+            }).join('')}
+          </div>
+        </div>
+        \${missedAnns.length > 0 ? \`
+          <div class="section">
+            <div class="section-title">LLM Missed (your annotations)</div>
+            <div class="llm-list">
+              \${missedAnns.map(m => \`
+                <div class="llm-item">
+                  <span class="annotation-type \${m.expectedType}">\${m.expectedType.slice(0,3)}</span>
+                  <span class="llm-text">\${getTokenText(m.id)}</span>
+                  <button class="llm-accept" style="background: var(--alert-color)" onclick="removeMissedAnnotation('\${m.id}')">−</button>
+                </div>
+              \`).join('')}
+            </div>
+          </div>
+        \` : ''}
+        <div class="section">
+          <div class="section-title">Summary</div>
+          <div class="diff-summary">
+            <div class="diff-item"><div class="diff-num" style="color: var(--success-color)">\${comp.correctMatches?.length || 0}</div><div class="diff-label">Correct</div></div>
+            <div class="diff-item"><div class="diff-num" style="color: var(--warning-color)">\${comp.typeMismatches?.length || 0}</div><div class="diff-label">Wrong type</div></div>
+            <div class="diff-item"><div class="diff-num" style="color: var(--alert-color)">\${comp.falsePositives?.length || 0}</div><div class="diff-label">Extra</div></div>
+            <div class="diff-item"><div class="diff-num" style="color: var(--warning-color)">\${missedAnns.length}</div><div class="diff-label">Missed</div></div>
+          </div>
+        </div>
+      \`;
+    }
+
+
+    let tokenTextCache = {};
+    function getTokenText(id) {
+      if (tokenTextCache[id]) return tokenTextCache[id];
+      const el = document.querySelector(\`[data-token-id="\${id}"]\`);
+      return el ? el.textContent : id.slice(0, 6);
+    }
+
     function selectToken(tokenId, event) {
       if (event.shiftKey) {
-        if (!selectedTokens.includes(tokenId)) {
-          selectedTokens.push(tokenId);
-        }
+        if (!selectedTokens.includes(tokenId)) selectedTokens.push(tokenId);
       } else {
         selectedTokens = [tokenId];
       }
-      
       document.querySelectorAll('.token.selected').forEach(el => el.classList.remove('selected'));
       selectedTokens.forEach(id => {
         const el = document.querySelector(\`[data-token-id="\${id}"]\`);
         if (el) el.classList.add('selected');
       });
-      
-      updateSelectedDisplay();
+      renderSidebar();
     }
 
-    function updateSelectedDisplay() {
-      const container = document.getElementById('selectedTokens');
-      if (!container) return;
-      
-      if (selectedTokens.length === 0) {
-        container.innerHTML = '<span style="color: var(--text-secondary); font-size: 11px;">Click tokens to select. Shift+click to add.</span>';
-      } else {
-        container.innerHTML = selectedTokens.map(id => \`<span class="selected-token">\${getTokenTextFromId(id)}</span>\`).join('');
-      }
+    function clearSelection() {
+      selectedTokens = [];
+      document.querySelectorAll('.token.selected').forEach(el => el.classList.remove('selected'));
+      renderSidebar();
     }
 
     function setType(type) {
@@ -955,109 +644,89 @@ const HTML = `<!DOCTYPE html>
     function updateTypeButtons() {
       document.querySelectorAll('.type-btn').forEach(btn => {
         btn.classList.remove('active');
-        if (btn.classList.contains(selectedType)) {
-          btn.classList.add('active');
-        }
+        if (btn.classList.contains(selectedType)) btn.classList.add('active');
       });
     }
 
-    function clearSelection() {
-      selectedTokens = [];
-      document.querySelectorAll('.token.selected').forEach(el => el.classList.remove('selected'));
-      updateSelectedDisplay();
+    function setTab(tab) {
+      activeTab = tab;
+      renderSidebar();
     }
 
-    async function saveGroup() {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
-      const anns = getAnnotationsForUrl(url);
-      
-      if (selectedTokens.length > 0) {
-        anns.push({
-          ids: [...selectedTokens],
-          type: selectedType
-        });
-      }
-      
-      setAnnotationsForUrl(url, anns);
+    function selectExample(i) {
+      currentIndex = i;
+      selectedTokens = [];
+      render();
+    }
+
+    function setFilter(val) {
+      filter = val;
+      currentIndex = 0;
+      selectedTokens = [];
+      render();
+    }
+
+    async function addAnnotation() {
+      if (selectedTokens.length === 0) return;
+      const filtered = getFiltered();
+      const url = filtered[currentIndex].url;
+      const anns = annotations[url] || [];
+      anns.push({ ids: [...selectedTokens], type: selectedType });
+      annotations[url] = anns;
       await saveAnnotations();
-      
       clearSelection();
       render();
-      showToast('Group saved!');
+      showToast('Annotation added');
     }
 
-    async function deleteAnnotation(index) {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
-      const anns = getAnnotationsForUrl(url);
-      anns.splice(index, 1);
-      setAnnotationsForUrl(url, anns);
+    async function deleteAnnotation(i) {
+      const filtered = getFiltered();
+      const url = filtered[currentIndex].url;
+      const anns = annotations[url] || [];
+      anns.splice(i, 1);
+      annotations[url] = anns;
       await saveAnnotations();
       render();
-      showToast('Annotation deleted');
+      showToast('Deleted');
     }
 
-    async function markAsNone() {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
-      setAnnotationsForUrl(url, []);
-      await saveAnnotations();
-      render();
-      showToast('Marked as none needed');
-    }
-
-    async function clearAllAnnotations() {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
-      delete annotations[url];
-      await saveAnnotations();
-      render();
-      showToast('Annotations cleared');
-    }
-
-    async function acceptLlmOutput() {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
+    async function acceptAllLlm() {
+      const filtered = getFiltered();
+      const url = filtered[currentIndex].url;
       const evalResult = evalResultsMap[url];
-      
-      if (!evalResult?.actual) {
-        showToast('No LLM results to accept', true);
-        return;
-      }
-
-      const converted = evalResult.actual.map(act => ({
-        ids: act.ids,
-        type: act.documentation.type
-      }));
-
-      setAnnotationsForUrl(url, converted);
+      if (!evalResult?.actual) return;
+      annotations[url] = evalResult.actual.map(act => ({ ids: act.ids, type: act.documentation.type }));
       await saveAnnotations();
       render();
-      showToast(\`Accepted \${converted.length} annotations from LLM!\`);
+      showToast('Accepted all');
     }
 
-    async function acceptSingleLlmResult(index) {
-      const filteredExamples = getFilteredExamples();
-      const url = filteredExamples[currentIndex].url;
+    async function acceptLlm(i) {
+      const filtered = getFiltered();
+      const url = filtered[currentIndex].url;
       const evalResult = evalResultsMap[url];
-      
-      if (!evalResult?.actual?.[index]) {
-        return;
-      }
-
-      const act = evalResult.actual[index];
-      const anns = getAnnotationsForUrl(url);
-      
-      anns.push({
-        ids: act.ids,
-        type: act.documentation.type
-      });
-
-      setAnnotationsForUrl(url, anns);
+      if (!evalResult?.actual?.[i]) return;
+      const act = evalResult.actual[i];
+      const anns = annotations[url] || [];
+      anns.push({ ids: act.ids, type: act.documentation.type });
+      annotations[url] = anns;
       await saveAnnotations();
       render();
-      showToast('Added annotation from LLM');
+      showToast('Added');
+    }
+
+    async function removeMissedAnnotation(tokenId) {
+      const filtered = getFiltered();
+      const url = filtered[currentIndex].url;
+      const anns = annotations[url] || [];
+      const idx = anns.findIndex(a => a.ids.includes(tokenId));
+      if (idx >= 0) {
+        anns.splice(idx, 1);
+        annotations[url] = anns;
+        await saveAnnotations();
+        render();
+        showToast('Removed');
+      }
     }
 
     async function saveAnnotations() {
@@ -1068,41 +737,47 @@ const HTML = `<!DOCTYPE html>
       });
     }
 
-    function selectExample(index) {
-      currentIndex = index;
-      selectedTokens = [];
-      render();
+    function toggleAdd() {
+      addOpen = !addOpen;
+      renderExamples();
     }
 
-    function setFilter(value) {
-      filter = value;
-      currentIndex = 0;
-      selectedTokens = [];
-      render();
+    async function submitAdd() {
+      const urlEl = document.getElementById('addUrl');
+      const htmlEl = document.getElementById('addHtml');
+      const url = urlEl.value.trim();
+      const html = htmlEl.value.trim();
+      if (!url || !html) { showToast('Fill in both fields', true); return; }
+      try {
+        const res = await fetch('/api/add-example', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, html })
+        });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error, true); return; }
+        examples.push(data.tokenizedExample);
+        addOpen = false;
+        render();
+        showToast('Added');
+      } catch (e) {
+        showToast('Failed', true);
+      }
     }
 
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast show' + (isError ? ' error' : '');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+    function showToast(msg, err = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (err ? ' error' : '');
+      setTimeout(() => t.classList.remove('show'), 2500);
     }
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        const filtered = getFilteredExamples();
-        if (currentIndex < filtered.length - 1) {
-          selectExample(currentIndex + 1);
-        }
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        if (currentIndex > 0) {
-          selectExample(currentIndex - 1);
-        }
-      } else if (e.key === 'Enter' && selectedTokens.length > 0) {
-        saveGroup();
-      } else if (e.key === 'Escape') {
-        clearSelection();
-      }
+      const filtered = getFiltered();
+      if (e.key === 'ArrowDown' && currentIndex < filtered.length - 1) { selectExample(currentIndex + 1); }
+      else if (e.key === 'ArrowUp' && currentIndex > 0) { selectExample(currentIndex - 1); }
+      else if (e.key === 'Enter' && selectedTokens.length > 0) { addAnnotation(); }
+      else if (e.key === 'Escape') { clearSelection(); }
     });
 
     loadData();
@@ -1164,6 +839,44 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         saveAnnotationsToFile(annotationsList);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: (e as Error).message }));
+      }
+    });
+    return;
+  }
+
+  if (req.method === 'POST' && req.url === '/api/add-example') {
+    let body = '';
+    req.on('data', (chunk: Buffer) => (body += chunk));
+    req.on('end', () => {
+      try {
+        const { url, html } = JSON.parse(body);
+
+        if (!url || !html) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'URL and HTML are required' }));
+          return;
+        }
+
+        const codeExamples = readCodeExamples();
+        if (codeExamples.some((ex) => ex.url === url)) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'This URL already exists' }));
+          return;
+        }
+
+        codeExamples.push({ url, html });
+        writeCodeExamples(codeExamples);
+
+        const tokenizedHtml = tokenizeHtml(html);
+        const tokenizedExamples = loadTokenizedExamples();
+        tokenizedExamples.push({ url, tokenizedHtml });
+        saveTokenizedExamples(tokenizedExamples);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, tokenizedExample: { url, tokenizedHtml } }));
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: (e as Error).message }));

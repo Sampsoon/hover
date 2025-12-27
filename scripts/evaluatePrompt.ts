@@ -293,7 +293,6 @@ async function evaluateExample(task: EvalTask, config: APIConfig, progress: Prog
   }
 }
 
-
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
 
@@ -329,34 +328,22 @@ async function main() {
     annotationsMap[ann.url] = ann.expectedAnnotations || [];
   });
 
-  const annotatedExamples = tokenizedExamples.filter(
-    (ex) => annotationsMap[ex.url] && annotationsMap[ex.url].length > 0,
-  );
-
-  if (annotatedExamples.length === 0) {
-    console.error('Error: No annotated examples found');
-    console.error('Annotate some examples first using the annotation UI');
-    process.exit(1);
-  }
-
   console.log(`\n${'='.repeat(60)}`);
   console.log('PROMPT EVALUATION');
   console.log('='.repeat(60));
   console.log(`Model: ${config.model}`);
   console.log(`Base URL: ${config.url}`);
-  console.log(`Annotated examples: ${annotatedExamples.length}`);
+  console.log(`Examples: ${tokenizedExamples.length}`);
   console.log('='.repeat(60) + '\n');
 
-  const tasks: EvalTask[] = annotatedExamples.map((example, index) => ({
+  const tasks: EvalTask[] = tokenizedExamples.map((example, index) => ({
     index,
     example,
-    expected: annotationsMap[example.url],
+    expected: annotationsMap[example.url] || [],
   }));
 
   const progress = new ProgressBar(tasks.length);
-  const results = await Promise.all(
-    tasks.map((task) => evaluateExample(task, config, progress)),
-  );
+  const results = await Promise.all(tasks.map((task) => evaluateExample(task, config, progress)));
 
   console.log(`\n${'='.repeat(60)}`);
   console.log('AGGREGATE RESULTS');

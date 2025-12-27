@@ -91,6 +91,28 @@ function loadAnnotations(): AnnotationEntry[] {
   return JSON.parse(readFileSync(ANNOTATIONS_PATH, 'utf-8'));
 }
 
+function initializeAnnotations(): void {
+  const tokenizedExamples = loadTokenizedExamples();
+  const existingAnnotations = loadAnnotations();
+
+  const existingUrls = new Set(existingAnnotations.map((a) => a.url));
+
+  let hasNewUrls = false;
+  for (const example of tokenizedExamples) {
+    if (!existingUrls.has(example.url)) {
+      existingAnnotations.push({
+        url: example.url,
+        expectedAnnotations: [],
+      });
+      hasNewUrls = true;
+    }
+  }
+
+  if (hasNewUrls || !existsSync(ANNOTATIONS_PATH)) {
+    saveAnnotationsToFile(existingAnnotations);
+  }
+}
+
 function loadEvalReport(): EvalReport | null {
   if (!existsSync(EVAL_REPORT_PATH)) {
     return null;
@@ -875,6 +897,12 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
         tokenizedExamples.push({ url, tokenizedHtml });
         saveTokenizedExamples(tokenizedExamples);
 
+        const annotations = loadAnnotations();
+        if (!annotations.some((a) => a.url === url)) {
+          annotations.push({ url, expectedAnnotations: [] });
+          saveAnnotationsToFile(annotations);
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true, tokenizedExample: { url, tokenizedHtml } }));
       } catch (e) {
@@ -888,6 +916,8 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
   res.writeHead(404);
   res.end('Not found');
 });
+
+initializeAnnotations();
 
 server.listen(PORT, () => {
   console.log(`\n  Annotation Workbench running at:`);

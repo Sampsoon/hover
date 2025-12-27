@@ -1,4 +1,4 @@
-import { CODE_DELIMITERS, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
+import { PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 
 function createProgrammaticallyAddedSpan(doc: Document, content: string): HTMLSpanElement {
   const span = doc.createElement('span');
@@ -6,6 +6,40 @@ function createProgrammaticallyAddedSpan(doc: Document, content: string): HTMLSp
   span.textContent = content;
   return span;
 }
+
+const CODE_DELIMITERS = new Set<string>([
+  ' ',
+  '\t',
+  '\n',
+  '\r',
+  '\v',
+  '\f',
+  '.',
+  ',',
+  ';',
+  ':',
+  '(',
+  ')',
+  '[',
+  ']',
+  '{',
+  '}',
+  '>',
+  '<',
+  '=',
+  '+',
+  '*',
+  '/',
+  '%',
+  '&',
+  '|',
+  '^',
+  '~',
+  '"',
+  "'",
+  '`',
+  '\\',
+]);
 
 function breakIntoTokens(doc: Document, elementContent: string): DocumentFragment {
   const fragment = doc.createDocumentFragment();
@@ -62,7 +96,7 @@ export function wrapTokensInSpans(doc: Document, element: HTMLElement): void {
       if (tokens.childNodes.length > 1) {
         node.parentNode?.replaceChild(tokens, node);
       }
-    } else if (node.nodeType === ELEMENT_NODE && node.nodeName !== 'SPAN') {
+    } else if (node.nodeType === ELEMENT_NODE) {
       wrapTokensInSpans(doc, node as HTMLElement);
     }
   });

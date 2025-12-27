@@ -1,37 +1,3 @@
 export const CODE_TOKEN_ID_NAME = 'tokenId';
 
 export const PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME = 'programmatically-added-element';
-
-export const CODE_DELIMITERS = new Set<string>([
-  ' ',
-  '\t',
-  '\n',
-  '\r',
-  '\v',
-  '\f',
-  '.',
-  ',',
-  ';',
-  ':',
-  '(',
-  ')',
-  '[',
-  ']',
-  '{',
-  '}',
-  '>',
-  '<',
-  '=',
-  '+',
-  '*',
-  '/',
-  '%',
-  '&',
-  '|',
-  '^',
-  '~',
-  '"',
-  "'",
-  '`',
-  '\\',
-]);

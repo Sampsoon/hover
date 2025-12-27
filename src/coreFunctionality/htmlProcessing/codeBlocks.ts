@@ -11,7 +11,7 @@ import {
 import { CODE_TOKEN_ID_NAME } from './constants';
 import { wrapTokensInSpans, getDomLeaves } from './tokenization';
 
-export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, CODE_DELIMITERS } from './constants';
+export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 

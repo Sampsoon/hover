@@ -300,6 +300,32 @@ const HTML = `<!DOCTYPE html>
     .legend-item { display: flex; align-items: center; gap: 4px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
 
+    .aggregate-summary {
+      padding: 10px 12px;
+      background: var(--code-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .aggregate-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .aggregate-label {
+      font-size: 9px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .aggregate-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .value-success { color: var(--success-color); }
+    .value-warning { color: var(--warning-color); }
+    .value-alert { color: var(--alert-color); }
+
     .sidebar { overflow-y: auto; display: flex; flex-direction: column; }
     .tabs { display: flex; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
     .tab { flex: 1; padding: 10px; font-size: 12px; font-weight: 500; text-align: center; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text-secondary); }
@@ -417,6 +443,33 @@ const HTML = `<!DOCTYPE html>
     function renderExamples() {
       const filtered = getFiltered();
       const reviewed = Object.keys(annotations).length;
+      const agg = evalReport?.aggregate;
+
+      let summaryHtml = '';
+      if (agg) {
+        const f1Class = agg.avgF1 >= 0.8 ? 'value-success' : agg.avgF1 >= 0.5 ? 'value-warning' : 'value-alert';
+        summaryHtml = \`
+          <div class="aggregate-summary">
+            <div class="aggregate-item">
+              <span class="aggregate-label">Avg F1</span>
+              <span class="aggregate-value \${f1Class}">\${(agg.avgF1 * 100).toFixed(1)}%</span>
+            </div>
+            <div class="aggregate-item">
+              <span class="aggregate-label">Success</span>
+              <span class="aggregate-value">\${agg.successfulExamples}/\${agg.totalExamples}</span>
+            </div>
+            <div class="aggregate-item">
+              <span class="aggregate-label">Avg Precision</span>
+              <span class="aggregate-value">\${(agg.avgPrecision * 100).toFixed(1)}%</span>
+            </div>
+            <div class="aggregate-item">
+              <span class="aggregate-label">Avg Recall</span>
+              <span class="aggregate-value">\${(agg.avgRecall * 100).toFixed(1)}%</span>
+            </div>
+          </div>
+        \`;
+      }
+
       document.getElementById('examplesPanel').innerHTML = \`
         <div class="examples-header">
           <div class="examples-title-row">
@@ -439,6 +492,7 @@ const HTML = `<!DOCTYPE html>
             </select>
           \`}
         </div>
+        \${summaryHtml}
         <div class="examples-list">
           \${filtered.map((ex, i) => {
             const isReviewed = annotations[ex.url] !== undefined;

@@ -4,10 +4,9 @@
   "type": "module",
   "scripts": {
     "scrape": "tsx scrapeCodeExamples.ts",
-    "evaluate": "tsx --env-file=.env evaluatePrompt.ts",
     "tokenize": "tsx tokenizeCodeExamples.ts",
-    "migrate": "tsx migrateAnnotations.ts",
-    "workbench": "tsx annotationWorkbench.ts"
+    "workbench": "tsx annotationWorkbench.ts",
+    "evaluate": "tsx --env-file=.env evaluatePrompt.ts"
   },
   "dependencies": {
     "playwright": "^1.49.1",

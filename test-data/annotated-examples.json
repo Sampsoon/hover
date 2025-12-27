@@ -1,21 +1,7 @@
 [
   {
     "url": "https://doc.rust-lang.org/book/ch03-05-control-flow.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-jqjlsl"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-q000xy",
-          "eeffx9"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",

@@ -1,32 +1,40 @@
 export const RETRIEVAL_HOVER_HINTS_PROMPT = `
-Analyze the provided HTML code blocks and produce hover hints for relevant code elements.
+Analyze the provided HTML code blocks and produce hover hints for code elements that would benefit from documentation.
 
-For each relevant code element:
-- Identify all occurrences that refer to the same underlying entity and collect their span data--element-id values.
-- Provide concise, high-signal documentation including the element's signature, purpose/behavior, key parameters and return values (if applicable), and notable usage notes.
+For each element worth documenting:
+1. Identify all token IDs (data-token-id values) that refer to the same entity
+2. Provide documentation using only the fields that add value
 
-Include documentation for:
-- Classes, functions, methods, variables, types, properties
-- Standard library functions (print, open, Math.max, etc.)
-- User-defined elements
+WHAT TO DOCUMENT:
+- Library/API calls that readers may not know
+- Functions with non-obvious behavior, side effects, or gotchas
+- Configuration objects and their options
+- Variables whose purpose isn't clear from the name
+- Complex expressions or algorithms
 
-Exclude:
-- Language keywords (def, class, if, return, etc.)
-- Built-in types (str, int, float, etc.)
-- Common syntax elements
-- Elements that are obvious to the user such as \`const hello = "hello"\` or types in a JSON object
+WHAT TO SKIP:
+- Language keywords (if, return, const, class, etc.)
+- Built-in types (string, int, boolean, etc.)
+- Self-explanatory code (const name = "Alice", simple getters)
+- Standard operations everyone knows (Math.max, console.log)
+- Obvious variable names (userId, isValid, count)
 
-Format all output strings should be plain text only. Do not use HTML tags or markdown under any circumstances.
-This includes all strings, even those nested in json objects.
+DOCUMENTATION FIELDS (all optional - only include what's useful):
+- signature: For callables (functions, methods, constructors, macros, decorators). Format: \`name(param: Type): ReturnType\`
+- properties: For objects/configs with non-obvious fields
+- params: Only for parameters with constraints, special values, or subtle behavior
+- returns: Only when return value isn't obvious from the function name
+- documentation: Brief explanation when the code's purpose needs clarification (1-5 sentences max)
+- tokenToCssStylingMap: CSS classes/styles for signature tokens to match the code's syntax highlighting
 
-Type mapping and fields:
-- Use lowercase category identifiers for the documentation type: function, object, variable.
-- Map elements: functions and methods → function; classes and objects → object; variables/constants → variable.
+QUALITY GUIDELINES:
+- Be concise - every word should add value
+- Skip obvious information - don't document what the code already shows
+- Focus on the "why" and "gotchas", not the "what"
+- Plain text only - no HTML or markdown in documentation strings
 
-For function documentation:
-- ALWAYS include the tokenToCssStylingMap field whenever possible.
-- This map applies CSS styling (class and/or style attributes) to tokens in the function signature to match the color theme of the code block.
-- Extract class and style attributes from the cleaned HTML input for each token that appears in the function signature.
-- Only include tokens that are part of the signature itself (function name, parameter names, type names, return type, etc.).
-- If a token in the signature doesn't appear in the code block, infer appropriate styling from similar tokens if available.
+CSS STYLING:
+When providing a signature, include tokenToCssStylingMap to preserve syntax highlighting.
+Extract class/style attributes from the HTML for tokens in your signature.
+Only include tokens that appear in the signature itself.
 `;

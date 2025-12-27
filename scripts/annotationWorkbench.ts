@@ -32,7 +32,6 @@ interface TokenizedExample {
 
 interface Annotation {
   ids: string[];
-  type: 'function' | 'variable' | 'object';
 }
 
 interface AnnotationEntry {
@@ -41,10 +40,9 @@ interface AnnotationEntry {
 }
 
 interface Comparison {
-  correctMatches: { id: string; type: string }[];
-  typeMismatches: { id: string; expectedType: string; actualType: string }[];
-  falsePositives: { id: string; actualType: string }[];
-  falseNegatives: { id: string; expectedType: string }[];
+  correctMatches: { id: string }[];
+  falsePositives: { id: string }[];
+  falseNegatives: { id: string }[];
 }
 
 interface ExampleResult {
@@ -54,10 +52,9 @@ interface ExampleResult {
     precision: number;
     recall: number;
     f1: number;
-    typeAccuracy: number;
   };
-  expected?: { ids: string[]; type: string }[];
-  actual?: { ids: string[]; documentation: { type: string } }[];
+  expected?: { ids: string[] }[];
+  actual?: { ids: string[] }[];
   comparison?: Comparison;
   error?: string;
 }
@@ -70,7 +67,6 @@ interface EvalReport {
     avgPrecision: number;
     avgRecall: number;
     avgF1: number;
-    avgTypeAccuracy: number;
     totalExamples: number;
     successfulExamples: number;
   };
@@ -168,13 +164,12 @@ function processTokenizedHtml(tokenizedHtml: string, annotations: Annotation[] =
   const document = dom.window.document;
   const root = document.getElementById('root')!;
 
-  const annotatedIdsWithType = new Map<string, string>();
+  const annotatedIds = new Set<string>();
   annotations.forEach((ann) => {
-    ann.ids.forEach((id) => annotatedIdsWithType.set(id, ann.type));
+    ann.ids.forEach((id) => annotatedIds.add(id));
   });
 
   const correctIds = comparison ? new Set(comparison.correctMatches.map((m) => m.id)) : new Set();
-  const typeMismatchIds = comparison ? new Map(comparison.typeMismatches.map((m) => [m.id, m])) : new Map();
   const falsePositiveIds = comparison ? new Set(comparison.falsePositives.map((m) => m.id)) : new Set();
   const falseNegativeIds = comparison ? new Set(comparison.falseNegatives.map((m) => m.id)) : new Set();
 
@@ -189,20 +184,13 @@ function processTokenizedHtml(tokenizedHtml: string, annotations: Annotation[] =
     element.classList.add('token');
     element.setAttribute('onclick', `selectToken('${tokenId}', event)`);
 
-    const annotationType = annotatedIdsWithType.get(tokenId);
-    if (annotationType) {
+    if (annotatedIds.has(tokenId)) {
       element.classList.add('annotated');
-      element.classList.add(`annotated-${annotationType}`);
     }
 
     if (comparison) {
       if (correctIds.has(tokenId)) {
         element.classList.add('eval-correct');
-      } else if (typeMismatchIds.has(tokenId)) {
-        element.classList.add('eval-type-mismatch');
-        const mismatch = typeMismatchIds.get(tokenId)!;
-        element.setAttribute('data-expected-type', mismatch.expectedType);
-        element.setAttribute('data-actual-type', mismatch.actualType);
       } else if (falsePositiveIds.has(tokenId)) {
         element.classList.add('eval-false-positive');
       } else if (falseNegativeIds.has(tokenId)) {
@@ -238,7 +226,7 @@ const HTML = `<!DOCTYPE html>
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font-family); background: var(--bg-primary); color: var(--text-primary); font-size: 13px; }
-    
+
     .layout {
       display: grid;
       grid-template-columns: 240px 1fr 280px;
@@ -289,11 +277,8 @@ const HTML = `<!DOCTYPE html>
     .code-block .token { cursor: pointer; padding: 1px 2px; border-radius: 2px; }
     .code-block .token:hover { background: rgba(95, 107, 225, 0.15); }
     .code-block .token.selected { background: rgba(31, 182, 126, 0.25); outline: 2px solid var(--success-color); }
-    .code-block .token.annotated-function { text-decoration: underline; text-decoration-color: var(--primary-color); text-underline-offset: 2px; }
-    .code-block .token.annotated-variable { text-decoration: underline; text-decoration-color: var(--invite-color); text-underline-offset: 2px; }
-    .code-block .token.annotated-object { text-decoration: underline; text-decoration-color: var(--warning-color); text-underline-offset: 2px; }
+    .code-block .token.annotated { text-decoration: underline; text-decoration-color: var(--primary-color); text-underline-offset: 2px; }
     .code-block .token.eval-correct { outline: 2px solid var(--success-color); }
-    .code-block .token.eval-type-mismatch { outline: 2px solid var(--warning-color); }
     .code-block .token.eval-false-positive { outline: 2px solid var(--alert-color); }
     .code-block .token.eval-false-negative { outline: 2px dashed var(--warning-color); }
     .code-legend { padding: 8px 16px; border-top: 1px solid var(--border-color); display: flex; gap: 16px; font-size: 11px; color: var(--text-secondary); }
@@ -337,17 +322,10 @@ const HTML = `<!DOCTYPE html>
     .section { margin-bottom: 16px; }
     .section:last-child { margin-bottom: 0; }
     .section-title { font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    
+
     .selection-tokens { display: flex; flex-wrap: wrap; gap: 4px; min-height: 28px; padding: 8px; background: var(--code-bg); border-radius: 6px; margin-bottom: 10px; }
     .selection-token { background: var(--success-color); color: white; padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; }
     .selection-empty { color: var(--text-secondary); font-size: 11px; }
-    
-    .type-btns { display: flex; gap: 4px; margin-bottom: 10px; }
-    .type-btn { flex: 1; padding: 6px; font-size: 11px; font-weight: 500; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-secondary); cursor: pointer; }
-    .type-btn:hover { border-color: var(--text-secondary); }
-    .type-btn.active.function { border-color: var(--primary-color); background: rgba(95, 107, 225, 0.08); color: var(--primary-color); }
-    .type-btn.active.variable { border-color: var(--invite-color); background: rgba(91, 179, 216, 0.08); color: var(--invite-color); }
-    .type-btn.active.object { border-color: var(--warning-color); background: rgba(208, 136, 80, 0.08); color: var(--warning-color); }
 
     .btn { padding: 6px 10px; font-size: 11px; font-weight: 500; border: none; border-radius: 4px; cursor: pointer; }
     .btn-primary { background: var(--primary-color); color: white; }
@@ -360,10 +338,6 @@ const HTML = `<!DOCTYPE html>
 
     .annotations-list { display: flex; flex-direction: column; gap: 4px; }
     .annotation-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--code-bg); border-radius: 4px; }
-    .annotation-type { font-size: 9px; font-weight: 600; padding: 2px 5px; border-radius: 3px; text-transform: uppercase; }
-    .annotation-type.function { background: var(--primary-color); color: white; }
-    .annotation-type.variable { background: var(--invite-color); color: white; }
-    .annotation-type.object { background: var(--warning-color); color: white; }
     .annotation-text { flex: 1; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .annotation-delete { background: none; border: none; color: var(--alert-color); cursor: pointer; font-size: 14px; padding: 2px 4px; opacity: 0.6; }
     .annotation-delete:hover { opacity: 1; }
@@ -374,8 +348,8 @@ const HTML = `<!DOCTYPE html>
     .llm-text { flex: 1; font-family: var(--font-mono); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .llm-accept { background: var(--success-color); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 500; cursor: pointer; }
     .llm-accept:hover { background: #1a9d6d; }
-    
-    .diff-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 10px; }
+
+    .diff-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 10px; }
     .diff-item { padding: 6px; background: var(--code-bg); border-radius: 4px; text-align: center; }
     .diff-num { font-size: 16px; font-weight: 600; }
     .diff-label { font-size: 9px; color: var(--text-secondary); }
@@ -400,7 +374,6 @@ const HTML = `<!DOCTYPE html>
     let evalResultsMap = {};
     let currentIndex = 0;
     let selectedTokens = [];
-    let selectedType = 'function';
     let filter = 'all';
     let activeTab = 'annotate';
 
@@ -540,7 +513,6 @@ const HTML = `<!DOCTYPE html>
         \${hasComparison ? \`
           <div class="code-legend">
             <div class="legend-item"><div class="legend-dot" style="background: var(--success-color)"></div>LLM correct</div>
-            <div class="legend-item"><div class="legend-dot" style="background: var(--warning-color)"></div>LLM wrong type</div>
             <div class="legend-item"><div class="legend-dot" style="background: var(--alert-color)"></div>LLM extra (you didn't annotate)</div>
             <div class="legend-item"><div class="legend-dot" style="border: 2px dashed var(--warning-color)"></div>LLM missed (you annotated)</div>
           </div>
@@ -586,7 +558,7 @@ const HTML = `<!DOCTYPE html>
       document.getElementById('sidebar').innerHTML = \`
         <div class="tabs">
           <div class="tab \${activeTab === 'annotate' ? 'active' : ''}" onclick="setTab('annotate')">Annotate</div>
-          <div class="tab \${activeTab === 'compare' ? 'active' : ''}" onclick="setTab('compare')">\${hasEval ? 'Compare' : 'Compare'}</div>
+          <div class="tab \${activeTab === 'compare' ? 'active' : ''}" onclick="setTab('compare')">Compare</div>
         </div>
         <div class="tab-content \${activeTab === 'annotate' ? 'active' : ''}" id="annotateTab">
           \${renderAnnotateTab(savedAnns)}
@@ -595,7 +567,6 @@ const HTML = `<!DOCTYPE html>
           \${renderCompareTab(evalResult)}
         </div>
       \`;
-      updateTypeButtons();
     }
 
     function renderAnnotateTab(savedAnns) {
@@ -603,14 +574,9 @@ const HTML = `<!DOCTYPE html>
         <div class="section">
           <div class="section-title">Selection</div>
           <div class="selection-tokens">
-            \${selectedTokens.length === 0 
+            \${selectedTokens.length === 0
               ? '<span class="selection-empty">Click tokens in code to select</span>'
               : selectedTokens.map(id => \`<span class="selection-token">\${getTokenText(id)}</span>\`).join('')}
-          </div>
-          <div class="type-btns">
-            <button class="type-btn function" onclick="setType('function')">Function</button>
-            <button class="type-btn variable" onclick="setType('variable')">Variable</button>
-            <button class="type-btn object" onclick="setType('object')">Object</button>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" onclick="addAnnotation()" \${selectedTokens.length === 0 ? 'disabled' : ''}>Add</button>
@@ -619,12 +585,11 @@ const HTML = `<!DOCTYPE html>
         </div>
         <div class="section">
           <div class="section-title">Annotations</div>
-          \${savedAnns.length === 0 
+          \${savedAnns.length === 0
             ? '<div class="empty-state">No annotations yet</div>'
             : \`<div class="annotations-list">
                 \${savedAnns.map((ann, i) => \`
                   <div class="annotation-item">
-                    <span class="annotation-type \${ann.type}">\${ann.type.slice(0,3)}</span>
                     <span class="annotation-text">\${ann.ids.map(id => getTokenText(id)).join(' ')}</span>
                     <button class="annotation-delete" onclick="deleteAnnotation(\${i})">×</button>
                   </div>
@@ -650,7 +615,6 @@ const HTML = `<!DOCTYPE html>
               const isCorrect = act.ids.some(id => correctIds.has(id));
               return \`
                 <div class="llm-item">
-                  <span class="annotation-type \${act.documentation.type}">\${act.documentation.type.slice(0,3)}</span>
                   <span class="llm-text">\${act.ids.map(id => getTokenText(id)).join(' ')}</span>
                   \${isCorrect ? '<span style="color: var(--success-color)">✓</span>' : \`<button class="llm-accept" onclick="acceptLlm(\${i})">+</button>\`}
                 </div>
@@ -664,9 +628,8 @@ const HTML = `<!DOCTYPE html>
             <div class="llm-list">
               \${missedAnns.map(m => \`
                 <div class="llm-item">
-                  <span class="annotation-type \${m.expectedType}">\${m.expectedType.slice(0,3)}</span>
                   <span class="llm-text">\${getTokenText(m.id)}</span>
-                  <button class="llm-accept" style="background: var(--alert-color)" onclick="removeMissedAnnotation('\${m.id}')">−</button>
+                  <button class="llm-accept" style="background: var(--alert-color)" onclick="removeMissedAnnotation('\${m.id}')">-</button>
                 </div>
               \`).join('')}
             </div>
@@ -676,7 +639,6 @@ const HTML = `<!DOCTYPE html>
           <div class="section-title">Summary</div>
           <div class="diff-summary">
             <div class="diff-item"><div class="diff-num" style="color: var(--success-color)">\${comp.correctMatches?.length || 0}</div><div class="diff-label">Correct</div></div>
-            <div class="diff-item"><div class="diff-num" style="color: var(--warning-color)">\${comp.typeMismatches?.length || 0}</div><div class="diff-label">Wrong type</div></div>
             <div class="diff-item"><div class="diff-num" style="color: var(--alert-color)">\${comp.falsePositives?.length || 0}</div><div class="diff-label">Extra</div></div>
             <div class="diff-item"><div class="diff-num" style="color: var(--warning-color)">\${missedAnns.length}</div><div class="diff-label">Missed</div></div>
           </div>
@@ -713,18 +675,6 @@ const HTML = `<!DOCTYPE html>
       renderSidebar();
     }
 
-    function setType(type) {
-      selectedType = type;
-      updateTypeButtons();
-    }
-
-    function updateTypeButtons() {
-      document.querySelectorAll('.type-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.classList.contains(selectedType)) btn.classList.add('active');
-      });
-    }
-
     function setTab(tab) {
       activeTab = tab;
       renderSidebar();
@@ -748,7 +698,7 @@ const HTML = `<!DOCTYPE html>
       const filtered = getFiltered();
       const url = filtered[currentIndex].url;
       const anns = annotations[url] || [];
-      anns.push({ ids: [...selectedTokens], type: selectedType });
+      anns.push({ ids: [...selectedTokens] });
       annotations[url] = anns;
       await saveAnnotations();
       clearSelection();
@@ -772,7 +722,7 @@ const HTML = `<!DOCTYPE html>
       const url = filtered[currentIndex].url;
       const evalResult = evalResultsMap[url];
       if (!evalResult?.actual) return;
-      annotations[url] = evalResult.actual.map(act => ({ ids: act.ids, type: act.documentation.type }));
+      annotations[url] = evalResult.actual.map(act => ({ ids: act.ids }));
       await saveAnnotations();
       render();
       showToast('Accepted all');
@@ -785,7 +735,7 @@ const HTML = `<!DOCTYPE html>
       if (!evalResult?.actual?.[i]) return;
       const act = evalResult.actual[i];
       const anns = annotations[url] || [];
-      anns.push({ ids: act.ids, type: act.documentation.type });
+      anns.push({ ids: act.ids });
       annotations[url] = anns;
       await saveAnnotations();
       render();

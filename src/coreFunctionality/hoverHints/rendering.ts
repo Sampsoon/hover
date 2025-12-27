@@ -12,15 +12,8 @@ import {
 } from './styles';
 import {
   HoverHintDocumentation,
-  isVariableDocumentation,
-  isObjectDocumentation,
-  isFunctionDocumentation,
-  FunctionDocumentation,
-  DocString,
   ParamDocString,
   ReturnDocString,
-  ObjectDocumentation,
-  VariableDocumentation,
   PropertyDocString,
   TokenToCssStylingMap,
 } from './types';
@@ -64,7 +57,7 @@ function renderSignatureAsHtml(signature: string, tokenToCssStylingMap: TokenToC
   return signatureElement;
 }
 
-function renderDocStringAsHtml(command: DocStringCommand, documentation: string, name?: string) {
+function renderDocStringItemAsHtml(command: DocStringCommand, documentation: string, name?: string) {
   const sanitizedDocumentation = sanitizeHtml(documentation);
 
   const div = document.createElement('div');
@@ -85,137 +78,90 @@ function renderDocStringAsHtml(command: DocStringCommand, documentation: string,
   return div.outerHTML;
 }
 
-function renderParamDocStringAsHtml(docString: ParamDocString) {
-  return renderDocStringAsHtml(DocStringCommand.PARAM, docString.documentation, docString.name);
+function renderParamAsHtml(param: ParamDocString) {
+  return renderDocStringItemAsHtml(DocStringCommand.PARAM, param.documentation, param.name);
 }
 
-function renderReturnDocStringAsHtml(docString: ReturnDocString) {
-  return renderDocStringAsHtml(DocStringCommand.RETURN, docString.documentation);
+function renderReturnAsHtml(returns: ReturnDocString) {
+  return renderDocStringItemAsHtml(DocStringCommand.RETURN, returns.documentation);
 }
 
-function renderObjectPropertyDocStringAsHtml(docString: PropertyDocString) {
-  return renderDocStringAsHtml(DocStringCommand.PROPERTY, docString.documentation, docString.name);
+function renderPropertyAsHtml(property: PropertyDocString) {
+  return renderDocStringItemAsHtml(DocStringCommand.PROPERTY, property.documentation, property.name);
 }
 
-function renderFunctionDocStringAsHtml(docString: DocString) {
-  const docStringElement = document.createElement('div');
-
-  applySecondaryTextStyle(docStringElement.style);
-  applyTextContainerStyle(docStringElement.style);
-
-  const params = docString.params.map((param) => renderParamDocStringAsHtml(param));
-  const returns = renderReturnDocStringAsHtml(docString.returns);
-  const renderedText = `${params.join('')}${returns}`;
-  docStringElement.innerHTML = renderedText;
-
-  return docStringElement;
-}
-
-function renderObjectPropertiesAsHtml(properties: PropertyDocString[]) {
+function renderPropertiesAsHtml(properties: PropertyDocString[]) {
   const propertiesElement = document.createElement('div');
 
   applySecondaryTextStyle(propertiesElement.style);
   applyTextContainerStyle(propertiesElement.style);
 
-  const renderedProperties = properties.map((property) => renderObjectPropertyDocStringAsHtml(property));
+  const renderedProperties = properties.map((property) => renderPropertyAsHtml(property));
   propertiesElement.innerHTML = renderedProperties.join('');
 
   return propertiesElement;
 }
 
-function renderFunctionDocumentationTextAsHtml(documentation: string) {
-  const sanitizedDocumentation = sanitizeHtml(documentation);
-  const documentationElement = document.createElement('div');
-
-  applyPrimaryTextStyle(documentationElement.style);
-  applyTextContainerStyle(documentationElement.style);
-  applyBottomMarginStyle(documentationElement.style);
-
-  documentationElement.innerHTML = sanitizedDocumentation;
-
-  return documentationElement;
-}
-
-function renderObjectDocumentationTextAsHtml(documentation: string) {
-  const sanitizedDocumentation = sanitizeHtml(documentation);
-  const documentationElement = document.createElement('div');
-
-  applyPrimaryTextStyle(documentationElement.style);
-  applyTextContainerStyle(documentationElement.style);
-  applyBottomMarginStyle(documentationElement.style);
-
-  documentationElement.innerHTML = sanitizedDocumentation;
-
-  return documentationElement;
-}
-
-function renderFunctionDocumentationAsHtml(documentation: FunctionDocumentation) {
-  const hoverHintElement = document.createElement('div');
-
-  const signatureElement = renderSignatureAsHtml(documentation.functionSignature, documentation.tokenToCssStylingMap);
-  hoverHintElement.appendChild(signatureElement);
-
-  if (documentation.docString) {
-    const docStringElement = renderFunctionDocStringAsHtml(documentation.docString);
-    hoverHintElement.appendChild(docStringElement);
+function renderParamsAndReturnsAsHtml(params: ParamDocString[] | undefined, returns: ReturnDocString | undefined) {
+  if (!params?.length && !returns) {
+    return null;
   }
 
-  if (documentation.documentation) {
-    const documentationElement = renderFunctionDocumentationTextAsHtml(documentation.documentation);
-    hoverHintElement.appendChild(documentationElement);
-  }
-
-  const renderedElement = hoverHintElement.outerHTML;
-  hoverHintElement.remove();
-
-  return renderedElement;
-}
-
-function renderObjectDocumentationAsHtml(documentation: ObjectDocumentation) {
-  const hoverHintElement = document.createElement('div');
-
-  if (documentation.docInHtml) {
-    const documentationElement = renderObjectDocumentationTextAsHtml(documentation.docInHtml);
-    hoverHintElement.appendChild(documentationElement);
-  }
-
-  if (documentation.properties) {
-    const propertiesElement = renderObjectPropertiesAsHtml(documentation.properties);
-    hoverHintElement.appendChild(propertiesElement);
-  }
-
-  const renderedElement = hoverHintElement.outerHTML;
-  hoverHintElement.remove();
-
-  return renderedElement;
-}
-
-function renderVariableDocumentationAsHtml(documentation: VariableDocumentation) {
-  const body = sanitizeHtml(documentation.docInHtml);
   const container = document.createElement('div');
+
+  applySecondaryTextStyle(container.style);
   applyTextContainerStyle(container.style);
 
-  const contentDiv = document.createElement('div');
-  applyPrimaryTextStyle(contentDiv.style);
-  contentDiv.innerHTML = body;
+  const renderedParams = params?.map((param) => renderParamAsHtml(param)) ?? [];
+  const renderedReturns = returns ? renderReturnAsHtml(returns) : '';
+  container.innerHTML = `${renderedParams.join('')}${renderedReturns}`;
 
-  container.appendChild(contentDiv);
-  return container.outerHTML;
+  return container;
+}
+
+function renderDocumentationTextAsHtml(documentation: string) {
+  const sanitizedDocumentation = sanitizeHtml(documentation);
+  const documentationElement = document.createElement('div');
+
+  applyPrimaryTextStyle(documentationElement.style);
+  applyTextContainerStyle(documentationElement.style);
+  applyBottomMarginStyle(documentationElement.style);
+
+  documentationElement.innerHTML = sanitizedDocumentation;
+
+  return documentationElement;
 }
 
 export function renderDocumentationAsHtml(documentation: HoverHintDocumentation) {
-  if (isFunctionDocumentation(documentation)) {
-    return renderFunctionDocumentationAsHtml(documentation);
+  const hoverHintElement = document.createElement('div');
+
+  if (documentation.signature) {
+    const signatureElement = renderSignatureAsHtml(documentation.signature, documentation.tokenToCssStylingMap);
+    hoverHintElement.appendChild(signatureElement);
   }
 
-  if (isObjectDocumentation(documentation)) {
-    return renderObjectDocumentationAsHtml(documentation);
+  if (documentation.properties?.length) {
+    const propertiesElement = renderPropertiesAsHtml(documentation.properties);
+    hoverHintElement.appendChild(propertiesElement);
   }
 
-  if (isVariableDocumentation(documentation)) {
-    return renderVariableDocumentationAsHtml(documentation);
+  const paramsReturnsElement = renderParamsAndReturnsAsHtml(documentation.params, documentation.returns);
+  if (paramsReturnsElement) {
+    hoverHintElement.appendChild(paramsReturnsElement);
   }
 
-  console.error('Unknown documentation type', documentation);
-  return undefined;
+  if (documentation.documentation) {
+    const documentationElement = renderDocumentationTextAsHtml(documentation.documentation);
+    hoverHintElement.appendChild(documentationElement);
+  }
+
+  // Return undefined if nothing was rendered
+  if (hoverHintElement.children.length === 0) {
+    return undefined;
+  }
+
+  const renderedElement = hoverHintElement.outerHTML;
+  hoverHintElement.remove();
+
+  return renderedElement;
 }

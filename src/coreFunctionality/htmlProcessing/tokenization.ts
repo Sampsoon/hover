@@ -103,5 +103,6 @@ export function wrapTokensInSpans(doc: Document, element: HTMLElement): void {
 }
 
 export function getDomLeaves(element: HTMLElement): HTMLElement[] {
-  return Array.from(element.querySelectorAll(':scope *:not(:has(*))'));
+  const allElements = element.querySelectorAll('*');
+  return Array.from(allElements).filter((el) => el.children.length === 0) as HTMLElement[];
 }

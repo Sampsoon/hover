@@ -4,14 +4,14 @@
     "expectedAnnotations": [
       {
         "ids": [
-          "m5nguj"
+          "-jqjlsl"
         ],
         "type": "function"
       },
       {
         "ids": [
-          "egca1u",
-          "-7x2348"
+          "-q000xy",
+          "eeffx9"
         ],
         "type": "function"
       }
@@ -19,77 +19,15 @@
   },
   {
     "url": "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-j75ow0"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://doc.rust-lang.org/book/ch10-02-traits.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "oo9j2y"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-tewtjg"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://doc.rust-lang.org/book/ch16-01-threads.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-6yrwb1"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-vk3ijd"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "1dnuis",
-          "8ao3o9"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-k6srfy",
-          "ht8y64"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-j7iggh",
-          "-2a1umg"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "13ya81",
-          "-sa1sfq",
-          "-5mdh4f"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html",
@@ -97,133 +35,35 @@
   },
   {
     "url": "https://www.typescriptlang.org/docs/handbook/2/generics.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "uvfhto"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-ln330f"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "57zbq5"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.typescriptlang.org/docs/handbook/2/classes.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "y7yir3"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/reference/react/useState",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-takv7l"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-7wet9g"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "dtxw5r"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-fh1lqd"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/reference/react/useEffect",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-qbl7kd"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/reference/react/useContext",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-h2outz"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-7u0m8s"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-pybmi8"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/learn/passing-props-to-a-component",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "314c3x"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "87icpi"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nodejs.org/api/fs.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "jmqw4w"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nodejs.org/api/http.html",
@@ -231,485 +71,43 @@
   },
   {
     "url": "https://nodejs.org/api/path.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "980e3l"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "12661m"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nodejs.org/api/events.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-3sf8ev",
-          "-4uawdl"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "r2mxjk",
-          "wrnjll"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-8z1kwf",
-          "kwwd74",
-          "-9nzswk"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "cs36zq"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "fcjxv9"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-a15qn9"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/cdk/v2/guide/hello_world.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-9agonp"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-2hve05"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-npgc82"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-uvjj3g"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "e5tf2e"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-fachyt"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "t9ipty"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-radgl3",
-          "olrv7x"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-dfosp5",
-          "-jdutp5"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-kh2b3w"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-caeiv9"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "qnsq64"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "hfjs2j"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "1ns3o2"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-i2igi4"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-u2x3re"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-ui1qf6"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-g1ffhe"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "nwhyia"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-4a5k1j"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/cdk/v2/guide/stacks.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "6rsgvx"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "inr0ac"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-9sffrq"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_s3_code_examples.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-yjztiw"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-dpvuud",
-          "-ymcjde"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "9fkgvi",
-          "kqytmr"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-jiftxv",
-          "-bu5wyw"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "f372xs",
-          "-w0pjfh"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "dzje41",
-          "-mrsya3",
-          "-we4bs0",
-          "-oepgz0"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-xhw5ct"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "4sbeim",
-          "-r0nrfg"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "xv4fum"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-ciktiq"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-bm1utj"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_dynamodb_code_examples.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "rwetpt",
-          "-7z7vmx"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-xptxdy",
-          "vupmbo"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "c8nrub"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "oeuh1o",
-          "-fdui80"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-e4sroh",
-          "tzo88c"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-64l8w",
-          "-3qtxti",
-          "-2x1k6p"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-3n2ch1"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "i6hjg7"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "erajb3"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_lambda_code_examples.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-mda1n6",
-          "-f9nb7k"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-xucs44"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ogugy2",
-          "-4cciw9"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "kdwlqk",
-          "-c3no4r"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-rm69ea",
-          "-3loc1s"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-ho866q",
-          "-jjx8bv",
-          "-bscim5"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "a9c02u",
-          "btgik2"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-136fc4"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-62n900"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "g0qwxk",
-          "-ar4l8w"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-8ixnol"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://platform.openai.com/docs/api-reference/chat/create",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "iukx5i"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://platform.openai.com/docs/guides/embeddings",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "cqphgo"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "2q9out"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "og7td4",
-          "llw9ut",
-          "-6yoyzq"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-wbbdml"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.anthropic.com/en/api/messages",
@@ -717,14 +115,7 @@
   },
   {
     "url": "https://realpython.com/python-lambda/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "rx7fgk"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://realpython.com/python-json/",
@@ -732,50 +123,7 @@
   },
   {
     "url": "https://realpython.com/async-io-python/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-bw1f64",
-          "ktq3ui"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "4me3y9",
-          "-ukx82z"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "x1jvrt",
-          "-j141fb",
-          "-yknhtk"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-k3giiu",
-          "wvsmwd"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-mvezkn"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-93bkmm",
-          "jrjk5u"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://realpython.com/python-requests/",
@@ -787,218 +135,27 @@
   },
   {
     "url": "https://dev.to/lydiahallie/javascript-visualized-event-loop-3dif",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "xzpb3u",
-          "84u8uk"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "f7ukgx",
-          "acdzhi"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ndmcrv",
-          "-udzq2p"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-8kukvx"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-9m25ph",
-          "yx1o07",
-          "xi9nyr"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.freecodecamp.org/news/how-to-fetch-data-from-an-api-using-the-fetch-api-in-javascript/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "e4i23y"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "93az09",
-          "-j3yvhk"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tkbk1d"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-mxx3ko"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "9i1wjo"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-lh8wi4"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.freecodecamp.org/news/async-await-in-javascript/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-peij2a"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "7xinro"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-nn1rmt",
-          "qeuc6a",
-          "ainylk"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.freecodecamp.org/news/destructuring-in-javascript/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-v28s82",
-          "-x2socr",
-          "bqswil",
-          "-pumaa4"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "olo2l4"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-vrow6p"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-fpoby6"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-4i313p",
-          "-ouzbhw",
-          "-oxe967"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://stackoverflow.com/questions/111102/how-do-javascript-closures-work",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-sk1iqq",
-          "9ascug"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-2nri86"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-sps6va",
-          "-c00xj5"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "e76i19"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-5mbfma"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "dsp9uq"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://stackoverflow.com/questions/351409/how-to-append-something-to-an-array",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "mcsif0",
-          "rn9rl8",
-          "m3t4rn"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "m51sc0"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-z8xp08"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array",
@@ -1006,440 +163,63 @@
   },
   {
     "url": "https://cn.vuejs.org/guide/essentials/computed.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "glkwti"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://mode.com/sql-tutorial/sql-select-statement/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "esh94p"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-tb2ppc"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-cwbf2z"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-2fbpc",
-          "-kmmszc"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://kubernetes.io/docs/concepts/workloads/pods/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-j0q3ha"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-zifq2y"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-b2xvuu"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-b457na",
-          "lbbcec"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-p9qvgz"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-o4r8b2"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "35rzaw"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-wjbx1w"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-v8rm99"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://doc.rust-lang.org/book/ch08-01-vectors.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "ylydxo"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ml86yt",
-          "-m5rzq8"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "mja9lg"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-ja25op"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://doc.rust-lang.org/book/ch09-02-recoverable-errors-with-result.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-otn00w"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "hp6mke"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "ptsy06"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "ux2mqc"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://www.typescriptlang.org/docs/handbook/2/mapped-types.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-nqafzn",
-          "-ulkrvm"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/reference/react/useMemo",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-5a5ds9"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://react.dev/reference/react/useCallback",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "l8ddn8"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nodejs.org/api/stream.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-2q2zfb"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nodejs.org/api/buffer.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "t04fw6",
-          "-g5lhim"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "nuho55",
-          "rqdq6s",
-          "si0inx",
-          "-66kt1h",
-          "-j2p5oi",
-          "musrvo",
-          "-41mcfa"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "jaaft1",
-          "-qho6nv",
-          "-ayl7x4",
-          "74araw"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-6hc3pi"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/cdk/v2/guide/resources.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-7db32s",
-          "ur907d",
-          "-m1xvsd"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "chtfys"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-6cd2na"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "8i0vpq"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/javascript_sns_code_examples.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "gpknfd",
-          "b89pla"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-fc0glz",
-          "gbp822"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "-do3yme",
-          "hvnyev"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-xx6qx4",
-          "-59e7uh"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "q0ey1o",
-          "-m6gy9k",
-          "-2kenme"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-nes1oa",
-          "-8zx5h5",
-          "xbbdf6"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-fmkxf8"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "nechqi",
-          "-5idx42"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-ewr2na",
-          "iw74e4",
-          "be0tpy"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "xbbdf6"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://realpython.com/python-data-classes/",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-p9wbgv"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "40sgcj",
-          "4ho3tv"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "40sgcj"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://svelte.dev/docs/introduction",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "7eupdp"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-6yowz9",
-          "89bpxe"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-chlpmu"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-5n40l8",
-          "68gl1n"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://vuejs.org/guide/essentials/reactivity-fundamentals.html",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-871ymx"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "4ajamy"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ww0fj1",
-          "-o5vuro",
-          "-mmya01"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "9cedjx"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.deno.com/runtime/fundamentals/typescript/",
@@ -1447,93 +227,11 @@
   },
   {
     "url": "https://bun.sh/docs/api/http",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "yekmx3",
-          "-d2iv5c"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "vkq5p0"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-cohi28"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-6f9b3b",
-          "-2ul1nv"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "47e4nv",
-          "-di0fic",
-          "-nibhca"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "tl5ksq"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "2gg1ti",
-          "3kt0ao"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "to77w9"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ibznq3"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "bjzk0x"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "fvcpe2",
-          "-8aou1b",
-          "-5pluir",
-          "-i11ix2"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://nextjs.org/docs/app/building-your-application/routing",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "srt41c"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://docs.astro.build/en/getting-started/",
@@ -1545,238 +243,26 @@
   },
   {
     "url": "https://trpc.io/docs/quickstart",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "9q7s6w"
-        ],
-        "type": "object"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://gemini.google.com/share/56c7c7f982da",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "tok_2c",
-          "tok_e"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_k",
-          "tok_s",
-          "tok_u",
-          "tok_12",
-          "tok_1b"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_l"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_r"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_1f"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_2b",
-          "tok_2o",
-          "tok_2w"
-        ],
-        "type": "object"
-      },
-      {
-        "ids": [
-          "tok_2p",
-          "tok_13"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_11"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_1w",
-          "tok_1s",
-          "tok_1j",
-          "tok_10",
-          "tok_z"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_1i",
-          "tok_p"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_1k"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_15",
-          "tok_1m",
-          "tok_1u"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_1a",
-          "tok_1g"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_24",
-          "tok_2d"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_2s"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_t"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_v"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://claude.ai/share/3bfa1831-a1a7-42c7-8a38-6db9fa605d48",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "-m53k5q",
-          "-6btltg"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "ddp7er",
-          "-rlq8km"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-wnov9y"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "qg5dbl"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "-kx5pnt"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "g3gnx1",
-          "-icxfpt"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "10ih5n"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "-51mhhe",
-          "z7ph8o",
-          "-27vy1r",
-          "l6sxbo"
-        ],
-        "type": "variable"
-      }
-    ]
+    "expectedAnnotations": []
   },
   {
     "url": "https://grok.com/share/bGVnYWN5_1b5fb303-6a03-4225-8a30-5482b17feb9f?rid=81d264b2-7753-49b9-a1af-1696c06d300d",
-    "expectedAnnotations": [
-      {
-        "ids": [
-          "tok_4"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_i"
-        ],
-        "type": "variable"
-      },
-      {
-        "ids": [
-          "tok_38",
-          "tok_2w",
-          "tok_2k",
-          "tok_28",
-          "tok_1w",
-          "tok_1k",
-          "tok_18",
-          "tok_3e"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_3h"
-        ],
-        "type": "function"
-      },
-      {
-        "ids": [
-          "tok_2"
-        ],
-        "type": "function"
-      }
-    ]
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://claude.ai/share/d87f93b5-347b-48d1-b2c1-766a7c29020a",
+    "expectedAnnotations": []
+  },
+  {
+    "url": "https://chatgpt.com/c/694c552b-6490-8327-a52c-c54063be2d8a",
+    "expectedAnnotations": []
   }
 ]

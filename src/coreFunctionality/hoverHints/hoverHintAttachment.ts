@@ -54,7 +54,7 @@ export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idM
   const { ids, documentation } = hoverHint;
   const { codeTokenElementMap } = idMappings;
 
-  const renderedHtml = renderDocumentationAsHtml(documentation);
+  const renderedHtml = renderDocumentationAsHtml(documentation, { idMappings });
 
   if (!renderedHtml) {
     return;
@@ -66,8 +66,6 @@ export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idM
     const codeToken = codeTokenElementMap.get(id);
     if (codeToken) {
       addEffectToCodeToken(codeToken);
-    } else {
-      console.error(`Code token with id ${id} not found in idToCodeTokenMap`);
     }
   });
 }

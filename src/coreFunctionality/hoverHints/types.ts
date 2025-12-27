@@ -27,14 +27,9 @@ const propertyDocStringSchema = z.object({
 
 export type PropertyDocString = z.infer<typeof propertyDocStringSchema>;
 
-const tokenToCssStylingMapSchema = z.record(
-  z.object({
-    class: z.string().optional(),
-    style: z.string().optional(),
-  }),
-);
+const signatureStylesSchema = z.record(z.string());
 
-export type TokenToCssStylingMap = z.infer<typeof tokenToCssStylingMapSchema>;
+export type SignatureStyles = z.infer<typeof signatureStylesSchema>;
 
 export const hoverHintDocumentation = z.object({
   signature: z
@@ -80,25 +75,18 @@ SKIP when: the code is self-documenting (e.g., \`Math.max\`, simple getters/sett
 Keep to 1-5 sentences. Mention: side effects, async behavior, error conditions, or common pitfalls.`,
     ),
 
-  tokenToCssStylingMap: tokenToCssStylingMapSchema.optional().describe(`
-CSS styling to apply to tokens in the signature, matching the code block's syntax highlighting theme.
+  signatureStyles: signatureStylesSchema.optional().describe(`
+Map signature tokens to token IDs from the HTML for syntax highlighting.
+Find tokens in the HTML with matching semantic roles (function names, types, parameters) and use their IDs.
 
-Extract class/style attributes from the HTML input for tokens that appear in your signature.
-Only include tokens that are IN the signature - not keywords like \`function\` or \`const\`.
-
-Example - given this HTML:
-\`\`\`html
-<id=fn1 class="hljs-title function_"/>greetUser</>(<id=p1/>name</>: <id=t1 class="hljs-built_in"/>string</>): <id=t2 class="hljs-built_in"/>string</>
-\`\`\`
-
-For signature \`greetUser(name: string): string\`, the map would be:
+Example - for signature \`greetUser(name: string): string\`:
 {
-  "greetUser": { "class": "hljs-title function_" },
-  "string": { "class": "hljs-built_in" }
+  "greetUser": "t1",  // t1 is a function name token
+  "name": "t3",       // t3 is a parameter token
+  "string": "t5"      // t5 is a type token
 }
 
-If a token in your signature doesn't appear in the HTML, infer styling from similar tokens (e.g., other type names, other function names).
-Include both class and style attributes when present on a token.
+Skip punctuation (parentheses, colons). Be consistent - highlight all types if highlighting any.
 `),
 });
 

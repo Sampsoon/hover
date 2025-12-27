@@ -10,26 +10,61 @@ import {
   MarginSize,
   DocStringCommand,
 } from './styles';
-import {
-  HoverHintDocumentation,
-  ParamDocString,
-  ReturnDocString,
-  PropertyDocString,
-  TokenToCssStylingMap,
-} from './types';
+import { HoverHintDocumentation, ParamDocString, ReturnDocString, PropertyDocString, SignatureStyles } from './types';
+import { IdMappings } from '../htmlProcessing';
 
 // Used to prevent cross-site scripting attacks
 function sanitizeHtml(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function applyTokenToCssStylingMap(signature: string, tokenToCssStylingMap: TokenToCssStylingMap) {
-  for (const [token, styling] of Object.entries(tokenToCssStylingMap)) {
-    if (!styling.class && !styling.style) {
+interface ResolvedStyle {
+  className?: string;
+  style?: string;
+}
+
+function filterHoverHintIndicatorStyle(style: string | null): string | undefined {
+  if (!style) {
+    return undefined;
+  }
+
+  const filtered = style
+    .split(';')
+    .map((s) => s.trim())
+    .filter((s) => !s.startsWith('text-decoration'))
+    .join('; ');
+
+  return filtered || undefined;
+}
+
+function resolveStylesFromTokenIds(
+  signatureStyles: SignatureStyles,
+  idMappings: IdMappings,
+): Record<string, ResolvedStyle> {
+  const resolvedStyles: Record<string, ResolvedStyle> = {};
+
+  for (const [token, tokenId] of Object.entries(signatureStyles)) {
+    const element = idMappings.codeTokenElementMap.get(tokenId);
+    if (!element) {
       continue;
     }
 
-    const classAttr = styling.class ? ` class="${styling.class}"` : '';
+    resolvedStyles[token] = {
+      className: element.className ? element.className : undefined,
+      style: filterHoverHintIndicatorStyle(element.getAttribute('style')),
+    };
+  }
+
+  return resolvedStyles;
+}
+
+function applyStylesToSignature(signature: string, resolvedStyles: Record<string, ResolvedStyle>) {
+  for (const [token, styling] of Object.entries(resolvedStyles)) {
+    if (!styling.className && !styling.style) {
+      continue;
+    }
+
+    const classAttr = styling.className ? ` class="${styling.className}"` : '';
     const styleAttr = styling.style ? ` style="${styling.style}"` : '';
 
     const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -40,7 +75,12 @@ function applyTokenToCssStylingMap(signature: string, tokenToCssStylingMap: Toke
   return signature;
 }
 
-function renderSignatureAsHtml(signature: string, tokenToCssStylingMap: TokenToCssStylingMap | undefined) {
+interface SignatureStyleContext {
+  signatureStyles?: SignatureStyles;
+  idMappings: IdMappings;
+}
+
+function renderSignatureAsHtml(signature: string, styleContext: SignatureStyleContext) {
   const sanitizedSignature = sanitizeHtml(signature);
 
   const signatureElement = document.createElement('div');
@@ -50,9 +90,14 @@ function renderSignatureAsHtml(signature: string, tokenToCssStylingMap: TokenToC
   applyTopMarginStyle(signatureElement.style);
   applyBottomMarginStyle(signatureElement.style, MarginSize.LARGE);
 
-  signatureElement.innerHTML = tokenToCssStylingMap
-    ? applyTokenToCssStylingMap(sanitizedSignature, tokenToCssStylingMap)
-    : sanitizedSignature;
+  const { signatureStyles, idMappings } = styleContext;
+
+  if (signatureStyles) {
+    const resolvedStyles = resolveStylesFromTokenIds(signatureStyles, idMappings);
+    signatureElement.innerHTML = applyStylesToSignature(sanitizedSignature, resolvedStyles);
+  } else {
+    signatureElement.innerHTML = sanitizedSignature;
+  }
 
   return signatureElement;
 }
@@ -132,11 +177,19 @@ function renderDocumentationTextAsHtml(documentation: string) {
   return documentationElement;
 }
 
-export function renderDocumentationAsHtml(documentation: HoverHintDocumentation) {
+export interface RenderContext {
+  idMappings: IdMappings;
+}
+
+export function renderDocumentationAsHtml(documentation: HoverHintDocumentation, context: RenderContext) {
   const hoverHintElement = document.createElement('div');
 
   if (documentation.signature) {
-    const signatureElement = renderSignatureAsHtml(documentation.signature, documentation.tokenToCssStylingMap);
+    const signatureElement = renderSignatureAsHtml(documentation.signature, {
+      signatureStyles: documentation.signatureStyles,
+      idMappings: context.idMappings,
+    });
+
     hoverHintElement.appendChild(signatureElement);
   }
 

@@ -12,6 +12,7 @@ TOKEN ID SELECTION:
 
 WHAT TO DOCUMENT:
 - Library/API calls that readers may not know
+- Non-obvious imports (unfamiliar libraries, aliased imports, or imports with unclear purposes)
 - Functions with non-obvious behavior, side effects, or gotchas
 - Configuration objects and their options
 - Variables whose purpose isn't clear from the name

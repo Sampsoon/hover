@@ -285,7 +285,7 @@ const HTML = `<!DOCTYPE html>
     .code-metrics span { color: var(--text-secondary); }
     .code-metrics strong { color: var(--text-primary); }
     .code-area { flex: 1; overflow: auto; padding: 16px; background: var(--code-bg); }
-    .code-block { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+    .code-block { font-family: var(--font-mono); font-size: 13px; line-height: 1.5; white-space: pre-wrap; user-select: none; }
     .code-block .token { cursor: pointer; padding: 1px 2px; border-radius: 2px; }
     .code-block .token:hover { background: rgba(95, 107, 225, 0.15); }
     .code-block .token.selected { background: rgba(31, 182, 126, 0.25); outline: 2px solid var(--success-color); }
@@ -693,6 +693,7 @@ const HTML = `<!DOCTYPE html>
     }
 
     function selectToken(tokenId, event) {
+      event.preventDefault();
       if (event.shiftKey) {
         if (!selectedTokens.includes(tokenId)) selectedTokens.push(tokenId);
       } else {

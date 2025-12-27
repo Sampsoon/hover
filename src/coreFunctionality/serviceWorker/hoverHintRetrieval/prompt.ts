@@ -40,9 +40,9 @@ SIGNATURE SYNTAX HIGHLIGHTING:
 Goal: Make signatures look like code - with colors matching the code block's syntax theme.
 
 How it works:
-- The HTML code block already has syntax highlighting (CSS classes applied to tokens)
-- We borrow those colors by referencing token IDs in signatureStyles
-- For each word in your signature, point to a token in the HTML that should have the same color
+- The HTML you receive has styles/classes stripped to reduce tokens
+- Identify token semantic roles (function, type, parameter, etc.) from code structure and position
+- For each word in your signature, point to a token in the HTML that has the same semantic role
 
 Example: For signature \`fetchUser(id: number): User\`
 - "fetchUser" should be colored like function names → find a function token in the HTML, use its ID

@@ -7,7 +7,6 @@
 * Keep popup on screen when user moves mouse over it
 * Look into removing styling cashing
 * Handle large inputs. Maybe in chucks?
-* Sanitize html further to remove styles
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management

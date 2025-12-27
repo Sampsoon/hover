@@ -77,7 +77,8 @@ Keep to 1-5 sentences. Mention: side effects, async behavior, error conditions, 
 
   signatureStyles: signatureStylesSchema.optional().describe(`
 Map signature tokens to token IDs from the HTML for syntax highlighting.
-Find tokens in the HTML with matching semantic roles (function names, types, parameters) and use their IDs.
+Styles/classes are stripped from the HTML - identify semantic roles from code structure and position.
+Find tokens with matching semantic roles (function names, types, parameters) and use their IDs.
 
 Example - for signature \`greetUser(name: string): string\`:
 {

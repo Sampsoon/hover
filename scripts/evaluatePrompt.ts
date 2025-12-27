@@ -211,11 +211,22 @@ function calculateMetrics(expected: ExpectedAnnotation[], actual: HoverHint[], c
   const falseNegatives = comparison.falseNegatives.length;
   const typeMismatchCount = comparison.typeMismatches.length;
 
-  const precision = truePositives / (truePositives + falsePositives) || 0;
-  const recall = truePositives / (truePositives + falseNegatives) || 0;
-  const f1 = (2 * (precision * recall)) / (precision + recall) || 0;
+  let precision: number;
+  let recall: number;
+  let f1: number;
+  let typeAccuracy: number;
 
-  const typeAccuracy = truePositives > 0 ? comparison.correctMatches.length / truePositives : 0;
+  if (expectedIds.size === 0 && actualIds.size === 0) {
+    precision = 1;
+    recall = 1;
+    f1 = 1;
+    typeAccuracy = 1;
+  } else {
+    precision = truePositives / (truePositives + falsePositives) || 0;
+    recall = truePositives / (truePositives + falseNegatives) || 0;
+    f1 = (2 * (precision * recall)) / (precision + recall) || 0;
+    typeAccuracy = truePositives > 0 ? comparison.correctMatches.length / truePositives : 0;
+  }
 
   return {
     precision,

@@ -1,17 +1,12 @@
-import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../hoverHints';
+import type { HoverHint } from '../hoverHints';
 import { callLLM, LlmParams } from '../llm';
-import { createHoverHintStreamError, createHoverHintStreamMessage, parseHoverHintBatchFromStream } from '../stream';
-import {
-  buildContinuationInput,
-  cleanHoverHintRetrievalHtml,
-  RETRIEVAL_HOVER_HINTS_PROMPT,
-} from './hoverHintRetrieval';
+import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
+import { retrieveHoverHints } from './hoverHintRetrieval';
 import { HoverHintRetrievalMessage } from './interface';
 import browser from 'webextension-polyfill';
 
 const MAX_RETRIES = 5;
 const RETRY_DELAY = 1000;
-const MAX_BATCHES = 10;
 
 async function callLLMWithRetry(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void): Promise<void> {
   let currentRetryDelay = RETRY_DELAY;
@@ -38,39 +33,11 @@ async function retrieveHoverHintsStream(
 ) {
   const startTime = performance.now();
 
-  const llmParams: LlmParams = {
-    prompt: RETRIEVAL_HOVER_HINTS_PROMPT,
-    schema: hoverHintListSchema,
-  };
-
-  const cleanedHtml = cleanHoverHintRetrievalHtml(codeBlockRawHtml);
-  const previousHints: HoverHint[] = [];
-  let remainingTokenCount = 0;
-  let batchCount = 0;
-
   try {
-    do {
-      batchCount++;
-
-      const input = buildContinuationInput(cleanedHtml, previousHints);
-      const { onChunk, getRemainingTokenCount } = parseHoverHintBatchFromStream(hoverHintSchema, (hint) => {
-        previousHints.push(hint);
-        onHoverHint(hint);
-      });
-
-      await callLLMWithRetry(input, llmParams, onChunk);
-
-      remainingTokenCount = getRemainingTokenCount();
-
-      if (remainingTokenCount > 0) {
-        console.log(`Batch ${batchCount.toString()} complete, ${remainingTokenCount.toString()} tokens remaining...`);
-      }
-    } while (remainingTokenCount > 0 && batchCount < MAX_BATCHES);
+    const hints = await retrieveHoverHints(codeBlockRawHtml, callLLMWithRetry, onHoverHint);
 
     const latency = (performance.now() - startTime) / 1000;
-    console.log(
-      `Annotation retrieval latency: ${latency.toFixed(2)}s (${batchCount.toString()} batch(es), ${previousHints.length.toString()} hints)`,
-    );
+    console.log(`Annotation retrieval latency: ${latency.toFixed(2)}s (${hints.length.toString()} hints)`);
   } catch {
     const latency = (performance.now() - startTime) / 1000;
     console.log(`Annotation retrieval latency (failed): ${latency.toFixed(2)}s`);

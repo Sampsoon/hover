@@ -11,14 +11,11 @@ import { fileURLToPath } from 'url';
 };
 (global as any).browser = (global as any).chrome;
 
-const { RETRIEVAL_HOVER_HINTS_PROMPT, cleanHoverHintRetrievalHtml } = await import(
-  '../src/coreFunctionality/serviceWorker/hoverHintRetrieval'
-);
-const { hoverHintListSchema, hoverHintSchema } = await import('../src/coreFunctionality/hoverHints');
+const { retrieveHoverHints } = await import('../src/coreFunctionality/serviceWorker/hoverHintRetrieval');
+import type { CallLLMFn } from '../src/coreFunctionality/serviceWorker/hoverHintRetrieval';
 import type { HoverHint } from '../src/coreFunctionality/hoverHints';
 const { callLLMWithConfig } = await import('../src/coreFunctionality/llm');
 import type { LlmParams } from '../src/coreFunctionality/llm';
-const { parseListOfObjectsFromStream } = await import('../src/coreFunctionality/stream');
 import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from '../src/storage/constants';
 import type { APIConfig } from '../src/storage/types';
 
@@ -105,37 +102,29 @@ function isRetryableError(error: unknown): boolean {
   return false;
 }
 
-async function invokeWithRetry(cleanedHtml: string, config: APIConfig): Promise<HoverHint[]> {
-  const llmParams: LlmParams = {
-    prompt: RETRIEVAL_HOVER_HINTS_PROMPT,
-    schema: hoverHintListSchema,
-  };
-
-  let lastError: unknown;
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    try {
-      const hints: HoverHint[] = [];
-      const onParsedElement = parseListOfObjectsFromStream(hoverHintSchema, (hint) => {
-        hints.push(hint);
-      });
-
-      await callLLMWithConfig(cleanedHtml, llmParams, config, onParsedElement);
-      return hints;
-    } catch (error) {
-      lastError = error;
-      if (isRetryableError(error)) {
-        const backoffMs = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
-        const errorMsg = error instanceof Error ? error.message : String(error);
-        console.log(
-          `    Retryable error (${errorMsg}), waiting ${backoffMs}ms before retry ${attempt + 1}/${MAX_RETRIES}...`,
-        );
-        await sleep(backoffMs);
-      } else {
-        throw error;
+function createCallLLMWithRetry(config: APIConfig): CallLLMFn {
+  return async (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void): Promise<void> => {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        await callLLMWithConfig(input, llmParams, config, onChunk);
+        return;
+      } catch (error) {
+        lastError = error;
+        if (isRetryableError(error)) {
+          const backoffMs = INITIAL_BACKOFF_MS * Math.pow(2, attempt);
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          console.log(
+            `    Retryable error (${errorMsg}), waiting ${backoffMs}ms before retry ${attempt + 1}/${MAX_RETRIES}...`,
+          );
+          await sleep(backoffMs);
+        } else {
+          throw error;
+        }
       }
     }
-  }
-  throw lastError;
+    throw lastError;
+  };
 }
 
 interface Metrics {
@@ -277,8 +266,8 @@ async function evaluateExample(task: EvalTask, config: APIConfig, progress: Prog
   const { example, expected } = task;
 
   try {
-    const cleanedHtml = cleanHoverHintRetrievalHtml(example.tokenizedHtml);
-    const actual = await invokeWithRetry(cleanedHtml, config);
+    const callLLM = createCallLLMWithRetry(config);
+    const actual = await retrieveHoverHints(example.tokenizedHtml, callLLM);
 
     const comparison = buildComparison(expected, actual);
     const metrics = calculateMetrics(expected, actual, comparison);

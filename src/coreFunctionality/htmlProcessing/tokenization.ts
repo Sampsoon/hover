@@ -8,37 +8,53 @@ function createProgrammaticallyAddedSpan(doc: Document, content: string): HTMLSp
 }
 
 const CODE_DELIMITERS = new Set<string>([
+  // Whitespace
   ' ',
   '\t',
   '\n',
   '\r',
   '\v',
   '\f',
+  // Punctuation
   '.',
   ',',
   ';',
   ':',
+  // Brackets
   '(',
   ')',
   '[',
   ']',
   '{',
   '}',
+  // Comparison/assignment
   '>',
   '<',
   '=',
+  // Arithmetic
   '+',
+  '-',
   '*',
   '/',
   '%',
+  // Bitwise
   '&',
   '|',
   '^',
   '~',
+  // Logical/other operators
+  '!',
+  '?',
+  // Quotes
   '"',
   "'",
   '`',
+  // Escape
   '\\',
+  // Decorators/annotations
+  '@',
+  // Comments/private fields
+  '#',
 ]);
 
 function breakIntoTokens(doc: Document, elementContent: string): DocumentFragment {
@@ -104,5 +120,5 @@ export function wrapTokensInSpans(doc: Document, element: HTMLElement): void {
 
 export function getDomLeaves(element: HTMLElement): HTMLElement[] {
   const allElements = element.querySelectorAll('*');
-  return Array.from(allElements).filter((el) => el.children.length === 0) as HTMLElement[];
+  return Array.from(allElements).filter((el) => el.children.length === 0 && el.textContent?.trim()) as HTMLElement[];
 }

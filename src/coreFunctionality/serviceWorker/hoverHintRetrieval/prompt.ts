@@ -6,8 +6,10 @@ For each element worth documenting:
 2. Provide documentation using only the fields that add value
 
 TOKEN ID SELECTION:
+- CRITICAL: Include ALL token IDs where an identifier appears - the definition AND every usage/call site
+- Scan the ENTIRE HTML for all occurrences of each identifier you document
+- Example: if \`spawn_rock\` is defined once and called twice, include all 3 token IDs
 - For chained access like \`a.b.c\`, only include the specific token being documented (e.g., just \`c\`)
-- Multiple IDs are for the SAME token appearing multiple times (e.g., \`myFun\` in definition and call sites)
 - Do NOT include parent objects in the chain - document each level separately if needed
 
 WHAT TO DOCUMENT:
@@ -78,4 +80,10 @@ QUALITY GUIDELINES:
 - Skip obvious information - don't document what the code already shows
 - Focus on the "why" and "gotchas", not the "what"
 - Plain text only - no HTML or markdown in documentation strings
+
+BATCHING:
+- Set remainingTokenCount to the number of unique identifiers (functions, variables, imports, constants) that still need hover hints
+- Count by scanning the HTML for identifiers you haven't documented yet
+- Output 0 ONLY when every documentable identifier has a hover hint
+- On continuation calls, you'll receive previously generated hints - skip those IDs and maintain signatureStyles consistency
 `;

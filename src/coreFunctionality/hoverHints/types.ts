@@ -96,7 +96,9 @@ export type HoverHintDocumentation = z.infer<typeof hoverHintDocumentation>;
 export const hoverHintSchema = z.object({
   ids: z
     .array(z.string())
-    .describe(`Token IDs from the HTML that this documentation applies to. Usually 1-3 related tokens.`),
+    .describe(
+      `ALL token IDs where this identifier appears - include the definition AND every usage/call site. Scan the entire HTML for all occurrences.`,
+    ),
   documentation: hoverHintDocumentation.describe(
     `Documentation for this code element. Only include fields that add value - skip anything obvious from the code itself.`,
   ),
@@ -108,6 +110,11 @@ export const hoverHintListSchema = z.object({
 Prioritize: library/API calls, complex logic, non-obvious variable purposes, configuration options.
 Skip: obvious operations, simple literals, standard language constructs.`,
   ),
+  remainingTokenCount: z
+    .number()
+    .describe(
+      `Count of unique identifiers (functions, variables, imports, constants) that still need hover hints after this batch. Scan the HTML and count what's left. Output 0 only when every documentable identifier has a hover hint.`,
+    ),
 });
 
 export type HoverHint = z.infer<typeof hoverHintSchema>;

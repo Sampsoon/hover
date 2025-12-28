@@ -5,4 +5,4 @@ export {
   createHoverHintStreamError,
 } from './types';
 
-export { parseListOfObjectsFromStream } from './parsing';
+export { parseListOfObjectsFromStream, parseHoverHintBatchFromStream } from './parsing';

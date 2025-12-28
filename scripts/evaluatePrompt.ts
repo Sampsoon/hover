@@ -1,6 +1,7 @@
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import cliProgress from 'cli-progress';
 
 (global as any).chrome = {
   runtime: { id: 'test-extension-id' },
@@ -46,38 +47,10 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-class ProgressBar {
-  private total: number;
-  private completed: number = 0;
-  private successful: number = 0;
-  private failed: number = 0;
-  private width: number = 40;
-
-  constructor(total: number) {
-    this.total = total;
-  }
-
-  update(success: boolean): void {
-    this.completed++;
-    if (success) {
-      this.successful++;
-    } else {
-      this.failed++;
-    }
-    this.render();
-  }
-
-  private render(): void {
-    const percent = this.completed / this.total;
-    const filled = Math.round(this.width * percent);
-    const empty = this.width - filled;
-    const bar = '█'.repeat(filled) + '░'.repeat(empty);
-    const status = `[${bar}] ${this.completed}/${this.total} (✓${this.successful} ✗${this.failed})`;
-    process.stdout.write(`\r${status}`);
-    if (this.completed === this.total) {
-      process.stdout.write('\n');
-    }
-  }
+interface BarState {
+  bar: cliProgress.SingleBar;
+  success: number;
+  fail: number;
 }
 
 function isRetryableError(error: unknown): boolean {
@@ -102,12 +75,25 @@ function isRetryableError(error: unknown): boolean {
   return false;
 }
 
-function createCallLLMWithRetry(config: APIConfig): CallLLMFn {
-  return async (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void): Promise<void> => {
+interface CallLLMWithLatency {
+  callLLM: CallLLMFn;
+  getLatencyMs: () => number;
+}
+
+function createCallLLMWithRetry(config: APIConfig): CallLLMWithLatency {
+  let totalLatencyMs = 0;
+
+  const callLLM: CallLLMFn = async (
+    input: string,
+    llmParams: LlmParams,
+    onChunk: (chunk: string) => void,
+  ): Promise<void> => {
     let lastError: unknown;
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
+        const start = Date.now();
         await callLLMWithConfig(input, llmParams, config, onChunk);
+        totalLatencyMs += Date.now() - start;
         return;
       } catch (error) {
         lastError = error;
@@ -125,6 +111,11 @@ function createCallLLMWithRetry(config: APIConfig): CallLLMFn {
     }
     throw lastError;
   };
+
+  return {
+    callLLM,
+    getLatencyMs: () => totalLatencyMs,
+  };
 }
 
 interface Metrics {
@@ -138,6 +129,7 @@ interface Metrics {
   typeMismatchCount: number;
   expectedCount: number;
   actualCount: number;
+  latencyMs: number;
 }
 
 interface Comparison {
@@ -191,7 +183,12 @@ function buildComparison(expected: ExpectedAnnotation[], actual: HoverHint[]): C
   return comparison;
 }
 
-function calculateMetrics(expected: ExpectedAnnotation[], actual: HoverHint[], comparison: Comparison): Metrics {
+function calculateMetrics(
+  expected: ExpectedAnnotation[],
+  actual: HoverHint[],
+  comparison: Comparison,
+  latencyMs: number,
+): Metrics {
   const expectedIds = new Set(expected.flatMap((ann) => ann.ids));
   const actualIds = new Set(actual.flatMap((hint) => hint.ids));
 
@@ -228,6 +225,7 @@ function calculateMetrics(expected: ExpectedAnnotation[], actual: HoverHint[], c
     typeMismatchCount,
     expectedCount: expectedIds.size,
     actualCount: actualIds.size,
+    latencyMs,
   };
 }
 
@@ -241,19 +239,36 @@ interface ExampleResult {
   error?: string;
 }
 
+interface ModelAggregate {
+  avgPrecision: number;
+  avgRecall: number;
+  avgF1: number;
+  avgTypeAccuracy: number;
+  avgLatencyMs: number;
+  p50LatencyMs: number;
+  p90LatencyMs: number;
+  totalLatencyMs: number;
+  totalExamples: number;
+  successfulExamples: number;
+}
+
+function percentile(sortedValues: number[], p: number): number {
+  if (sortedValues.length === 0) {
+    return 0;
+  }
+  const index = Math.ceil((p / 100) * sortedValues.length) - 1;
+  return sortedValues[Math.max(0, index)];
+}
+
+interface ModelResult {
+  aggregate: ModelAggregate;
+  results: ExampleResult[];
+}
+
 interface EvalReport {
   timestamp: string;
-  model: string;
   config: { url: string };
-  aggregate: {
-    avgPrecision: number;
-    avgRecall: number;
-    avgF1: number;
-    avgTypeAccuracy: number;
-    totalExamples: number;
-    successfulExamples: number;
-  };
-  results: ExampleResult[];
+  models: { [modelName: string]: ModelResult };
 }
 
 interface EvalTask {
@@ -262,17 +277,18 @@ interface EvalTask {
   expected: ExpectedAnnotation[];
 }
 
-async function evaluateExample(task: EvalTask, config: APIConfig, progress: ProgressBar): Promise<ExampleResult> {
+async function evaluateExample(task: EvalTask, config: APIConfig, barState: BarState): Promise<ExampleResult> {
   const { example, expected } = task;
 
   try {
-    const callLLM = createCallLLMWithRetry(config);
+    const { callLLM, getLatencyMs } = createCallLLMWithRetry(config);
     const actual = await retrieveHoverHints(example.tokenizedHtml, callLLM);
 
     const comparison = buildComparison(expected, actual);
-    const metrics = calculateMetrics(expected, actual, comparison);
+    const metrics = calculateMetrics(expected, actual, comparison, getLatencyMs());
 
-    progress.update(true);
+    barState.success++;
+    barState.bar.increment({ success: barState.success, fail: barState.fail });
 
     return {
       url: example.url,
@@ -284,7 +300,8 @@ async function evaluateExample(task: EvalTask, config: APIConfig, progress: Prog
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    progress.update(false);
+    barState.fail++;
+    barState.bar.increment({ success: barState.success, fail: barState.fail });
     return {
       url: example.url,
       tokenizedHtml: example.tokenizedHtml,
@@ -293,20 +310,89 @@ async function evaluateExample(task: EvalTask, config: APIConfig, progress: Prog
   }
 }
 
+function getShortModelName(modelName: string): string {
+  const parts = modelName.split('/');
+  const name = parts[parts.length - 1];
+  return name.length > 25 ? name.slice(0, 22) + '...' : name.padEnd(25);
+}
+
+async function evaluateModel(
+  modelName: string,
+  tasks: EvalTask[],
+  baseConfig: Omit<APIConfig, 'model'>,
+  multibar: cliProgress.MultiBar,
+): Promise<{ model: string; result: ModelResult }> {
+  const config: APIConfig = { ...baseConfig, model: modelName };
+  const bar = multibar.create(tasks.length, 0, {
+    model: getShortModelName(modelName),
+    success: 0,
+    fail: 0,
+  });
+  const barState: BarState = { bar, success: 0, fail: 0 };
+  const results = await Promise.all(tasks.map((task) => evaluateExample(task, config, barState)));
+
+  const successfulResults = results.filter((r) => r.metrics);
+
+  let aggregate: ModelAggregate = {
+    avgPrecision: 0,
+    avgRecall: 0,
+    avgF1: 0,
+    avgTypeAccuracy: 0,
+    avgLatencyMs: 0,
+    p50LatencyMs: 0,
+    p90LatencyMs: 0,
+    totalLatencyMs: 0,
+    totalExamples: results.length,
+    successfulExamples: successfulResults.length,
+  };
+
+  if (successfulResults.length > 0) {
+    aggregate.avgPrecision =
+      successfulResults.reduce((sum, r) => sum + r.metrics!.precision, 0) / successfulResults.length;
+    aggregate.avgRecall = successfulResults.reduce((sum, r) => sum + r.metrics!.recall, 0) / successfulResults.length;
+    aggregate.avgF1 = successfulResults.reduce((sum, r) => sum + r.metrics!.f1, 0) / successfulResults.length;
+    aggregate.avgTypeAccuracy =
+      successfulResults.reduce((sum, r) => sum + r.metrics!.typeAccuracy, 0) / successfulResults.length;
+
+    const latencies = successfulResults.map((r) => r.metrics!.latencyMs).sort((a, b) => a - b);
+    aggregate.totalLatencyMs = latencies.reduce((sum, l) => sum + l, 0);
+    aggregate.avgLatencyMs = aggregate.totalLatencyMs / successfulResults.length;
+    aggregate.p50LatencyMs = percentile(latencies, 50);
+    aggregate.p90LatencyMs = percentile(latencies, 90);
+  }
+
+  return {
+    model: modelName,
+    result: { aggregate, results },
+  };
+}
+
+function parseModelsArg(): string[] | null {
+  const modelsIndex = process.argv.indexOf('--models');
+  if (modelsIndex === -1 || modelsIndex === process.argv.length - 1) {
+    return null;
+  }
+  const modelsArg = process.argv[modelsIndex + 1];
+  return modelsArg.split(',').map((m) => m.trim());
+}
+
 async function main() {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     console.error('Error: OPENAI_API_KEY environment variable is required');
     console.error('Usage: OPENAI_API_KEY=your-key pnpm evaluate');
+    console.error('       OPENAI_API_KEY=your-key pnpm evaluate --models "model1,model2,model3"');
     process.exit(1);
   }
 
-  const config: APIConfig = {
+  const baseConfig = {
     key: apiKey,
     url: OPEN_ROUTER_API_URL,
-    model: DEFAULT_MODEL,
   };
+
+  const modelsArg = parseModelsArg();
+  const models = modelsArg || [DEFAULT_MODEL];
 
   if (!existsSync(ANNOTATIONS_PATH)) {
     console.error('Error: No annotated examples found at', ANNOTATIONS_PATH);
@@ -331,8 +417,8 @@ async function main() {
   console.log(`\n${'='.repeat(60)}`);
   console.log('PROMPT EVALUATION');
   console.log('='.repeat(60));
-  console.log(`Model: ${config.model}`);
-  console.log(`Base URL: ${config.url}`);
+  console.log(`Models: ${models.join(', ')}`);
+  console.log(`Base URL: ${baseConfig.url}`);
   console.log(`Examples: ${tokenizedExamples.length}`);
   console.log('='.repeat(60) + '\n');
 
@@ -342,53 +428,59 @@ async function main() {
     expected: annotationsMap[example.url] || [],
   }));
 
-  const progress = new ProgressBar(tasks.length);
-  const results = await Promise.all(tasks.map((task) => evaluateExample(task, config, progress)));
+  const multibar = new cliProgress.MultiBar(
+    {
+      format: '{model} [{bar}] {value}/{total} | ✓{success} ✗{fail}',
+      clearOnComplete: false,
+      hideCursor: true,
+      barCompleteChar: '█',
+      barIncompleteChar: '░',
+    },
+    cliProgress.Presets.shades_classic,
+  );
+
+  const originalLog = console.log;
+  console.log = () => {};
+
+  const modelResults = await Promise.all(models.map((model) => evaluateModel(model, tasks, baseConfig, multibar)));
+
+  console.log = originalLog;
+  multibar.stop();
 
   console.log(`\n${'='.repeat(60)}`);
   console.log('AGGREGATE RESULTS');
   console.log('='.repeat(60));
 
-  const successfulResults = results.filter((r) => r.metrics);
-
-  let aggregate = {
-    avgPrecision: 0,
-    avgRecall: 0,
-    avgF1: 0,
-    avgTypeAccuracy: 0,
-    totalExamples: results.length,
-    successfulExamples: successfulResults.length,
-  };
-
-  if (successfulResults.length > 0) {
-    aggregate.avgPrecision =
-      successfulResults.reduce((sum, r) => sum + r.metrics!.precision, 0) / successfulResults.length;
-    aggregate.avgRecall = successfulResults.reduce((sum, r) => sum + r.metrics!.recall, 0) / successfulResults.length;
-    aggregate.avgF1 = successfulResults.reduce((sum, r) => sum + r.metrics!.f1, 0) / successfulResults.length;
-    aggregate.avgTypeAccuracy =
-      successfulResults.reduce((sum, r) => sum + r.metrics!.typeAccuracy, 0) / successfulResults.length;
-
-    console.log(`\nAverage Precision: ${(aggregate.avgPrecision * 100).toFixed(1)}%`);
-    console.log(`Average Recall:    ${(aggregate.avgRecall * 100).toFixed(1)}%`);
-    console.log(`Average F1 Score:  ${(aggregate.avgF1 * 100).toFixed(1)}%`);
-    console.log(`Type Accuracy:     ${(aggregate.avgTypeAccuracy * 100).toFixed(1)}%`);
-    console.log(`\nSuccessful: ${successfulResults.length}/${results.length}`);
-  } else {
-    console.log('No successful evaluations');
+  const modelsMap: { [modelName: string]: ModelResult } = {};
+  for (const { model, result } of modelResults) {
+    modelsMap[model] = result;
+    const agg = result.aggregate;
+    console.log(`\n${model}:`);
+    console.log(`  Precision: ${(agg.avgPrecision * 100).toFixed(1)}%`);
+    console.log(`  Recall:    ${(agg.avgRecall * 100).toFixed(1)}%`);
+    console.log(`  F1 Score:  ${(agg.avgF1 * 100).toFixed(1)}%`);
+    console.log(`  Type Acc:  ${(agg.avgTypeAccuracy * 100).toFixed(1)}%`);
+    console.log(
+      `  Latency:   ${(agg.avgLatencyMs / 1000).toFixed(2)}s avg | p50: ${(agg.p50LatencyMs / 1000).toFixed(2)}s | p90: ${(agg.p90LatencyMs / 1000).toFixed(2)}s | total: ${(agg.totalLatencyMs / 1000).toFixed(1)}s`,
+    );
+    console.log(`  Success:   ${agg.successfulExamples}/${agg.totalExamples}`);
   }
 
   const report: EvalReport = {
     timestamp: new Date().toISOString(),
-    model: config.model,
-    config: { url: config.url },
-    aggregate,
-    results,
+    config: { url: baseConfig.url },
+    models: modelsMap,
   };
 
   writeFileSync(EVAL_REPORT_PATH, JSON.stringify(report, null, 2));
   console.log(`\nReport saved to: ${EVAL_REPORT_PATH}`);
 
-  console.log('\n' + '='.repeat(60) + '\n');
+  console.log('\n' + '='.repeat(60));
+  console.log('Example multi-model command:');
+  console.log(
+    '  OPENAI_API_KEY=your-key pnpm evaluate --models "x-ai/grok-4.1-fast,openai/gpt-4o,anthropic/claude-sonnet-4"',
+  );
+  console.log('='.repeat(60) + '\n');
 }
 
 main().catch(console.error);

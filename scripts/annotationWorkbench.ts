@@ -52,6 +52,7 @@ interface ExampleResult {
     precision: number;
     recall: number;
     f1: number;
+    latencyMs?: number;
   };
   expected?: { ids: string[] }[];
   actual?: { ids: string[] }[];
@@ -59,17 +60,35 @@ interface ExampleResult {
   error?: string;
 }
 
+interface ModelAggregate {
+  avgPrecision: number;
+  avgRecall: number;
+  avgF1: number;
+  avgTypeAccuracy?: number;
+  avgLatencyMs?: number;
+  p50LatencyMs?: number;
+  p90LatencyMs?: number;
+  totalLatencyMs?: number;
+  totalExamples: number;
+  successfulExamples: number;
+}
+
+interface ModelResult {
+  aggregate: ModelAggregate;
+  results: ExampleResult[];
+}
+
 interface EvalReport {
+  timestamp: string;
+  config: { url: string };
+  models: { [modelName: string]: ModelResult };
+}
+
+interface LegacyEvalReport {
   timestamp: string;
   model: string;
   config: { url: string };
-  aggregate: {
-    avgPrecision: number;
-    avgRecall: number;
-    avgF1: number;
-    totalExamples: number;
-    successfulExamples: number;
-  };
+  aggregate: ModelAggregate;
   results: ExampleResult[];
 }
 
@@ -113,7 +132,21 @@ function loadEvalReport(): EvalReport | null {
   if (!existsSync(EVAL_REPORT_PATH)) {
     return null;
   }
-  return JSON.parse(readFileSync(EVAL_REPORT_PATH, 'utf-8'));
+  const raw = JSON.parse(readFileSync(EVAL_REPORT_PATH, 'utf-8'));
+  if (raw.models) {
+    return raw as EvalReport;
+  }
+  const legacy = raw as LegacyEvalReport;
+  return {
+    timestamp: legacy.timestamp,
+    config: legacy.config,
+    models: {
+      [legacy.model]: {
+        aggregate: legacy.aggregate,
+        results: legacy.results,
+      },
+    },
+  };
 }
 
 function saveAnnotationsToFile(annotations: AnnotationEntry[]): void {
@@ -229,7 +262,7 @@ const HTML = `<!DOCTYPE html>
 
     .layout {
       display: grid;
-      grid-template-columns: 240px 1fr 280px;
+      grid-template-columns: 280px 1fr 280px;
       height: 100vh;
     }
     .layout > * { border-right: 1px solid var(--border-color); }
@@ -284,6 +317,31 @@ const HTML = `<!DOCTYPE html>
     .code-legend { padding: 8px 16px; border-top: 1px solid var(--border-color); display: flex; gap: 16px; font-size: 11px; color: var(--text-secondary); }
     .legend-item { display: flex; align-items: center; gap: 4px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    .model-selector {
+      margin-bottom: 10px;
+    }
+    .model-selector-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .model-select {
+      width: 100%;
+      padding: 8px;
+      font-size: 11px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: var(--input-bg);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+    .model-select option {
+      padding: 4px;
+    }
 
     .aggregate-summary {
       padding: 10px 12px;
@@ -372,10 +430,24 @@ const HTML = `<!DOCTYPE html>
     let annotations = {};
     let evalReport = null;
     let evalResultsMap = {};
+    let modelsList = [];
+    let selectedModel = null;
     let currentIndex = 0;
     let selectedTokens = [];
     let filter = 'all';
     let activeTab = 'annotate';
+
+    function getShortModelName(modelName) {
+      const parts = modelName.split('/');
+      return parts[parts.length - 1];
+    }
+
+    function formatLatency(ms) {
+      if (ms === undefined || ms === null) {
+        return '-';
+      }
+      return (ms / 1000).toFixed(2) + 's';
+    }
 
     async function loadData() {
       const res = await fetch('/api/data');
@@ -383,25 +455,61 @@ const HTML = `<!DOCTYPE html>
       examples = data.examples;
       annotations = data.annotations;
       evalReport = data.evalReport;
-      if (evalReport) {
-        evalReport.results.forEach(r => { evalResultsMap[r.url] = r; });
+
+      modelsList = [];
+      evalResultsMap = {};
+      selectedModel = null;
+
+      if (evalReport && evalReport.models) {
+        modelsList = Object.keys(evalReport.models);
+        if (modelsList.length > 0) {
+          selectedModel = modelsList[0];
+          updateEvalResultsMap();
+        }
       }
+      render();
+    }
+
+    function updateEvalResultsMap() {
+      evalResultsMap = {};
+      if (evalReport && selectedModel && evalReport.models[selectedModel]) {
+        evalReport.models[selectedModel].results.forEach(r => {
+          evalResultsMap[r.url] = r;
+        });
+      }
+    }
+
+    function setModel(modelName) {
+      selectedModel = modelName;
+      updateEvalResultsMap();
       render();
     }
 
     function getFiltered() {
       return examples.filter(ex => {
-        if (filter === 'all') return true;
-        if (filter === 'reviewed') return annotations[ex.url] !== undefined;
-        if (filter === 'pending') return annotations[ex.url] === undefined;
-        if (filter === 'low-f1') return evalResultsMap[ex.url]?.metrics?.f1 < 0.5;
+        if (filter === 'all') {
+          return true;
+        }
+        if (filter === 'reviewed') {
+          return annotations[ex.url] !== undefined;
+        }
+        if (filter === 'pending') {
+          return annotations[ex.url] === undefined;
+        }
+        if (filter === 'low-f1') {
+          return evalResultsMap[ex.url]?.metrics?.f1 < 0.5;
+        }
         return true;
       });
     }
 
     function getF1Class(f1) {
-      if (f1 >= 0.8) return 'good';
-      if (f1 >= 0.5) return 'mid';
+      if (f1 >= 0.8) {
+        return 'good';
+      }
+      if (f1 >= 0.5) {
+        return 'mid';
+      }
       return 'bad';
     }
 
@@ -416,7 +524,25 @@ const HTML = `<!DOCTYPE html>
     function renderExamples() {
       const filtered = getFiltered();
       const reviewed = Object.keys(annotations).length;
-      const agg = evalReport?.aggregate;
+      const agg = selectedModel && evalReport?.models?.[selectedModel]?.aggregate;
+
+      let modelSelectorHtml = '';
+      if (modelsList.length > 0) {
+        modelSelectorHtml = \`
+          <div class="model-selector">
+            <div class="model-selector-label">Model</div>
+            <select class="model-select" onchange="setModel(this.value)">
+              \${modelsList.map(m => {
+                const mAgg = evalReport.models[m].aggregate;
+                const f1Pct = (mAgg.avgF1 * 100).toFixed(0);
+                const p50 = formatLatency(mAgg.p50LatencyMs);
+                const label = getShortModelName(m) + ' | F1: ' + f1Pct + '% | p50: ' + p50;
+                return \`<option value="\${m}" \${m === selectedModel ? 'selected' : ''}>\${label}</option>\`;
+              }).join('')}
+            </select>
+          </div>
+        \`;
+      }
 
       let summaryHtml = '';
       if (agg) {
@@ -428,16 +554,16 @@ const HTML = `<!DOCTYPE html>
               <span class="aggregate-value \${f1Class}">\${(agg.avgF1 * 100).toFixed(1)}%</span>
             </div>
             <div class="aggregate-item">
-              <span class="aggregate-label">Success</span>
-              <span class="aggregate-value">\${agg.successfulExamples}/\${agg.totalExamples}</span>
+              <span class="aggregate-label">Precision / Recall</span>
+              <span class="aggregate-value">\${(agg.avgPrecision * 100).toFixed(0)}% / \${(agg.avgRecall * 100).toFixed(0)}%</span>
             </div>
             <div class="aggregate-item">
-              <span class="aggregate-label">Avg Precision</span>
-              <span class="aggregate-value">\${(agg.avgPrecision * 100).toFixed(1)}%</span>
+              <span class="aggregate-label">p50 / p90 Latency</span>
+              <span class="aggregate-value">\${formatLatency(agg.p50LatencyMs)} / \${formatLatency(agg.p90LatencyMs)}</span>
             </div>
             <div class="aggregate-item">
-              <span class="aggregate-label">Avg Recall</span>
-              <span class="aggregate-value">\${(agg.avgRecall * 100).toFixed(1)}%</span>
+              <span class="aggregate-label">Total Latency</span>
+              <span class="aggregate-value">\${formatLatency(agg.totalLatencyMs)}</span>
             </div>
           </div>
         \`;
@@ -457,6 +583,7 @@ const HTML = `<!DOCTYPE html>
               <button class="btn btn-primary" onclick="submitAdd()">Add</button>
             </div>
           \` : \`
+            \${modelSelectorHtml}
             <select class="filter-select" onchange="setFilter(this.value)">
               <option value="all" \${filter === 'all' ? 'selected' : ''}>All examples</option>
               <option value="reviewed" \${filter === 'reviewed' ? 'selected' : ''}>Reviewed</option>
@@ -472,13 +599,15 @@ const HTML = `<!DOCTYPE html>
             const annCount = (annotations[ex.url] || []).length;
             const evalResult = evalResultsMap[ex.url];
             const f1 = evalResult?.metrics?.f1;
+            const latency = evalResult?.metrics?.latencyMs;
             return \`
               <div class="example-item \${i === currentIndex ? 'active' : ''}" onclick="selectExample(\${i})">
                 <div class="example-url">\${ex.url}</div>
                 <div class="example-status">
                   <span class="status-dot \${isReviewed ? 'reviewed' : 'pending'}"></span>
                   \${f1 !== undefined ? \`<span class="f1-score \${getF1Class(f1)}">\${(f1 * 100).toFixed(0)}%</span>\` : ''}
-                  \${annCount > 0 ? \`<span class="ann-count">\${annCount} annotations</span>\` : ''}
+                  \${latency !== undefined ? \`<span class="ann-count">\${formatLatency(latency)}</span>\` : ''}
+                  \${annCount > 0 ? \`<span class="ann-count">\${annCount} ann</span>\` : ''}
                 </div>
               </div>
             \`;
@@ -504,6 +633,7 @@ const HTML = `<!DOCTYPE html>
               <span>F1 <strong>\${(evalResult.metrics.f1 * 100).toFixed(0)}%</strong></span>
               <span>P <strong>\${(evalResult.metrics.precision * 100).toFixed(0)}%</strong></span>
               <span>R <strong>\${(evalResult.metrics.recall * 100).toFixed(0)}%</strong></span>
+              \${evalResult.metrics.latencyMs !== undefined ? \`<span>⏱ <strong>\${formatLatency(evalResult.metrics.latencyMs)}</strong></span>\` : ''}
             \` : ''}
           </div>
         </div>
@@ -524,7 +654,9 @@ const HTML = `<!DOCTYPE html>
     async function loadCodeBlock() {
       const filtered = getFiltered();
       const ex = filtered[currentIndex];
-      if (!ex) return;
+      if (!ex) {
+        return;
+      }
       const savedAnns = annotations[ex.url] || [];
       const evalResult = evalResultsMap[ex.url];
       const res = await fetch('/api/process-html', {
@@ -542,7 +674,9 @@ const HTML = `<!DOCTYPE html>
         });
         selectedTokens.forEach(id => {
           const el = document.querySelector(\`[data-token-id="\${id}"]\`);
-          if (el) el.classList.add('selected');
+          if (el) {
+            el.classList.add('selected');
+          }
         });
       }
     }
@@ -550,7 +684,9 @@ const HTML = `<!DOCTYPE html>
     function renderSidebar() {
       const filtered = getFiltered();
       const ex = filtered[currentIndex];
-      if (!ex) return;
+      if (!ex) {
+        return;
+      }
       const savedAnns = annotations[ex.url] || [];
       const evalResult = evalResultsMap[ex.url];
       const hasEval = evalResult?.actual?.length > 0;
@@ -649,7 +785,9 @@ const HTML = `<!DOCTYPE html>
 
     let tokenTextCache = {};
     function getTokenText(id) {
-      if (tokenTextCache[id]) return tokenTextCache[id];
+      if (tokenTextCache[id]) {
+        return tokenTextCache[id];
+      }
       const el = document.querySelector(\`[data-token-id="\${id}"]\`);
       return el ? el.textContent : id.slice(0, 6);
     }
@@ -657,14 +795,18 @@ const HTML = `<!DOCTYPE html>
     function selectToken(tokenId, event) {
       event.preventDefault();
       if (event.shiftKey) {
-        if (!selectedTokens.includes(tokenId)) selectedTokens.push(tokenId);
+        if (!selectedTokens.includes(tokenId)) {
+          selectedTokens.push(tokenId);
+        }
       } else {
         selectedTokens = [tokenId];
       }
       document.querySelectorAll('.token.selected').forEach(el => el.classList.remove('selected'));
       selectedTokens.forEach(id => {
         const el = document.querySelector(\`[data-token-id="\${id}"]\`);
-        if (el) el.classList.add('selected');
+        if (el) {
+          el.classList.add('selected');
+        }
       });
       renderSidebar();
     }
@@ -694,7 +836,9 @@ const HTML = `<!DOCTYPE html>
     }
 
     async function addAnnotation() {
-      if (selectedTokens.length === 0) return;
+      if (selectedTokens.length === 0) {
+        return;
+      }
       const filtered = getFiltered();
       const url = filtered[currentIndex].url;
       const anns = annotations[url] || [];
@@ -721,7 +865,9 @@ const HTML = `<!DOCTYPE html>
       const filtered = getFiltered();
       const url = filtered[currentIndex].url;
       const evalResult = evalResultsMap[url];
-      if (!evalResult?.actual) return;
+      if (!evalResult?.actual) {
+        return;
+      }
       annotations[url] = evalResult.actual.map(act => ({ ids: act.ids }));
       await saveAnnotations();
       render();
@@ -732,7 +878,9 @@ const HTML = `<!DOCTYPE html>
       const filtered = getFiltered();
       const url = filtered[currentIndex].url;
       const evalResult = evalResultsMap[url];
-      if (!evalResult?.actual?.[i]) return;
+      if (!evalResult?.actual?.[i]) {
+        return;
+      }
       const act = evalResult.actual[i];
       const anns = annotations[url] || [];
       anns.push({ ids: act.ids });
@@ -774,7 +922,10 @@ const HTML = `<!DOCTYPE html>
       const htmlEl = document.getElementById('addHtml');
       const url = urlEl.value.trim();
       const html = htmlEl.value.trim();
-      if (!url || !html) { showToast('Fill in both fields', true); return; }
+      if (!url || !html) {
+        showToast('Fill in both fields', true);
+        return;
+      }
       try {
         const res = await fetch('/api/add-example', {
           method: 'POST',
@@ -782,7 +933,10 @@ const HTML = `<!DOCTYPE html>
           body: JSON.stringify({ url, html })
         });
         const data = await res.json();
-        if (!res.ok) { showToast(data.error, true); return; }
+        if (!res.ok) {
+          showToast(data.error, true);
+          return;
+        }
         examples.push(data.tokenizedExample);
         addOpen = false;
         render();
@@ -801,10 +955,15 @@ const HTML = `<!DOCTYPE html>
 
     document.addEventListener('keydown', (e) => {
       const filtered = getFiltered();
-      if (e.key === 'ArrowDown' && currentIndex < filtered.length - 1) { selectExample(currentIndex + 1); }
-      else if (e.key === 'ArrowUp' && currentIndex > 0) { selectExample(currentIndex - 1); }
-      else if (e.key === 'Enter' && selectedTokens.length > 0) { addAnnotation(); }
-      else if (e.key === 'Escape') { clearSelection(); }
+      if (e.key === 'ArrowDown' && currentIndex < filtered.length - 1) {
+        selectExample(currentIndex + 1);
+      } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+        selectExample(currentIndex - 1);
+      } else if (e.key === 'Enter' && selectedTokens.length > 0) {
+        addAnnotation();
+      } else if (e.key === 'Escape') {
+        clearSelection();
+      }
     });
 
     loadData();

@@ -1,5 +1,6 @@
 export const RETRIEVAL_HOVER_HINTS_PROMPT = `
-Analyze the provided HTML code blocks and produce hover hints for code elements that would benefit from documentation.
+You are generating hover hints for a browser extension that provides LSP-style documentation for code on the web.
+When users hover over code tokens, they see documentation popups - just like hovering over code in an IDE.
 
 For each element worth documenting:
 1. READ THE EXACT TEXT inside each token - the text between <id=xxx/> and </> is the identifier name
@@ -12,11 +13,11 @@ CRITICAL - VERIFY TOKEN CONTENT:
 - Do NOT confuse similar-looking identifiers (e.g., "item" vs "items", "data" vs "date")
 
 TOKEN ID SELECTION:
-- CRITICAL: Include ALL token IDs where an identifier appears - the definition AND every usage/call site
-- Scan the ENTIRE HTML for all occurrences of each identifier you document
-- Example: if \`spawn_rock\` is defined once and called twice, include all 3 token IDs
-- For chained access like \`a.b.c\`, only include the specific token being documented (e.g., just \`c\`)
-- Do NOT include parent objects in the chain - document each level separately if needed
+- The \`ids\` field groups all occurrences of the SAME identifier - definition + every usage
+- NEVER group different identifiers together - each distinct identifier needs its own hover hint
+- Scan the ENTIRE HTML for all occurrences of the identifier you're documenting
+- Example: if \`spawn_rock\` is defined once and called twice, include all 3 token IDs for spawn_rock
+- For chained access like \`a.b.c\`, document each part separately (\`a\`, \`b\`, \`c\` get their own hover hints)
 
 WHAT TO DOCUMENT:
 - Library/API calls that readers may not know

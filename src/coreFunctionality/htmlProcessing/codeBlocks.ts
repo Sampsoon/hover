@@ -19,6 +19,12 @@ function generateRandomId(): string {
   return ((Math.random() * 0x100000000) | 0).toString(36);
 }
 
+function generateTokenId(tokenContent: string): string {
+  const prefix = tokenContent.replace(/\s/g, '').slice(0, 3).toLowerCase();
+  const randomPart = generateRandomId();
+  return prefix ? `${prefix}-${randomPart}` : randomPart;
+}
+
 export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const { html } = code;
   const { codeTokenElementMap } = idMappings;
@@ -30,7 +36,7 @@ export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
 
   codeTokens.forEach((token) => {
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
-      const id = generateRandomId();
+      const id = generateTokenId(token.textContent ?? '');
 
       token.dataset[CODE_TOKEN_ID_NAME] = id;
       codeTokenElementMap.set(id, token);

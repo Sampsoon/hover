@@ -2,8 +2,14 @@ export const RETRIEVAL_HOVER_HINTS_PROMPT = `
 Analyze the provided HTML code blocks and produce hover hints for code elements that would benefit from documentation.
 
 For each element worth documenting:
-1. Identify token IDs (data-token-id values) that refer to the same entity
-2. Provide documentation using only the fields that add value
+1. READ THE EXACT TEXT inside each token - the text between <id=xxx/> and </> is the identifier name
+2. Match documentation to what the token ACTUALLY says, not what you assume from context
+3. Provide documentation using only the fields that add value
+
+CRITICAL - VERIFY TOKEN CONTENT:
+- Before documenting any token, confirm what text it contains
+- Token IDs have prefixes from the first 3 chars - "ite-abc123" could be "item" OR "items", so read the actual text
+- Do NOT confuse similar-looking identifiers (e.g., "item" vs "items", "data" vs "date")
 
 TOKEN ID SELECTION:
 - CRITICAL: Include ALL token IDs where an identifier appears - the definition AND every usage/call site

@@ -4,9 +4,8 @@
 * Scrub inputs to service workers
 * Scrub output html such as the style map
 * Have ability to select local LLMs
-* Keep popup on screen when user moves mouse over it
-* Look into removing styling cashing
 * Handle large inputs. Maybe in chucks?
+
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management

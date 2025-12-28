@@ -25,6 +25,7 @@ export function setupHoverHintState(): HoverHintState {
     tooltip: createTooltip(),
     timeoutId: NO_TIMEOUT_ACTIVE,
     currentCodeBlockId: undefined,
+    lastStyleComputedAt: 0,
   };
 }
 

@@ -124,4 +124,5 @@ export interface HoverHintState {
   tooltip: HTMLElement;
   timeoutId: TimeoutId;
   currentCodeBlockId: CodeBlockId | undefined;
+  lastStyleComputedAt: number;
 }

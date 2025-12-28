@@ -3,6 +3,7 @@ import { HoverHintState } from './types';
 
 const DEFAULT_DARK_COLOR = 'rgb(30, 30, 30)';
 const DEFAULT_LIGHT_COLOR = 'rgb(240, 240, 240)';
+const STYLE_CACHE_EXPIRY_MS = 500;
 
 export enum MarginSize {
   SMALL = '0.5em',
@@ -80,11 +81,15 @@ export function styleTooltip(
     return;
   }
 
-  if (hoverHintState.currentCodeBlockId === parentCodeBlock.codeBlockId) {
+  const now = Date.now();
+  const cacheExpired = now - hoverHintState.lastStyleComputedAt > STYLE_CACHE_EXPIRY_MS;
+
+  if (hoverHintState.currentCodeBlockId === parentCodeBlock.codeBlockId && !cacheExpired) {
     return;
   }
 
   hoverHintState.currentCodeBlockId = parentCodeBlock.codeBlockId;
+  hoverHintState.lastStyleComputedAt = now;
 
   tooltip.style.backgroundColor = DEFAULT_LIGHT_COLOR;
   tooltip.style.color = DEFAULT_DARK_COLOR;

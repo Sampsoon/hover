@@ -7,12 +7,12 @@ function toKebab(s: string) {
 
 export function cleanHoverHintRetrievalHtml(html: string) {
   const dataAttr = `data-${toKebab(CODE_TOKEN_ID_NAME)}`;
-  const tokenIdPattern = new RegExp(`<[^>]+\\s+${dataAttr}="([^"]+)"[^>]*>`, 'g');
+  const tokenIdPattern = new RegExp(`<([a-z0-9]+)\\b[^>]*\\s+${dataAttr}="([^"]+)"[^>]*>`, 'gi');
 
   return html
-    .replace(tokenIdPattern, '<id=$1/>')
-    .replace(/<\/(?!>)[^>]*>/g, '</>')
-    .replace(/<(?!id=|\/?>)[^>]+>/g, '');
+    .replace(tokenIdPattern, '<t id="$2">')
+    .replace(/<([a-z0-9]+)\b(?! id=)[^>]*>/gi, '<t>')
+    .replace(/<\/([a-z0-9]+)[^>]*>/gi, '</t>');
 }
 
 export function buildContinuationInput(cleanedHtml: string, previousHints: HoverHint[]): string {

@@ -5,7 +5,7 @@ When users hover over code tokens, they see documentation popups - just like hov
 For each element worth documenting:
 1. READ THE EXACT TEXT inside each token - the text between <id=xxx/> and </> is the identifier name
 2. Match documentation to what the token ACTUALLY says, not what you assume from context
-3. Provide documentation using only the fields that add value
+3. Provide COMPLETE documentation - always include params for callables with parameters, returns for callables with return values
 
 CRITICAL - VERIFY TOKEN CONTENT:
 - Before documenting any token, confirm what text it contains
@@ -27,22 +27,31 @@ WHAT TO DOCUMENT:
 - Variables whose purpose isn't clear from the name
 - Complex expressions or algorithms
 
-WHAT TO SKIP:
+WHAT TO SKIP (tokens only - NOT documentation fields):
 - Language keywords (if, return, const, class, etc.)
 - Built-in types (string, int, boolean, etc.)
-- Self-explanatory code (const name = "Alice", simple getters)
-- Standard operations everyone knows (Math.max, console.log)
-- Obvious variable names (userId, isValid, count)
+- Simple literals and obvious variable assignments
 
-DOCUMENTATION FIELDS (all optional - only include what's useful):
-- signature: For callables (functions, methods, constructors, macros, decorators). Format: \`name(param: Type): ReturnType\`
-- properties: For documenting fields on objects/configs. Use with signature or documentation - never standalone.
-- params: Only for parameters with constraints, special values, or subtle behavior. Use with signature.
-- returns: Only when return value isn't obvious from the function name. Use with signature.
-- documentation: Brief explanation when the code's purpose needs clarification (1-5 sentences max)
-- signatureStyles: Map signature tokens to token IDs from the HTML for syntax highlighting
+Note: When you DO document a token, provide complete documentation including params and returns. The "skip" guidance is about which TOKENS to document, not which FIELDS to include.
 
-Every hover hint must have at least a signature or documentation field to provide context.
+DOCUMENTATION FIELDS:
+
+For callables (functions, methods, constructors, macros, decorators):
+- signature: REQUIRED. Format: \`name(param: Type): ReturnType\`
+- params: REQUIRED if callable has parameters. Document each parameter's purpose and constraints.
+- returns: REQUIRED if callable returns a value. Describe what is returned.
+- documentation: REQUIRED. 1-3 sentence explanation of what the code does.
+- signatureStyles: Map signature tokens to token IDs from the HTML for syntax highlighting.
+
+For classes, interfaces, types, structs:
+- signature: REQUIRED. Format: \`class ClassName\`, \`interface IName\`, \`type TypeName\`, \`struct StructName\`
+- properties: Include for documenting class fields or interface members.
+- documentation: REQUIRED. 1-3 sentence explanation.
+- signatureStyles: Map signature tokens to token IDs for syntax highlighting.
+
+For variables, imports, configs:
+- documentation: REQUIRED. 1-3 sentence explanation.
+- properties: Include for config objects or complex data structures.
 
 SIGNATURE SYNTAX HIGHLIGHTING:
 
@@ -84,7 +93,6 @@ CONSISTENCY:
 
 QUALITY GUIDELINES:
 - Be concise - every word should add value
-- Skip obvious information - don't document what the code already shows
 - Focus on the "why" and "gotchas", not the "what"
 - Plain text only - no HTML or markdown in documentation strings
 

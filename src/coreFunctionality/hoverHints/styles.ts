@@ -67,8 +67,8 @@ export function applySemiBoldTextStyle(styles: CSSStyleDeclaration) {
   styles.fontWeight = '500';
 }
 
-export function styleElementToMatchCodeBlock(
-  element: HTMLElement,
+export function styleTooltipToMatchCodeBlock(
+  tooltip: HTMLElement,
   idMappings: IdMappings,
   hoverHintState: HoverHintState,
   tokenId: CodeTokenId,
@@ -91,17 +91,17 @@ export function styleElementToMatchCodeBlock(
   hoverHintState.currentCodeBlockId = parentCodeBlock.codeBlockId;
   hoverHintState.lastStyleComputedAt = now;
 
-  element.style.backgroundColor = DEFAULT_LIGHT_COLOR;
-  element.style.color = DEFAULT_DARK_COLOR;
+  tooltip.style.backgroundColor = DEFAULT_LIGHT_COLOR;
+  tooltip.style.color = DEFAULT_DARK_COLOR;
 
-  setProgrammaticColors(element, parentCodeBlock.html);
+  inheritStylesFromParent(tooltip, parentCodeBlock.html);
 
-  element.style.border = `1px solid ${element.style.color}`;
+  tooltip.style.border = `1px solid ${tooltip.style.color}`;
 }
 
-function setProgrammaticColors(element: HTMLElement, codeBlock: HTMLElement) {
+export function inheritStylesFromParent(element: HTMLElement, parentElement: HTMLElement) {
   const backgroundStyle = findStyle(
-    codeBlock,
+    parentElement,
     (style) => style.backgroundColor !== 'transparent' && style.backgroundColor !== 'rgba(0, 0, 0, 0)',
   );
 
@@ -115,7 +115,7 @@ function setProgrammaticColors(element: HTMLElement, codeBlock: HTMLElement) {
     return;
   }
 
-  const textStyle = findStyle(codeBlock, (style) => doColorsContrast(backgroundStyle.backgroundColor, style.color));
+  const textStyle = findStyle(parentElement, (style) => doColorsContrast(backgroundStyle.backgroundColor, style.color));
 
   if (textStyle) {
     element.style.backgroundColor = backgroundStyle.backgroundColor;

@@ -1,4 +1,4 @@
-import { getOrAddIdToCodeBlock } from './codeBlocks';
+import { getOrAddIdToCodeBlock, getOrWrapCodeBlockInContainer } from './codeBlocks';
 import { CODE_SELECTORS, CodeBlock } from './types';
 
 const queryAllSelectorsSelector = Object.values(CODE_SELECTORS)
@@ -18,9 +18,11 @@ function searchForCodeBlockElementIsPartOf(element: Element): CodeBlock | null {
 
   if (codeBlockElement) {
     const { id: codeBlockId } = getOrAddIdToCodeBlock(codeBlockElement);
+    const container = getOrWrapCodeBlockInContainer(codeBlockElement);
     return {
       html: codeBlockElement,
       codeBlockId,
+      container,
     };
   }
 
@@ -61,10 +63,12 @@ export function findCodeBlocksOnPage(document: Document): CodeBlock[] {
     }
 
     const { id: codeBlockId } = getOrAddIdToCodeBlock(htmlElement);
+    const container = getOrWrapCodeBlockInContainer(htmlElement);
 
     codeBlocks.push({
       html: htmlElement,
       codeBlockId,
+      container,
     });
   }
 

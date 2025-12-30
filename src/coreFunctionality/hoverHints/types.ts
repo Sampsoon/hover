@@ -121,5 +121,4 @@ export interface HoverHintState {
   timeoutId: TimeoutId;
   currentCodeBlockId: CodeBlockId | undefined;
   lastStyleComputedAt: number;
-  tallyElements: Map<CodeBlockId, HTMLElement>;
 }

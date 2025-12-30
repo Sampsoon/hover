@@ -11,10 +11,6 @@
 * Add button to generate a hover hint for a given token
 * Add button for force generation of token
 * Make padding on top match bottom for hover hints
-* See if tokens with white space are having IDs generated for them. If so, stop.
-* Add div around code block to contain "annotation(s)"
-* Add annotations pending state before the hover hints start to come in
-
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management

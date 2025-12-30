@@ -8,10 +8,9 @@ import {
   CodeTokenId,
   IdMappings,
 } from './types';
-import { CODE_TOKEN_ID_NAME, TALLY_ATTRIBUTE_NAME } from './constants';
+import { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 import { wrapTokensInSpans, getDomLeaves } from './tokenization';
-
-export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, TALLY_ATTRIBUTE_NAME } from './constants';
+import { getOrCreateTally, inheritStylesFromParent } from '../hoverHints';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
@@ -25,6 +24,41 @@ function generateTokenId(tokenContent: string): string {
   return prefix ? `${prefix}-${randomPart}` : randomPart;
 }
 
+const CONTAINER_CLASS_NAME = 'vibey-code-container';
+
+function addElementsToContainer(container: HTMLElement) {
+  void getOrCreateTally(container);
+}
+
+export function getOrWrapCodeBlockInContainer(codeBlock: HTMLElement): HTMLElement {
+  if (codeBlock.parentElement?.classList.contains(CONTAINER_CLASS_NAME)) {
+    return codeBlock.parentElement;
+  }
+
+  const container = document.createElement('div');
+  container.className = CONTAINER_CLASS_NAME;
+  container.setAttribute(PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, 'true');
+
+  container.style.display = 'flex';
+  container.style.flexDirection = 'column';
+
+  inheritStylesFromParent(container, codeBlock);
+
+  const computedStyle = window.getComputedStyle(codeBlock);
+  const marginTop = computedStyle.marginTop;
+  if (marginTop && marginTop !== '0px') {
+    container.style.marginTop = marginTop;
+    codeBlock.style.marginTop = '0';
+  }
+
+  codeBlock.parentNode?.insertBefore(container, codeBlock);
+  container.appendChild(codeBlock);
+
+  addElementsToContainer(container);
+
+  return container;
+}
+
 export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const { html } = code;
   const { codeTokenElementMap } = idMappings;
@@ -35,10 +69,6 @@ export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
-    if (token.dataset[TALLY_ATTRIBUTE_NAME]) {
-      return;
-    }
-
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
       const id = generateTokenId(token.textContent ?? '');
 

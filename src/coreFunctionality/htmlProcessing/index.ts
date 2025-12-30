@@ -17,13 +17,13 @@ export {
   setupCodeBlockTracking,
   clearCodeBlockTimeoutIfExists,
   setCodeBlockTimeout,
-  CODE_TOKEN_ID_NAME,
   attachIdsToTokens,
   isCodeBlockInView,
   setupIdToElementMapping,
-  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
-  TALLY_ATTRIBUTE_NAME,
+  getOrWrapCodeBlockInContainer,
 } from './codeBlocks';
+
+export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 
 export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';
 

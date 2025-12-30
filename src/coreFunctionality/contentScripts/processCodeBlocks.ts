@@ -12,6 +12,7 @@ import {
   IdMappings,
   PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
   setupIdToElementMapping,
+  getOrWrapCodeBlockInContainer,
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
 import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorker';
@@ -57,9 +58,11 @@ function createCodeBlockProcessingObserver(codeBlockTrackingState: CodeBlockTrac
             () => {
               intersectionObserver.unobserve(entry.target as HTMLElement);
 
-              const codeBlock = {
+              const container: HTMLElement = getOrWrapCodeBlockInContainer(html);
+              const codeBlock: CodeBlock = {
                 html,
                 codeBlockId,
+                container,
               };
 
               generateHoverhintsForCodeBlock(codeBlock, idMappings);

@@ -1,6 +1,6 @@
 import { CODE_TOKEN_ID_NAME, CodeTokenId, IdMappings } from '../htmlProcessing';
 import { renderDocumentationAsHtml } from './rendering';
-import { applyHoverHintStyle, hideElement, styleElementToMatchCodeBlock } from './styles';
+import { applyHoverHintStyle, hideElement, styleTooltipToMatchCodeBlock } from './styles';
 import { updateTallyDisplay } from './tallyDisplay';
 import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
 
@@ -27,7 +27,6 @@ export function setupHoverHintState(): HoverHintState {
     timeoutId: NO_TIMEOUT_ACTIVE,
     currentCodeBlockId: undefined,
     lastStyleComputedAt: 0,
-    tallyElements: new Map(),
   };
 }
 
@@ -66,7 +65,7 @@ export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idM
   if (ids.length > 0) {
     const parentCodeBlock = parentCodeBlockMap.get(ids[0]);
     if (parentCodeBlock) {
-      updateTallyDisplay(parentCodeBlock, ids.length, state.tallyElements);
+      updateTallyDisplay(parentCodeBlock.container, ids.length);
     }
   }
 
@@ -139,7 +138,7 @@ function showTooltip(
   state.tooltip.innerHTML = html;
 
   positionTooltip(state.tooltip, event.target as HTMLElement);
-  styleElementToMatchCodeBlock(state.tooltip, idMappings, state, tokenId);
+  styleTooltipToMatchCodeBlock(state.tooltip, idMappings, state, tokenId);
 
   state.tooltip.style.display = 'block';
 }

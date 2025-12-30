@@ -22,6 +22,7 @@ export {
   isCodeBlockInView,
   setupIdToElementMapping,
   PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
+  TALLY_ATTRIBUTE_NAME,
 } from './codeBlocks';
 
 export { findCodeBlockPartOfMutation, findCodeBlocksOnPage } from './parsing';

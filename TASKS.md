@@ -9,11 +9,11 @@
 * Handle large inputs. Maybe in chucks?
 * Add button for triggering hover hints manually on code block
 * Add button to generate a hover hint for a given token
-* Remove "..." underline and replace with something else
-    * Maybe add pending animation and no thing under?
-    * Maybe add thing in the upper right hand conner
 * Add button for force generation of token
 * Make padding on top match bottom for hover hints
+* See if tokens with white space are having IDs generated for them. If so, stop.
+* Add div around code block to contain "annotation(s)"
+* Add annotations pending state before the hover hints start to come in
 
 ### House Keeping
 * Clean up `processCodeBlocks.ts`

@@ -8,10 +8,10 @@ import {
   CodeTokenId,
   IdMappings,
 } from './types';
-import { CODE_TOKEN_ID_NAME } from './constants';
+import { CODE_TOKEN_ID_NAME, TALLY_ATTRIBUTE_NAME } from './constants';
 import { wrapTokensInSpans, getDomLeaves } from './tokenization';
 
-export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
+export { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME, TALLY_ATTRIBUTE_NAME } from './constants';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
@@ -35,6 +35,10 @@ export function attachIdsToTokens(code: CodeBlock, idMappings: IdMappings) {
   const codeTokens = getDomLeaves(html);
 
   codeTokens.forEach((token) => {
+    if (token.dataset[TALLY_ATTRIBUTE_NAME]) {
+      return;
+    }
+
     if (!token.dataset[CODE_TOKEN_ID_NAME]) {
       const id = generateTokenId(token.textContent ?? '');
 

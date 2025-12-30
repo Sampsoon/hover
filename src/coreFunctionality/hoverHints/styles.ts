@@ -67,8 +67,8 @@ export function applySemiBoldTextStyle(styles: CSSStyleDeclaration) {
   styles.fontWeight = '500';
 }
 
-export function styleTooltip(
-  tooltip: HTMLElement,
+export function styleElementToMatchCodeBlock(
+  element: HTMLElement,
   idMappings: IdMappings,
   hoverHintState: HoverHintState,
   tokenId: CodeTokenId,
@@ -91,15 +91,15 @@ export function styleTooltip(
   hoverHintState.currentCodeBlockId = parentCodeBlock.codeBlockId;
   hoverHintState.lastStyleComputedAt = now;
 
-  tooltip.style.backgroundColor = DEFAULT_LIGHT_COLOR;
-  tooltip.style.color = DEFAULT_DARK_COLOR;
+  element.style.backgroundColor = DEFAULT_LIGHT_COLOR;
+  element.style.color = DEFAULT_DARK_COLOR;
 
-  setProgrammaticColors(tooltip, parentCodeBlock.html);
+  setProgrammaticColors(element, parentCodeBlock.html);
 
-  tooltip.style.border = `1px solid ${tooltip.style.color}`;
+  element.style.border = `1px solid ${element.style.color}`;
 }
 
-function setProgrammaticColors(tooltip: HTMLElement, codeBlock: HTMLElement) {
+function setProgrammaticColors(element: HTMLElement, codeBlock: HTMLElement) {
   const backgroundStyle = findStyle(
     codeBlock,
     (style) => style.backgroundColor !== 'transparent' && style.backgroundColor !== 'rgba(0, 0, 0, 0)',
@@ -110,24 +110,24 @@ function setProgrammaticColors(tooltip: HTMLElement, codeBlock: HTMLElement) {
   }
 
   if (doColorsContrast(backgroundStyle.backgroundColor, backgroundStyle.color)) {
-    tooltip.style.backgroundColor = backgroundStyle.backgroundColor;
-    tooltip.style.color = backgroundStyle.color;
+    element.style.backgroundColor = backgroundStyle.backgroundColor;
+    element.style.color = backgroundStyle.color;
     return;
   }
 
   const textStyle = findStyle(codeBlock, (style) => doColorsContrast(backgroundStyle.backgroundColor, style.color));
 
   if (textStyle) {
-    tooltip.style.backgroundColor = backgroundStyle.backgroundColor;
-    tooltip.style.color = textStyle.color;
+    element.style.backgroundColor = backgroundStyle.backgroundColor;
+    element.style.color = textStyle.color;
     return;
   }
 
   const contrastingColor = computeContrastingColor(backgroundStyle.backgroundColor);
 
   if (contrastingColor) {
-    tooltip.style.backgroundColor = backgroundStyle.backgroundColor;
-    tooltip.style.color = contrastingColor;
+    element.style.backgroundColor = backgroundStyle.backgroundColor;
+    element.style.color = contrastingColor;
     return;
   }
 }

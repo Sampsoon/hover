@@ -1,6 +1,7 @@
 import { CODE_TOKEN_ID_NAME, CodeTokenId, IdMappings } from '../htmlProcessing';
 import { renderDocumentationAsHtml } from './rendering';
-import { applyHoverHintStyle, hideElement, styleTooltip } from './styles';
+import { applyHoverHintStyle, hideElement, styleElementToMatchCodeBlock } from './styles';
+import { updateTallyDisplay } from './tallyDisplay';
 import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
 
 const MOUSE_EVENTS = {
@@ -26,6 +27,7 @@ export function setupHoverHintState(): HoverHintState {
     timeoutId: NO_TIMEOUT_ACTIVE,
     currentCodeBlockId: undefined,
     lastStyleComputedAt: 0,
+    tallyElements: new Map(),
   };
 }
 
@@ -53,7 +55,7 @@ export function setupHoverHintTriggers(
 
 export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idMappings: IdMappings) {
   const { ids, documentation } = hoverHint;
-  const { codeTokenElementMap } = idMappings;
+  const { parentCodeBlockMap } = idMappings;
 
   const renderedHtml = renderDocumentationAsHtml(documentation, { idMappings });
 
@@ -61,18 +63,16 @@ export function attachHoverHint(hoverHint: HoverHint, state: HoverHintState, idM
     return;
   }
 
+  if (ids.length > 0) {
+    const parentCodeBlock = parentCodeBlockMap.get(ids[0]);
+    if (parentCodeBlock) {
+      updateTallyDisplay(parentCodeBlock, ids.length, state.tallyElements);
+    }
+  }
+
   ids.forEach((id) => {
     state.hoverHintMap.set(id, renderedHtml);
-
-    const codeToken = codeTokenElementMap.get(id);
-    if (codeToken) {
-      addEffectToCodeToken(codeToken);
-    }
   });
-}
-
-function addEffectToCodeToken(htmlElement: HTMLElement) {
-  htmlElement.style.textDecoration = 'underline dotted';
 }
 
 function isHTMLElement(target: EventTarget | null): target is HTMLElement {
@@ -139,7 +139,7 @@ function showTooltip(
   state.tooltip.innerHTML = html;
 
   positionTooltip(state.tooltip, event.target as HTMLElement);
-  styleTooltip(state.tooltip, idMappings, state, tokenId);
+  styleElementToMatchCodeBlock(state.tooltip, idMappings, state, tokenId);
 
   state.tooltip.style.display = 'block';
 }

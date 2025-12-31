@@ -72,6 +72,10 @@ See [scripts/README.md](scripts/README.md) for evaluation tools.
 
 See [TASKS.md](TASKS.md) for a list of known issues and planned improvements.
 
+## Privacy
+
+See [PRIVACY.md](PRIVACY.md) for details on data handling.
+
 ## License
 
 MIT

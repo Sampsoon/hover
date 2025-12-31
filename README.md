@@ -16,6 +16,8 @@ Works on documentation sites and AI chat apps like ChatGPT and Claude.
 
 ## Setup
 
+**Note:** This extension is coming to the chrome web store soon
+
 ### 1. Build the extension
 
 ```bash

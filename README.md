@@ -1,27 +1,73 @@
-# Vibey LSP
+# Hover
 
-This is a Chrome extension that adds LSP-style documentation to any code on the internet. This project is nearing completion but still has a little way to go.
+Hover over code on any webpage to see documentation. Like your IDE, but everywhere.
 
-## Scripts
+Works on documentation sites and AI chat apps like ChatGPT and Claude.
 
-- `pnpm dev` — Start development server
-- `pnpm build` — Type-check, build, and lint for production
-- `pnpm lint` — Run ESLint
-- `pnpm format` — Format code with Prettier
+<p align="center">
+  <img src="docs/demo0.gif" alt="Demo">
+</p>
 
-## Requirements
+<p align="center">
+  <img src="docs/demo1.gif" alt="Demo 2">
+</p>
 
-- Node.js ≥ 18
-- pnpm
+---
 
+## Setup
 
-#### API Key Setup
+### 1. Build the extension
 
-- Create a `.env` file in the project root.
-- Add the following API key(s) with the Vite prefix:
-
-```
-VITE_OPEN_ROUTER_API_KEY=your-openrouter-key-here
+```bash
+pnpm install && pnpm build
 ```
 
-Access the key(s) in code go to `src/keys/index.ts`
+### 2. Load in Chrome
+
+Navigate to `chrome://extensions` → Enable **Developer Mode** → **Load Unpacked** → Select the `dist_chrome` folder
+
+### 3. Configure API
+
+Click the extension icon, go to **Settings**, and add your [OpenRouter](https://openrouter.ai) API key or configure a custom OpenAI client compatible endpoint.
+
+#### OpenRouter
+
+<img src="docs/openrouter-settings.png" alt="OpenRouter Settings">
+
+#### Custom Endpoint
+
+<img src="docs/custom-endpoint-settings.png" alt="Custom Endpoint Settings">
+
+### 4. Configure websites
+
+Set which websites the extension runs on using URL patterns (e.g. `*://*.github.com/*`).
+
+<img src="docs/website-settings.png" alt="Website Settings">
+
+---
+
+## Development
+
+```bash
+pnpm dev      # Dev server
+pnpm build    # Production build and lint
+pnpm lint     # Lint
+pnpm format   # Format
+```
+
+Optional: Create `.env` to bundle an API key into dev builds:
+```
+VITE_OPEN_ROUTER_API_KEY=your-key
+```
+
+## Testing
+
+See [scripts/README.md](scripts/README.md) for evaluation tools.
+
+## Known Issues & Future Improvements
+
+See [TASKS.md](TASKS.md) for a list of known issues and planned improvements.
+
+## License
+
+MIT

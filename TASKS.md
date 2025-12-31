@@ -4,6 +4,20 @@
 * Add button for force generation of token
 * Add toggle to turn off auto generation in div around code block. When this happens, the user should be able to manually generate documentation for a token.
 
+### Improvements
+* Make syntax highlighting better
+* Make it so "annotations(s)" string is either constantly inside or outside a code block
+
+### Possible Large Changes
+* Add backend
+* Use on device LLMs
+    * Would require completely changing flow to optimize for smaller context window
+    * Low chance of being smart enough
+    * [chrome://on-device-internals/](chrome://on-device-internals/)
+    * [Chrome Prompt API](https://developer.chrome.com/docs/ai/prompt-api?_gl=1*pmq4tr*_up*MQ..&gclid=Cj0KCQjwovPGBhDxARIsAFhgkwSe9HUu4OXW2BWOM0HaXBiXTRh0SRW7BjLVO0yABcgLlspt0wsRFbsaAvgQEALw_wcB&gbraid=0AAAAAC1d8f4DQgFp_TfJG8fwdrY2UkdAY)
+* Add github support.
+    * Github does not use  `<code\>` blocks, this would require implementing new parsing logic
+
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management

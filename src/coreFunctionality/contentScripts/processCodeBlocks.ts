@@ -1,18 +1,20 @@
 import {
   clearCodeBlockTimeoutIfExists,
-  CodeBlock,
-  CodeBlockTrackingState,
-  findCodeBlocksOnPage,
-  findCodeBlockPartOfMutation,
   setCodeBlockTimeout,
   setupCodeBlockTracking,
   isCodeBlockInView,
   getOrAddIdToCodeBlock,
   attachIdsToTokens,
-  IdMappings,
-  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
   setupIdToElementMapping,
   getOrWrapCodeBlockInContainer,
+} from '../htmlProcessing/codeBlocks';
+import {
+  CodeBlock,
+  CodeBlockTrackingState,
+  findCodeBlocksOnPage,
+  findCodeBlockPartOfMutation,
+  IdMappings,
+  PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME,
 } from '../htmlProcessing';
 import { attachHoverHint, setupHoverHintState, setupHoverHintTriggers } from '../hoverHints';
 import { invokeHoverHintRetrievalServiceWorker, listenForHoverHintsFromServiceWorker } from '../serviceWorker';

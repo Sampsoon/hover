@@ -40,7 +40,6 @@ interface Annotation {
 
 interface ExpectedAnnotation {
   ids: string[];
-  type: string;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -122,61 +121,52 @@ interface Metrics {
   precision: number;
   recall: number;
   f1: number;
-  typeAccuracy: number;
   truePositives: number;
   falsePositives: number;
   falseNegatives: number;
-  typeMismatchCount: number;
   expectedCount: number;
   actualCount: number;
   latencyMs: number;
 }
 
 interface Comparison {
-  correctMatches: { id: string; type: string }[];
-  typeMismatches: { id: string; expectedType: string; actualType: string }[];
-  falsePositives: { id: string; actualType: string }[];
-  falseNegatives: { id: string; expectedType: string }[];
+  correctMatches: string[];
+  falsePositives: string[];
+  falseNegatives: string[];
 }
 
 function buildComparison(expected: ExpectedAnnotation[], actual: HoverHint[]): Comparison {
-  const expectedIdToType = new Map<string, string>();
+  const expectedIds = new Set<string>();
   for (const ann of expected) {
     for (const id of ann.ids) {
-      expectedIdToType.set(id, ann.type);
+      expectedIds.add(id);
     }
   }
 
-  const actualIdToType = new Map<string, string>();
+  const actualIds = new Set<string>();
   for (const hint of actual) {
     for (const id of hint.ids) {
-      actualIdToType.set(id, hint.documentation.type);
+      actualIds.add(id);
     }
   }
 
   const comparison: Comparison = {
     correctMatches: [],
-    typeMismatches: [],
     falsePositives: [],
     falseNegatives: [],
   };
 
-  for (const [id, actualType] of actualIdToType) {
-    const expectedType = expectedIdToType.get(id);
-    if (expectedType) {
-      if (expectedType === actualType) {
-        comparison.correctMatches.push({ id, type: actualType });
-      } else {
-        comparison.typeMismatches.push({ id, expectedType, actualType });
-      }
+  for (const id of actualIds) {
+    if (expectedIds.has(id)) {
+      comparison.correctMatches.push(id);
     } else {
-      comparison.falsePositives.push({ id, actualType });
+      comparison.falsePositives.push(id);
     }
   }
 
-  for (const [id, expectedType] of expectedIdToType) {
-    if (!actualIdToType.has(id)) {
-      comparison.falseNegatives.push({ id, expectedType });
+  for (const id of expectedIds) {
+    if (!actualIds.has(id)) {
+      comparison.falseNegatives.push(id);
     }
   }
 
@@ -192,37 +182,31 @@ function calculateMetrics(
   const expectedIds = new Set(expected.flatMap((ann) => ann.ids));
   const actualIds = new Set(actual.flatMap((hint) => hint.ids));
 
-  const truePositives = comparison.correctMatches.length + comparison.typeMismatches.length;
+  const truePositives = comparison.correctMatches.length;
   const falsePositives = comparison.falsePositives.length;
   const falseNegatives = comparison.falseNegatives.length;
-  const typeMismatchCount = comparison.typeMismatches.length;
 
   let precision: number;
   let recall: number;
   let f1: number;
-  let typeAccuracy: number;
 
   if (expectedIds.size === 0 && actualIds.size === 0) {
     precision = 1;
     recall = 1;
     f1 = 1;
-    typeAccuracy = 1;
   } else {
     precision = truePositives / (truePositives + falsePositives) || 0;
     recall = truePositives / (truePositives + falseNegatives) || 0;
     f1 = (2 * (precision * recall)) / (precision + recall) || 0;
-    typeAccuracy = truePositives > 0 ? comparison.correctMatches.length / truePositives : 0;
   }
 
   return {
     precision,
     recall,
     f1,
-    typeAccuracy,
     truePositives,
     falsePositives,
     falseNegatives,
-    typeMismatchCount,
     expectedCount: expectedIds.size,
     actualCount: actualIds.size,
     latencyMs,
@@ -243,7 +227,6 @@ interface ModelAggregate {
   avgPrecision: number;
   avgRecall: number;
   avgF1: number;
-  avgTypeAccuracy: number;
   avgLatencyMs: number;
   p50LatencyMs: number;
   p90LatencyMs: number;
@@ -337,7 +320,6 @@ async function evaluateModel(
     avgPrecision: 0,
     avgRecall: 0,
     avgF1: 0,
-    avgTypeAccuracy: 0,
     avgLatencyMs: 0,
     p50LatencyMs: 0,
     p90LatencyMs: 0,
@@ -351,8 +333,6 @@ async function evaluateModel(
       successfulResults.reduce((sum, r) => sum + r.metrics!.precision, 0) / successfulResults.length;
     aggregate.avgRecall = successfulResults.reduce((sum, r) => sum + r.metrics!.recall, 0) / successfulResults.length;
     aggregate.avgF1 = successfulResults.reduce((sum, r) => sum + r.metrics!.f1, 0) / successfulResults.length;
-    aggregate.avgTypeAccuracy =
-      successfulResults.reduce((sum, r) => sum + r.metrics!.typeAccuracy, 0) / successfulResults.length;
 
     const latencies = successfulResults.map((r) => r.metrics!.latencyMs).sort((a, b) => a - b);
     aggregate.totalLatencyMs = latencies.reduce((sum, l) => sum + l, 0);
@@ -459,7 +439,6 @@ async function main() {
     console.log(`  Precision: ${(agg.avgPrecision * 100).toFixed(1)}%`);
     console.log(`  Recall:    ${(agg.avgRecall * 100).toFixed(1)}%`);
     console.log(`  F1 Score:  ${(agg.avgF1 * 100).toFixed(1)}%`);
-    console.log(`  Type Acc:  ${(agg.avgTypeAccuracy * 100).toFixed(1)}%`);
     console.log(
       `  Latency:   ${(agg.avgLatencyMs / 1000).toFixed(2)}s avg | p50: ${(agg.p50LatencyMs / 1000).toFixed(2)}s | p90: ${(agg.p90LatencyMs / 1000).toFixed(2)}s | total: ${(agg.totalLatencyMs / 1000).toFixed(1)}s`,
     );

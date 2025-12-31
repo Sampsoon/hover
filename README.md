@@ -16,7 +16,7 @@ Works on documentation sites and AI chat apps like ChatGPT and Claude.
 
 ## Setup
 
-**Note:** This extension is coming to the chrome web store soon
+**Note:** This extension is coming to the chrome web store soon and will be linked here when available.
 
 ### 1. Build the extension
 

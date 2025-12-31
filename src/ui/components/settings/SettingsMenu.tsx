@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
 import { baseSliderStyle, ApiKeyIcon, GlobeIcon } from '../common';
 import { SettingsTab } from '../../../storage';
 
@@ -22,56 +21,11 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
     0,
     tabs.findIndex((tab) => tab.id === selected),
   );
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseDown = useCallback(() => {
-    setIsDragging(true);
-  }, []);
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const y = e.clientY - rect.top - SIDEBAR_PADDING;
-      const itemHeight = BUTTON_HEIGHT + ITEM_GAP;
-      const targetIndex = Math.max(0, Math.min(tabs.length - 1, Math.floor(Math.max(0, y) / itemHeight)));
-
-      if (tabs[targetIndex].id !== selected) {
-        onSelect(tabs[targetIndex].id);
-      }
-    },
-    [isDragging, selected, onSelect],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  useEffect(() => {
-    if (!isDragging) return;
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, handleMouseMove, handleMouseUp]);
-
-  const handleTabClick = useCallback(
-    (tabId: SettingsTab) => {
-      if (!isDragging) onSelect(tabId);
-    },
-    [isDragging, onSelect],
-  );
 
   const sliderY = SIDEBAR_PADDING + selectedIndex * (BUTTON_HEIGHT + ITEM_GAP);
 
   return (
     <nav
-      ref={containerRef}
-      onMouseDown={handleMouseDown}
       style={{
         flexShrink: 0,
         padding: SIDEBAR_PADDING,
@@ -80,8 +34,6 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
         flexDirection: 'column',
         gap: ITEM_GAP,
         position: 'relative',
-        userSelect: 'none',
-        cursor: isDragging ? 'grabbing' : 'grab',
       }}
     >
       {/* Animated slider background */}
@@ -94,7 +46,7 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
           height: BUTTON_HEIGHT,
           top: 0,
           transform: `translateY(${sliderY.toString()}px)`,
-          transition: animate ? (isDragging ? 'var(--transition-dragging)' : 'var(--transition-normal)') : 'none',
+          transition: animate ? 'var(--transition-normal)' : 'none',
         }}
       />
 
@@ -102,9 +54,7 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
       {tabs.map(({ id, title, icon: Icon }) => (
         <button
           key={id}
-          onClick={() => {
-            handleTabClick(id);
-          }}
+          onClick={() => onSelect(id)}
           title={title}
           style={{
             position: 'relative',

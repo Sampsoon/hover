@@ -56,6 +56,7 @@ pnpm format   # Format
 ```
 
 Optional: Create `.env` to bundle an API key into dev builds:
+
 ```
 VITE_OPEN_ROUTER_API_KEY=your-key
 ```

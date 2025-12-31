@@ -85,7 +85,7 @@ const sizes = [16, 48, 128];
 
 async function generateIcons() {
   mkdirSync(outputDir, { recursive: true });
-  
+
   for (const size of sizes) {
     const outputPath = join(outputDir, `icon${size}.png`);
 
@@ -124,7 +124,7 @@ async function generateIcons() {
     writeFileSync(outputPath, finalBuffer);
     console.log(`✓ Generated ${outputPath} (${size}x${size})`);
   }
-  
+
   console.log('\nAll icons generated successfully!');
 }
 

@@ -21,6 +21,7 @@ Scrapes code blocks from ~70 documentation and tutorial sites to build a test da
 **Sources include:** MDN, Python docs, Rust Book, TypeScript handbook, React docs, Node.js docs, AWS CDK/SDK docs, Real Python, Stack Overflow, and more.
 
 **First-time setup:**
+
 ```bash
 pnpm exec playwright install chromium
 ```
@@ -39,6 +40,7 @@ Processes scraped HTML and assigns unique token IDs to each code token using the
 Local web server (http://localhost:3459) for reviewing LLM outputs and marking expected annotations.
 
 **Features:**
+
 - View tokenized code with clickable tokens
 - See LLM-generated hover hints from eval results
 - Accept/reject individual annotations or "Accept All"
@@ -50,6 +52,7 @@ Local web server (http://localhost:3459) for reviewing LLM outputs and marking e
 Runs the hover hint retrieval prompt against all tokenized examples and calculates precision/recall/F1 metrics.
 
 **Usage:**
+
 ```bash
 OPENAI_API_KEY=your-key pnpm evaluate
 OPENAI_API_KEY=your-key pnpm evaluate --models "model1,model2"
@@ -62,6 +65,7 @@ OPENAI_API_KEY=your-key pnpm evaluate --models "model1,model2"
 Generates PNG icons at 16x16, 48x48, and 128x128 from the SVG source. Uses resvg-js for SVG rendering and sharp for compositing.
 
 **Note:** Run from project root (uses root dependencies, not scripts dependencies):
+
 ```bash
 cd .. && node scripts/generateIcons.mjs
 ```

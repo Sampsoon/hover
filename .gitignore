@@ -11,6 +11,7 @@ node_modules
 dist
 dist_chrome
 dist-ssr
+hover-extension.zip
 *.local
 .eslintcache
 

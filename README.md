@@ -55,6 +55,7 @@ pnpm dev      # Dev server
 pnpm build    # Production build and lint
 pnpm lint     # Lint
 pnpm format   # Format
+pnpm package  # Build and create hover-extension.zip for Chrome Web Store
 ```
 
 Optional: Create `.env` to bundle an API key into dev builds:

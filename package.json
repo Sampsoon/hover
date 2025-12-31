@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "check-format": "prettier --check ."
+    "check-format": "prettier --check .",
+    "package": "pnpm build && cd dist_chrome && zip -r ../hover-extension.zip . -x '.vite/*' -x '.DS_Store'"
   },
   "dependencies": {
     "@crxjs/vite-plugin": "^2.0.2",

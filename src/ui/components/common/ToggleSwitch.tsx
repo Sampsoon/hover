@@ -59,7 +59,9 @@ export function ToggleSwitch<T extends string>({
       {options.map((option, index) => (
         <button
           key={option}
-          onClick={() => onChange(option)}
+          onClick={() => {
+            onChange(option);
+          }}
           style={buttonStyle(value === option)}
         >
           {labels[index]}

@@ -54,7 +54,9 @@ export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps)
       {tabs.map(({ id, title, icon: Icon }) => (
         <button
           key={id}
-          onClick={() => onSelect(id)}
+          onClick={() => {
+            onSelect(id);
+          }}
           title={title}
           style={{
             position: 'relative',

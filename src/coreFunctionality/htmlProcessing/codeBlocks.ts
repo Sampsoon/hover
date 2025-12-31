@@ -24,7 +24,7 @@ function generateTokenId(tokenContent: string): string {
   return prefix ? `${prefix}-${randomPart}` : randomPart;
 }
 
-const CONTAINER_CLASS_NAME = 'vibey-code-container';
+const CONTAINER_CLASS_NAME = 'hover-code-container';
 
 function addElementsToContainer(container: HTMLElement) {
   void getOrCreateTally(container);

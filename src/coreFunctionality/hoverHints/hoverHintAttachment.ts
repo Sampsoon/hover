@@ -120,7 +120,7 @@ function onMouseLeaveCodeToken(event: MouseEvent, state: HoverHintState) {
 
 function createTooltip(): HTMLElement {
   const tooltip = document.createElement('div');
-  tooltip.className = 'vibey-tooltip';
+  tooltip.className = 'hover-tooltip';
   applyHoverHintStyle(tooltip.style);
   hideElement(tooltip);
 

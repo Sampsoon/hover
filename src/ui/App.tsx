@@ -5,7 +5,7 @@ import { ThemeMode } from '../storage';
 import iconUrl from '/icons/icon.svg';
 import iconDarkUrl from '/icons/icon-dark.svg';
 
-const GITHUB_URL = 'https://github.com/Sampsoon/vibey_lsp';
+const GITHUB_URL = 'https://github.com/Sampsoon/hover';
 
 function useIsDarkMode(themeMode: ThemeMode) {
   if (themeMode === ThemeMode.DARK) {
@@ -55,7 +55,7 @@ function App() {
             letterSpacing: '-0.01em',
           }}
         >
-          Vibey LSP
+          Hover
         </h1>
         <img src={isDark ? iconDarkUrl : iconUrl} alt="" width={24} height={24} />
       </div>

@@ -1,11 +1,11 @@
 {
-  "name": "vibey_lsp",
+  "name": "Hover",
   "version": "1.0.0",
   "description": "",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "Vibey LSP"
+    "default_title": "Hover"
   },
   "options_ui": {
     "page": "options.html",

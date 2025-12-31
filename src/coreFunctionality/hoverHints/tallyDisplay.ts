@@ -1,6 +1,6 @@
 import { PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from '../htmlProcessing';
 
-const TALLY_CLASS_NAME = 'vibey-tally';
+const TALLY_CLASS_NAME = 'hover-tally';
 
 function insertTallyIntoContainer(tally: HTMLElement, container: HTMLElement): void {
   // Insert at the beginning (before code block) so tally appears above code

@@ -31,6 +31,8 @@ WHAT TO SKIP (tokens only - NOT documentation fields):
 - Language keywords (if, return, const, class, etc.)
 - Built-in types (string, int, boolean, etc.)
 - Simple literals and obvious variable assignments
+- Tokens inside string literals or comments - not code. Example: in \`"Hello world"\` or \`console.log("fetchUser")\`, do NOT document "Hello", "world", or the string "fetchUser"
+- Raw text such as MARKDOWN and ERROR messages should be skipped
 
 Note: When you DO document a token, provide complete documentation including params and returns. The "skip" guidance is about which TOKENS to document, not which FIELDS to include.
 

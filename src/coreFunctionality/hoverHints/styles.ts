@@ -25,6 +25,7 @@ export function applyHoverHintStyle(styles: CSSStyleDeclaration) {
   styles.zIndex = '999999';
   styles.pointerEvents = 'none';
   styles.boxSizing = 'border-box';
+  styles.paddingTop = MarginSize.SMALL;
 }
 
 export function hideElement(element: HTMLElement) {

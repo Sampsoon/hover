@@ -10,7 +10,6 @@
 * Add button for triggering hover hints manually on code block
 * Add button to generate a hover hint for a given token
 * Add button for force generation of token
-* Make padding on top match bottom for hover hints
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management

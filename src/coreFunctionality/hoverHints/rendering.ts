@@ -87,7 +87,6 @@ function renderSignatureAsHtml(signature: string, styleContext: SignatureStyleCo
 
   applyCodeTextStyle(signatureElement.style);
   applyCodeContainerStyle(signatureElement.style);
-  applyTopMarginStyle(signatureElement.style);
   applyBottomMarginStyle(signatureElement.style, MarginSize.LARGE);
 
   const { signatureStyles, idMappings } = styleContext;

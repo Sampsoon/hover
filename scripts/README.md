@@ -1,6 +1,6 @@
 # Scripts
 
-Vibe-coded scripts for development and evaluation. These are **not included in the compiled extension** and probably have bugs.
+Vibe-coded scripts for development and evaluation. These are **not included in the compiled extension**, have their own `package.json` and probably have bugs.
 
 ## Available Scripts
 

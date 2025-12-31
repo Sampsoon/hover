@@ -91,12 +91,12 @@ export function styleTooltipToMatchCodeBlock(
   tooltip.style.backgroundColor = DEFAULT_LIGHT_COLOR;
   tooltip.style.color = DEFAULT_DARK_COLOR;
 
-  inheritStylesFromParent(tooltip, parentCodeBlock.html);
+  applyInheritedStylesToTooltip(tooltip, parentCodeBlock.html);
 
   tooltip.style.border = `1px solid ${tooltip.style.color}`;
 }
 
-export function inheritStylesFromParent(element: HTMLElement, parentElement: HTMLElement) {
+function applyInheritedStylesToTooltip(element: HTMLElement, parentElement: HTMLElement) {
   const backgroundStyle = findStyle(
     parentElement,
     (style) => style.backgroundColor !== 'transparent' && style.backgroundColor !== 'rgba(0, 0, 0, 0)',

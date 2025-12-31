@@ -10,7 +10,7 @@ import {
 } from './types';
 import { CODE_TOKEN_ID_NAME, PROGRAMMATICALLY_ADDED_ELEMENT_ATTRIBUTE_NAME } from './constants';
 import { wrapTokensInSpans, getDomLeaves } from './tokenization';
-import { getOrCreateTally, inheritStylesFromParent } from '../hoverHints';
+import { getOrCreateTally } from '../hoverHints';
 
 const CODE_BLOCK_ID_ATTRIBUTE_NAME = 'blockId';
 
@@ -41,8 +41,6 @@ export function getOrWrapCodeBlockInContainer(codeBlock: HTMLElement): HTMLEleme
 
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
-
-  inheritStylesFromParent(container, codeBlock);
 
   const computedStyle = window.getComputedStyle(codeBlock);
   const marginTop = computedStyle.marginTop;

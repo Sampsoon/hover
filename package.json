@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "package": "pnpm build && cd dist_chrome && zip -r ../hover-extension.zip . -x '.vite/*' -x '.DS_Store'"
+    "package": "pnpm build && cd dist_chrome && zip -r ../hover-extension.zip . -x '.vite/*' -x '.DS_Store' -x '.env*'"
   },
   "dependencies": {
     "@crxjs/vite-plugin": "^2.0.2",

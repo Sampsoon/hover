@@ -5,7 +5,6 @@ import {
   applySecondaryTextStyle,
   applyBottomMarginStyle,
   applyTextContainerStyle,
-  applyTopMarginStyle,
   applySemiBoldTextStyle,
   MarginSize,
   DocStringCommand,

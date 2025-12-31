@@ -60,10 +60,6 @@ export function applyBottomMarginStyle(styles: CSSStyleDeclaration, marginSize: 
   styles.marginBottom = marginSize;
 }
 
-export function applyTopMarginStyle(styles: CSSStyleDeclaration, marginSize: string = MarginSize.SMALL) {
-  styles.marginTop = marginSize;
-}
-
 export function applySemiBoldTextStyle(styles: CSSStyleDeclaration) {
   styles.fontWeight = '500';
 }

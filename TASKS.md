@@ -1,13 +1,10 @@
 
 ### Tasks
 * Play around with UI style and logo some more
-
-### POC Tasks
-* Add button for triggering hover hints manually on code block
-* Add button to generate a hover hint for a given token
 * Add button for force generation of token
+* Add toggle to turn off auto generation in div around code block. When this happens, the user should be able to manually generate documentation for a token.
 
 ### House Keeping
 * Clean up `processCodeBlocks.ts`
 * Clean up state management
-* Take another look at style generation code as see if it can be improved. In doing so, check if caching in necessary, because it can get stale if the user changes the theme.
+* Take another look at style generation code as see if it can be improved.

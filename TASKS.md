@@ -8,6 +8,8 @@
 
 - Make syntax highlighting better
 - Make it so "annotations(s)" string is either constantly inside or outside a code block
+- Figure a method for the hover hins to stay on the page so that the user can select stuff, without them getting in the way when the user wants them to go away
+- Add links and commands to install packages in hover hints
 
 ### Possible Large Changes
 

@@ -21,7 +21,7 @@ Works on documentation sites and AI chat apps like ChatGPT and Claude.
 ### 1. Build the extension
 
 ```bash
-pnpm install && pnpm build
+bun install && bun run build
 ```
 
 ### 2. Load in Chrome
@@ -51,11 +51,11 @@ Set which websites the extension runs on using URL patterns (e.g. `*://*.github.
 ## Development
 
 ```bash
-pnpm dev      # Dev server
-pnpm build    # Production build and lint
-pnpm lint     # Lint
-pnpm format   # Format
-pnpm package  # Build and create hover-extension.zip for Chrome Web Store
+bun run dev      # Dev server
+bun run build    # Production build and lint
+bun run lint     # Lint
+bun run format   # Format
+bun run package  # Build and create hover-extension.zip for Chrome Web Store
 ```
 
 Optional: Create `.env` to bundle an API key into dev builds:

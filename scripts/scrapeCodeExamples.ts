@@ -13,9 +13,9 @@
  * - Merges with existing data (won't duplicate URLs)
  *
  * Usage:
- *   cd scripts && pnpm install
- *   pnpm exec playwright install chromium   # First time only
- *   pnpm run scrape
+ *   cd scripts && bun install
+ *   bun x playwright install chromium   # First time only
+ *   bun run scrape
  *
  * Output: test-data/code-examples.json
  */

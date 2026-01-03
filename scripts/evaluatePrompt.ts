@@ -361,8 +361,8 @@ async function main() {
 
   if (!apiKey) {
     console.error('Error: OPENAI_API_KEY environment variable is required');
-    console.error('Usage: OPENAI_API_KEY=your-key pnpm evaluate');
-    console.error('       OPENAI_API_KEY=your-key pnpm evaluate --models "model1,model2,model3"');
+    console.error('Usage: OPENAI_API_KEY=your-key bun run evaluate');
+    console.error('       OPENAI_API_KEY=your-key bun run evaluate --models "model1,model2,model3"');
     process.exit(1);
   }
 
@@ -376,13 +376,13 @@ async function main() {
 
   if (!existsSync(ANNOTATIONS_PATH)) {
     console.error('Error: No annotated examples found at', ANNOTATIONS_PATH);
-    console.error('Run the annotation UI first: pnpm annotate');
+    console.error('Run the annotation UI first: bun run annotate');
     process.exit(1);
   }
 
   if (!existsSync(TOKENIZED_EXAMPLES_PATH)) {
     console.error('Error: No tokenized examples found at', TOKENIZED_EXAMPLES_PATH);
-    console.error('Run the tokenization script first: pnpm tokenize');
+    console.error('Run the tokenization script first: bun run tokenize');
     process.exit(1);
   }
 
@@ -457,7 +457,7 @@ async function main() {
   console.log('\n' + '='.repeat(60));
   console.log('Example multi-model command:');
   console.log(
-    '  OPENAI_API_KEY=your-key pnpm evaluate --models "x-ai/grok-4.1-fast,openai/gpt-4o,anthropic/claude-sonnet-4"',
+    '  OPENAI_API_KEY=your-key bun run evaluate --models "x-ai/grok-4.1-fast,openai/gpt-4o,anthropic/claude-sonnet-4"',
   );
   console.log('='.repeat(60) + '\n');
 }

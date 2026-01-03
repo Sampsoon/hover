@@ -5,10 +5,10 @@ Vibe-coded scripts for development and evaluation. These are **not included in t
 ## Available Scripts
 
 ```bash
-pnpm scrape      # Scrape code examples from documentation sites
-pnpm tokenize    # Tokenize scraped HTML for evaluation
-pnpm workbench   # Annotation UI for reviewing/editing expected annotations
-pnpm evaluate    # Run prompt evaluation against annotated examples
+bun run scrape      # Scrape code examples from documentation sites
+bun run tokenize    # Tokenize scraped HTML for evaluation
+bun run workbench   # Annotation UI for reviewing/editing expected annotations
+bun run evaluate    # Run prompt evaluation against annotated examples
 node generateIcons.mjs  # Generate PNG icons from SVG
 ```
 
@@ -23,7 +23,7 @@ Scrapes code blocks from ~70 documentation and tutorial sites to build a test da
 **First-time setup:**
 
 ```bash
-pnpm exec playwright install chromium
+bun x playwright install chromium
 ```
 
 **Output:** `test-data/code-examples.json`
@@ -54,8 +54,8 @@ Runs the hover hint retrieval prompt against all tokenized examples and calculat
 **Usage:**
 
 ```bash
-OPENAI_API_KEY=your-key pnpm evaluate
-OPENAI_API_KEY=your-key pnpm evaluate --models "model1,model2"
+OPENAI_API_KEY=your-key bun run evaluate
+OPENAI_API_KEY=your-key bun run evaluate --models "model1,model2"
 ```
 
 **Output:** `test-data/eval-report.json`
@@ -76,10 +76,10 @@ cd .. && node scripts/generateIcons.mjs
 
 ## Evaluation Workflow
 
-1. `pnpm scrape` - Collect code examples from documentation sites
-2. `pnpm tokenize` - Process HTML and assign token IDs
-3. `pnpm workbench` - Review LLM outputs and mark expected annotations
-4. `pnpm evaluate` - Compare LLM outputs against expected annotations
+1. `bun run scrape` - Collect code examples from documentation sites
+2. `bun run tokenize` - Process HTML and assign token IDs
+3. `bun run workbench` - Review LLM outputs and mark expected annotations
+4. `bun run evaluate` - Compare LLM outputs against expected annotations
 
 ## Environment
 

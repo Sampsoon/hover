@@ -1,3 +1,5 @@
+**Note:** This extension was posted on Hacker News. The discussion could be useful in the future for future improvements. It can be found [here](https://news.ycombinator.com/item?id=46490895)
+
 ### Tasks
 
 - Play around with UI style and logo some more

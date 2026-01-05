@@ -14,21 +14,27 @@ Works on documentation sites and AI chat apps like ChatGPT and Claude.
 
 ---
 
-## Setup
+## Installation
 
-**Note:** This extension is coming to the chrome web store soon and will be linked here when available.
+### Chrome Web Store
 
-### 1. Build the extension
+[Install from Chrome Web Store](https://chromewebstore.google.com/detail/glibgenldljgejmnkoodobacbkipinik)
+
+### Manual Install
+
+1. Build the extension:
 
 ```bash
 bun install && bun run build
 ```
 
-### 2. Load in Chrome
+2. Load in Chrome: Navigate to `chrome://extensions` → Enable **Developer Mode** → **Load Unpacked** → Select the `dist_chrome` folder
 
-Navigate to `chrome://extensions` → Enable **Developer Mode** → **Load Unpacked** → Select the `dist_chrome` folder
+---
 
-### 3. Configure API
+## Setup
+
+### 1. Configure API
 
 Click the extension icon, go to **Settings**, and add your [OpenRouter](https://openrouter.ai) API key or configure a custom OpenAI client compatible endpoint.
 
@@ -40,7 +46,7 @@ Click the extension icon, go to **Settings**, and add your [OpenRouter](https://
 
 <img src="docs/custom-endpoint-settings.png" alt="Custom Endpoint Settings">
 
-### 4. Configure websites
+### 2. Configure websites
 
 Set which websites the extension runs on using URL patterns (e.g. `*://*.github.com/*`).
 

@@ -1,12 +1,12 @@
 /**
  * Analytics Tracking API
  *
- * Receives tracking events from the Chrome extension and forwards to Vercel Analytics.
+ * Receives tracking events from the Chrome extension.
+ * Logs to Axiom via Vercel integration (console.log → auto-exported).
  * Rate limiting is handled by Vercel Firewall (configured in dashboard).
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { track } from '@vercel/analytics/server';
 import { isAPIProvider } from '@hover/shared';
 
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -52,11 +52,15 @@ export default async function handler(request: VercelRequest, response: VercelRe
     return;
   }
 
-  try {
-    await track('hover_hint_request', { visitorId, provider, requestSize }, { request });
-    response.status(200).json({ success: true });
-  } catch (error) {
-    console.error('Track error:', error);
-    response.status(500).json({ error: 'Tracking failed' });
-  }
+  console.log(
+    JSON.stringify({
+      event: 'hover_hint_request',
+      visitorId,
+      provider,
+      requestSize,
+      timestamp: new Date().toISOString(),
+    }),
+  );
+
+  response.status(200).json({ success: true });
 }

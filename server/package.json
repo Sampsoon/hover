@@ -9,8 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@hover/shared": "workspace:*",
-    "@vercel/analytics": "^1.6.1"
+    "@hover/shared": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

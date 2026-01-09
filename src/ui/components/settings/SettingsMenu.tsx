@@ -1,4 +1,4 @@
-import { baseSliderStyle, ApiKeyIcon, GlobeIcon } from '../common';
+import { baseSliderStyle, ApiKeyIcon, GlobeIcon, ShieldIcon } from '../common';
 import { SettingsTab } from '../../../storage';
 
 interface SettingsMenuProps {
@@ -14,6 +14,7 @@ const SIDEBAR_PADDING = 24;
 const tabs: { id: SettingsTab; title: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }[] = [
   { id: SettingsTab.API, title: 'API Key Configuration', icon: ApiKeyIcon },
   { id: SettingsTab.WEBSITES, title: 'Website Permissions', icon: GlobeIcon },
+  { id: SettingsTab.PRIVACY, title: 'Privacy', icon: ShieldIcon },
 ];
 
 export function SettingsMenu({ selected, onSelect, animate }: SettingsMenuProps) {

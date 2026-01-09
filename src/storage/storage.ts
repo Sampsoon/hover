@@ -67,4 +67,5 @@ export const storage = {
   websiteFilter: createStorageAccessors<WebsiteFilterConfig>('websiteFilter', DEFAULT_WEBSITE_FILTER_CONFIG),
   themeMode: createStorageAccessors<ThemeMode>('themeMode', ThemeMode.SYSTEM),
   visitorId: createStorageAccessors<string>('visitorId'),
+  telemetryEnabled: createStorageAccessors<boolean>('telemetryEnabled', true),
 } as const;

@@ -16,6 +16,7 @@ export type APIConfig = CustomAPIConfig;
 export enum SettingsTab {
   API = 'api',
   WEBSITES = 'websites',
+  PRIVACY = 'privacy',
 }
 
 export const TAB_QUERY_PARAM = 'tab';

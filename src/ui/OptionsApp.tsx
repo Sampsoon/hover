@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ApiConfiguration, SettingsMenu, WebsiteList, ThemeToggle } from './components';
+import { ApiConfiguration, SettingsMenu, WebsiteList, ThemeToggle, PrivacySettings } from './components';
 import { storage, SettingsTab, TAB_QUERY_PARAM } from '../storage';
 import { useTheme } from './hooks';
 
@@ -13,7 +13,7 @@ function OptionsApp() {
       const params = new URLSearchParams(window.location.search);
       let tab = params.get(TAB_QUERY_PARAM) as SettingsTab | null;
 
-      if (tab !== SettingsTab.API && tab !== SettingsTab.WEBSITES) {
+      if (tab !== SettingsTab.API && tab !== SettingsTab.WEBSITES && tab !== SettingsTab.PRIVACY) {
         tab = (await storage.selectedTab.get()) ?? SettingsTab.API;
       }
 
@@ -65,6 +65,7 @@ function OptionsApp() {
       >
         {selectedTab === SettingsTab.API && <ApiConfiguration />}
         {selectedTab === SettingsTab.WEBSITES && <WebsiteList />}
+        {selectedTab === SettingsTab.PRIVACY && <PrivacySettings />}
       </main>
     </div>
   );

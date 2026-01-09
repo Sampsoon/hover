@@ -1,6 +1,6 @@
+import { APIProvider } from '@hover/shared';
 import {
   CustomAPIConfig,
-  APIProvider,
   OpenRouterAPIConfig,
   SettingsTab,
   WebsiteFilterConfig,
@@ -66,4 +66,5 @@ export const storage = {
   selectedTab: createStorageAccessors<SettingsTab>('selectedTab'),
   websiteFilter: createStorageAccessors<WebsiteFilterConfig>('websiteFilter', DEFAULT_WEBSITE_FILTER_CONFIG),
   themeMode: createStorageAccessors<ThemeMode>('themeMode', ThemeMode.SYSTEM),
+  visitorId: createStorageAccessors<string>('visitorId'),
 } as const;

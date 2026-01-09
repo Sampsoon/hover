@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import browser from 'webextension-polyfill';
-import { storage, APIProvider, WebsiteFilterMode, SettingsTab, TAB_QUERY_PARAM } from '../../../storage';
+import { storage, WebsiteFilterMode, SettingsTab, TAB_QUERY_PARAM } from '../../../storage';
+import { APIProvider } from '@hover/shared';
 import { CheckCircleIcon, CircleIcon, ApiKeyIcon, GlobeIcon } from '../common';
 
 interface SetupStatus {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertIcon, Input, PasswordInput, RadioOption, TextArea, fieldLabelStyle } from '../common';
-import { APIProvider, DEFAULT_MODEL, OPEN_ROUTER_API_URL, OPEN_ROUTER_DEFAULT_PARAMS, storage } from '../../../storage';
+import { DEFAULT_MODEL, OPEN_ROUTER_API_URL, OPEN_ROUTER_DEFAULT_PARAMS, storage } from '../../../storage';
+import { APIProvider } from '@hover/shared';
 import { createDebounce } from '../../utils';
 import { Json } from '../../../shared';
 import { ApiPreview } from './ApiPreview';

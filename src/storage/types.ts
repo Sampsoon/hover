@@ -1,4 +1,4 @@
-import { Json } from '../shared';
+import type { Json } from '../shared';
 
 export interface CustomAPIConfig {
   model: string;
@@ -12,11 +12,6 @@ export interface OpenRouterAPIConfig {
 }
 
 export type APIConfig = CustomAPIConfig;
-
-export enum APIProvider {
-  OPEN_ROUTER = 'OpenRouter',
-  CUSTOM = 'Custom',
-}
 
 export enum SettingsTab {
   API = 'api',

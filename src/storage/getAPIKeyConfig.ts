@@ -1,6 +1,7 @@
 import { Json } from '../shared';
+import { APIProvider } from '@hover/shared';
 import { storage } from './storage';
-import { APIConfig, APIProvider, OpenRouterAPIConfig, CustomAPIConfig } from './types';
+import { APIConfig, OpenRouterAPIConfig, CustomAPIConfig } from './types';
 import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from './constants';
 
 interface OpenRouterChatCompletionCreateParams extends Json {

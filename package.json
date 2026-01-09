@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "type": "module",
+  "workspaces": [
+    "shared",
+    "server"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "eslint . --fix --cache && tsc -b && vite build --config vite.config.chrome.ts",
@@ -14,6 +18,7 @@
     "package": "bun run build && cd dist_chrome && zip -r ../hover-extension.zip . -x '.vite/*' -x '.DS_Store' -x '.env*'"
   },
   "dependencies": {
+    "@hover/shared": "workspace:*",
     "@crxjs/vite-plugin": "^2.0.2",
     "openai": "^4.103.0",
     "react": "^18.3.1",

@@ -13,6 +13,7 @@ By default, code is sent to OpenRouter (openrouter.ai). If you configure a custo
 ## What data is stored
 
 Hover stores your settings locally in Chrome:
+
 - API configuration (endpoint URL, API key, model)
 - Website permissions (which sites the extension runs on)
 - UI preferences (theme)

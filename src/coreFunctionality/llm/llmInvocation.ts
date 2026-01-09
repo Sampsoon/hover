@@ -74,9 +74,9 @@ export async function callLLMWithConfig(
 export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) {
   const config = await getAPIKeyConfig();
 
-  const provider = await storage.apiProvider.get();
+  // const provider = await storage.apiProvider.get();
 
-  void trackProviderRequest(provider, input.length);
+  // void trackProviderRequest(provider, input.length);
 
   await callLLMWithConfig(input, llmParams, config, onChunk);
 }

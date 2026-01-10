@@ -80,6 +80,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
       .incr(RedisKey.TotalRequests)
       .pfadd(RedisKey.UniqueUsersHyperloglog, visitorId)
       .incr(`hourly:${hour}`)
+      .incr(`provider:${provider}`)
       .exec();
 
     const count = await redis.pfcount(RedisKey.UniqueUsersHyperloglog);

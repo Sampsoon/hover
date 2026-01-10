@@ -140,7 +140,7 @@ export function PrivacySettings() {
             <li style={listItemStyle}>API provider used (OpenRouter or Custom)</li>
             <li style={listItemStyle}>Request size</li>
           </ul>
-          <div style={{ marginTop: '12px' }}>No personal data, API keys, or hover content is ever collected.</div>
+          <div style={{ marginTop: '12px' }}>No personal data, API keys, or page content is collected.</div>
           <a
             href={REPO_URL}
             target="_blank"

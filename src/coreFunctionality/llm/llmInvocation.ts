@@ -2,9 +2,8 @@ import { OpenAI } from 'openai';
 import * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import { getAPIKeyConfig, APIConfig, storage } from '../../storage';
+import { getAPIKeyConfig, APIConfig } from '../../storage';
 import { Json } from '../../shared';
-import { trackProviderRequest } from '../metrics';
 
 export interface LlmParams {
   prompt: string;
@@ -73,12 +72,5 @@ export async function callLLMWithConfig(
 
 export async function callLLM(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) {
   const config = await getAPIKeyConfig();
-
-  const telemetryEnabled = await storage.telemetryEnabled.get();
-  if (telemetryEnabled) {
-    const provider = await storage.apiProvider.get();
-    void trackProviderRequest(provider, input.length);
-  }
-
   await callLLMWithConfig(input, llmParams, config, onChunk);
 }

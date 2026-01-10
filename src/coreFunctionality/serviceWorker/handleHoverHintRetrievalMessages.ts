@@ -1,5 +1,7 @@
+import { storage } from '../../storage';
 import type { HoverHint } from '../hoverHints';
 import { callLLM, LlmParams } from '../llm';
+import { trackProviderRequest } from '../metrics';
 import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
 import { retrieveHoverHints } from './hoverHintRetrieval';
 import { HoverHintRetrievalMessage } from './interface';
@@ -35,6 +37,12 @@ async function retrieveHoverHintsStream(
 
   try {
     const hints = await retrieveHoverHints(codeBlockRawHtml, callLLMWithRetry, onHoverHint);
+
+    const telemetryEnabled = await storage.telemetryEnabled.get();
+    if (telemetryEnabled) {
+      const provider = await storage.apiProvider.get();
+      void trackProviderRequest(provider, codeBlockRawHtml.length);
+    }
 
     const latency = (performance.now() - startTime) / 1000;
     console.log(`Annotation retrieval latency: ${latency.toFixed(2)}s (${hints.length.toString()} hints)`);

@@ -26,7 +26,6 @@ const SMALLEST_SCREEN_DIMENSION = Math.min(window.innerWidth, window.innerHeight
 const ROOT_MARGIN_PERCENTAGE = 0.25;
 
 function generateHoverhintsForCodeBlock(codeBlock: CodeBlock, idMappings: IdMappings) {
-  console.log('Retrieving annotations for code block:', codeBlock.codeBlockId);
   attachIdsToTokens(codeBlock, idMappings);
   void invokeHoverHintRetrievalServiceWorker(codeBlock);
 }

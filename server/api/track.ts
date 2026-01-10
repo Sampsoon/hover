@@ -11,18 +11,12 @@ import { Redis } from '@upstash/redis';
 import { isAPIProvider } from '@hover/shared';
 
 enum RedisKey {
-  TotalRequests = 'total_requests',
-  UniqueUsersHyperloglog = 'unique_users_hyperloglog',
-  UniqueUsersEstimation = 'unique_users_estimation',
+  TotalRequests = 'hover:total_requests',
+  UniqueUsersHyperloglog = 'hover:unique_users_hyperloglog',
+  UniqueUsersEstimation = 'hover:unique_users_estimation',
 }
 
-const redis =
-  process.env.HOVER_KV_REST_API_URL && process.env.HOVER_KV_REST_API_TOKEN
-    ? new Redis({
-        url: process.env.HOVER_KV_REST_API_URL,
-        token: process.env.HOVER_KV_REST_API_TOKEN,
-      })
-    : undefined;
+const redis = Redis.fromEnv();
 
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -31,12 +25,6 @@ function isValidUUID(id: string): boolean {
 }
 
 export default async function handler(request: VercelRequest, response: VercelResponse): Promise<void> {
-  if (!redis) {
-    response.status(500).json({ error: 'Redis not configured' });
-    console.error('Redis not configured');
-    return;
-  }
-
   response.setHeader('Access-Control-Allow-Origin', '*');
   response.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -79,8 +67,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
       .pipeline()
       .incr(RedisKey.TotalRequests)
       .pfadd(RedisKey.UniqueUsersHyperloglog, visitorId)
-      .incr(`hourly:${hour}`)
-      .incr(`provider:${provider}`)
+      .incr(`hover:hourly:${hour}`)
+      .incr(`hover:provider:${provider}`)
       .exec();
 
     const count = await redis.pfcount(RedisKey.UniqueUsersHyperloglog);

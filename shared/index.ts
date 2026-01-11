@@ -1,4 +1,5 @@
 export enum APIProvider {
+  HOSTED_API = 'HostedAPI',
   OPEN_ROUTER = 'OpenRouter',
   CUSTOM = 'Custom',
 }

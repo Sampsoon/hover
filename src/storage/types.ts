@@ -11,6 +11,12 @@ export interface OpenRouterAPIConfig {
   key: string;
 }
 
+export interface GoogleAuthConfig {
+  googleToken?: string;
+  userEmail?: string;
+  expiresAt?: number;
+}
+
 export type APIConfig = CustomAPIConfig;
 
 export enum SettingsTab {

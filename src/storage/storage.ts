@@ -2,6 +2,7 @@ import { APIProvider } from '@hover/shared';
 import {
   CustomAPIConfig,
   OpenRouterAPIConfig,
+  GoogleAuthConfig,
   SettingsTab,
   WebsiteFilterConfig,
   DEFAULT_WEBSITE_FILTER_CONFIG,
@@ -62,6 +63,7 @@ function createStorageAccessors<T>(key: string, defaultValue?: T) {
 export const storage = {
   openRouterApiConfig: createStorageAccessors<OpenRouterAPIConfig>('openRouterApiConfig'),
   customApiConfig: createStorageAccessors<CustomAPIConfig>('customApiConfig'),
+  googleAuth: createStorageAccessors<GoogleAuthConfig>('googleAuth'),
   apiProvider: createStorageAccessors<APIProvider>('apiProvider'),
   selectedTab: createStorageAccessors<SettingsTab>('selectedTab'),
   websiteFilter: createStorageAccessors<WebsiteFilterConfig>('websiteFilter', DEFAULT_WEBSITE_FILTER_CONFIG),

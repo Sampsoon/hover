@@ -21,5 +21,11 @@
     "128": "icons/icon128.png"
   },
   "permissions": ["scripting", "storage"],
-  "optional_host_permissions": ["<all_urls>"]
+  "optional_permissions": ["identity"],
+  "optional_host_permissions": ["<all_urls>"],
+  "oauth2": {
+    "client_id": "790223671254-luguoc74v0deh1b21nlcf9i9af9grjoi.apps.googleusercontent.com",
+    "scopes": ["email", "profile"]
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp913sR8E3jghbsGMPsYYQZOHuWHDnG5JPirELS1Hvp262iCEE5oa2K7geH9QlNEFzmTY8/miwkxLauJGl3s5pSfAW0rhxB11pP84fPoPDFtuV0r20eyqNLJTJhMtbOLE6E6PyOUmRLm0BWDwIThFyd8K1MeDNTJIPa6ctg/ddg2ky/cHwZefNv/w8b+CykFEb6pGRfvBYF9KzuFQgfF6Ma7fTFsa0XW3AU1rdUJVSXvjGU7BhNeIAfrR+RIiugWdca/cxQWG0tXwGD77+CsTbuN2OHxaxiDIMBdJ+9u6MVlO1OUAQ3zdL/wnJbHcgZLqdmAV3Sm3fjg1RIvDfSMGBQIDAQAB"
 }

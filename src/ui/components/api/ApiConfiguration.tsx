@@ -5,6 +5,7 @@ import { APIProvider } from '@hover/shared';
 import { createDebounce } from '../../utils';
 import { Json } from '../../../shared';
 import { ApiPreview } from './ApiPreview';
+import { GoogleAuthButton } from './GoogleAuthButton';
 
 const OPEN_ROUTER_API_KEY_URL = 'https://openrouter.ai/keys';
 
@@ -122,6 +123,29 @@ export function ApiConfiguration() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <RadioOption
+        id="hostedApi"
+        label="Hosted API"
+        selected={selectedProvider === APIProvider.HOSTED_API}
+        onSelect={() => {
+          setSelectedProvider(APIProvider.HOSTED_API);
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: '13px',
+              margin: 0,
+              lineHeight: 1.5,
+            }}
+          >
+            Free to use with rate limits. Sign in with Google to get started.
+          </p>
+          <GoogleAuthButton />
+        </div>
+      </RadioOption>
+
       <RadioOption
         id="openRouter"
         label="OpenRouter"

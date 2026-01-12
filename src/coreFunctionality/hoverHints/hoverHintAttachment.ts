@@ -2,7 +2,8 @@ import { CODE_TOKEN_ID_NAME, CodeTokenId, IdMappings } from '../htmlProcessing';
 import { renderDocumentationAsHtml } from './rendering';
 import { applyHoverHintStyle, hideElement, styleTooltipToMatchCodeBlock } from './styles';
 import { updateTallyDisplay } from './tallyDisplay';
-import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState, HoverHint } from './types';
+import type { HoverHint } from '@hover/shared';
+import { NO_TIMEOUT_ACTIVE, TimeoutId, NoTimeoutActive, HoverHintState } from './types';
 
 const MOUSE_EVENTS = {
   MOUSE_ENTER: 'mouseenter',

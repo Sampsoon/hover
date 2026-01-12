@@ -9,7 +9,13 @@ import {
   MarginSize,
   DocStringCommand,
 } from './styles';
-import { HoverHintDocumentation, ParamDocString, ReturnDocString, PropertyDocString, SignatureStyles } from './types';
+import type {
+  HoverHintDocumentation,
+  ParamDocString,
+  ReturnDocString,
+  PropertyDocString,
+  SignatureStyles,
+} from '@hover/shared';
 import { IdMappings } from '../htmlProcessing';
 
 // Used to prevent cross-site scripting attacks

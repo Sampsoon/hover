@@ -1,4 +1,4 @@
-import { HoverHint } from '../hoverHints';
+import type { HoverHint } from '@hover/shared';
 
 const enum StreamMessageType {
   HOVER_HINT_CHUNK = 'hoverHint',

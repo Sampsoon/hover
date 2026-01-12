@@ -1,5 +1,5 @@
 import { storage } from '../../storage';
-import type { HoverHint } from '../hoverHints';
+import type { HoverHint } from '@hover/shared';
 import { callLLM, LlmParams } from '../llm';
 import { trackProviderRequest } from '../metrics';
 import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';

@@ -1,4 +1,4 @@
-import { HoverHint } from '../../hoverHints';
+import type { HoverHint } from '@hover/shared';
 import { CodeBlock } from '../../htmlProcessing';
 import { isHoverHintStreamError, isHoverHintStreamMessage } from '../../stream';
 import { ServiceWorkerMessageType, HoverHintRetrievalMessage } from './types';

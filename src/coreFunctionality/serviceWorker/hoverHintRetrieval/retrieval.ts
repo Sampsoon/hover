@@ -1,8 +1,9 @@
-import { HoverHint, hoverHintListSchema, hoverHintSchema } from '../../hoverHints';
+import type { HoverHint } from '@hover/shared';
+import { hoverHintListSchema, hoverHintSchema } from '@hover/shared';
 import type { LlmParams } from '../../llm';
 import { parseHoverHintBatchFromStream } from '../../stream';
 import { buildContinuationInput, cleanHoverHintRetrievalHtml } from './inputPreparation';
-import { RETRIEVAL_HOVER_HINTS_PROMPT } from './prompt';
+import { RETRIEVAL_HOVER_HINTS_PROMPT } from '@hover/shared';
 
 const MAX_BATCHES = 10;
 

@@ -1,5 +1,5 @@
 import { CODE_TOKEN_ID_NAME } from '../../htmlProcessing';
-import { HoverHint } from '../../hoverHints';
+import type { HoverHint } from '@hover/shared';
 
 function toKebab(s: string) {
   return s.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);

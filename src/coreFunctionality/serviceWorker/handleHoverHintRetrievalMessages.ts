@@ -1,32 +1,11 @@
-import { storage } from '../../storage';
+import { getAPIKeyConfig, storage } from '../../storage';
 import type { HoverHint } from '@hover/shared';
-import { callLLM, LlmParams } from '../llm';
+import { callLLMWithRetry } from '@hover/shared';
 import { trackProviderRequest } from '../metrics';
 import { createHoverHintStreamError, createHoverHintStreamMessage } from '../stream';
 import { retrieveHoverHints } from './hoverHintRetrieval';
 import { HoverHintRetrievalMessage } from './interface';
 import browser from 'webextension-polyfill';
-
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 1000;
-
-async function callLLMWithRetry(input: string, llmParams: LlmParams, onChunk: (chunk: string) => void): Promise<void> {
-  let currentRetryDelay = RETRY_DELAY;
-
-  for (let i = 0; i < MAX_RETRIES; i++) {
-    try {
-      await callLLM(input, llmParams, onChunk);
-      return;
-    } catch (error) {
-      console.error('Error retrieving annotations', error);
-      if (i === MAX_RETRIES - 1) {
-        throw error;
-      }
-      await new Promise((resolve) => setTimeout(resolve, currentRetryDelay));
-      currentRetryDelay *= 2;
-    }
-  }
-}
 
 async function retrieveHoverHintsStream(
   codeBlockRawHtml: string,
@@ -36,7 +15,8 @@ async function retrieveHoverHintsStream(
   const startTime = performance.now();
 
   try {
-    const hints = await retrieveHoverHints(codeBlockRawHtml, callLLMWithRetry, onHoverHint);
+    const config = await getAPIKeyConfig();
+    const hints = await retrieveHoverHints(codeBlockRawHtml, callLLMWithRetry, config, onHoverHint);
 
     const telemetryEnabled = await storage.telemetryEnabled.get();
     if (telemetryEnabled) {

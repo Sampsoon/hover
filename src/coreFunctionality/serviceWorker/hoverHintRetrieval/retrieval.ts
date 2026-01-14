@@ -1,4 +1,4 @@
-import type { HoverHint } from '@hover/shared';
+import type { HoverHint, APIConfig } from '@hover/shared';
 import { hoverHintListSchema, hoverHintSchema } from '@hover/shared';
 import type { LlmParams } from '../../llm';
 import { parseHoverHintBatchFromStream } from '../../stream';
@@ -7,11 +7,17 @@ import { RETRIEVAL_HOVER_HINTS_PROMPT } from '@hover/shared';
 
 const MAX_BATCHES = 10;
 
-export type CallLLMFn = (input: string, llmParams: LlmParams, onChunk: (chunk: string) => void) => Promise<void>;
+export type CallLLMFn = (
+  input: string,
+  llmParams: LlmParams,
+  config: APIConfig,
+  onChunk: (chunk: string) => void,
+) => Promise<void>;
 
 export async function retrieveHoverHints(
   codeBlockRawHtml: string,
   callLLM: CallLLMFn,
+  config: APIConfig,
   onHoverHint?: (hoverHint: HoverHint) => void,
 ): Promise<HoverHint[]> {
   const llmParams: LlmParams = {
@@ -33,7 +39,7 @@ export async function retrieveHoverHints(
       onHoverHint?.(hint);
     });
 
-    await callLLM(input, llmParams, onChunk);
+    await callLLM(input, llmParams, config, onChunk);
 
     remainingTokenCount = getRemainingTokenCount();
 

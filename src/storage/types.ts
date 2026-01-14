@@ -1,12 +1,3 @@
-import type { Json } from '../shared';
-
-export interface CustomAPIConfig {
-  model: string;
-  url: string;
-  key: string;
-  additionalArguments?: Json;
-}
-
 export interface OpenRouterAPIConfig {
   key: string;
 }
@@ -16,8 +7,6 @@ export interface GoogleAuthConfig {
   userEmail?: string;
   expiresAt?: number;
 }
-
-export type APIConfig = CustomAPIConfig;
 
 export enum SettingsTab {
   API = 'api',

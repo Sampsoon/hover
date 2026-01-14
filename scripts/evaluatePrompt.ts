@@ -79,12 +79,13 @@ interface CallLLMWithLatency {
   getLatencyMs: () => number;
 }
 
-function createCallLLMWithRetry(config: APIConfig): CallLLMWithLatency {
+function createCallLLMWithRetry(): CallLLMWithLatency {
   let totalLatencyMs = 0;
 
   const callLLM: CallLLMFn = async (
     input: string,
     llmParams: LlmParams,
+    config: APIConfig,
     onChunk: (chunk: string) => void,
   ): Promise<void> => {
     let lastError: unknown;
@@ -264,8 +265,8 @@ async function evaluateExample(task: EvalTask, config: APIConfig, barState: BarS
   const { example, expected } = task;
 
   try {
-    const { callLLM, getLatencyMs } = createCallLLMWithRetry(config);
-    const actual = await retrieveHoverHints(example.tokenizedHtml, callLLM);
+    const { callLLM, getLatencyMs } = createCallLLMWithRetry();
+    const actual = await retrieveHoverHints(example.tokenizedHtml, callLLM, config);
 
     const comparison = buildComparison(expected, actual);
     const metrics = calculateMetrics(expected, actual, comparison, getLatencyMs());

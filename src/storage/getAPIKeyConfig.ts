@@ -1,7 +1,6 @@
-import { Json } from '../shared';
-import { APIProvider } from '@hover/shared';
+import { APIProvider, type Json, type APIConfig } from '@hover/shared';
 import { storage } from './storage';
-import { APIConfig, OpenRouterAPIConfig, CustomAPIConfig } from './types';
+import { OpenRouterAPIConfig } from './types';
 import { DEFAULT_MODEL, OPEN_ROUTER_API_URL } from './constants';
 
 interface OpenRouterChatCompletionCreateParams extends Json {
@@ -39,7 +38,7 @@ function getDevEnvironmentApiKey() {
   return env.VITE_OPEN_ROUTER_API_KEY;
 }
 
-function isValidCustomAPIConfig(config: CustomAPIConfig | undefined): config is CustomAPIConfig {
+function isValidAPIConfig(config: APIConfig | undefined): config is APIConfig {
   if (config?.model && config.url && config.key) {
     return true;
   }
@@ -81,7 +80,7 @@ export async function getAPIKeyConfig(): Promise<APIConfig> {
     };
   }
 
-  if (provider === APIProvider.CUSTOM && isValidCustomAPIConfig(customApiConfig)) {
+  if (provider === APIProvider.CUSTOM && isValidAPIConfig(customApiConfig)) {
     return customApiConfig;
   }
 

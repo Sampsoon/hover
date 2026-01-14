@@ -1,3 +1,12 @@
+export type Json = Record<string, unknown>;
+
+export interface APIConfig {
+  model: string;
+  url: string;
+  key: string;
+  additionalArguments?: Json;
+}
+
 export enum APIProvider {
   HOSTED_API = 'HostedAPI',
   OPEN_ROUTER = 'OpenRouter',

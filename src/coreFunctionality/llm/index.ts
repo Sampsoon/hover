@@ -1,2 +1,2 @@
-export { callLLM, callLLMWithConfig } from './llmInvocation';
-export type { LlmParams } from './llmInvocation';
+export { callLLMWithConfig, callLLMWithRetry, type LlmParams } from '@hover/shared';
+export { callLLM } from './llmInvocation';

@@ -58,20 +58,23 @@ cd server && bun run lint         # Lint and typecheck
 
 ## Import/Export Style
 
-Prefer importing directly from the source module rather than re-exporting through intermediate files. Instead of:
-```typescript
-// types.ts
-import type { Foo } from '@pkg/shared';
-export type { Foo };
+**NEVER create files that only re-export from another package.** This is a hard rule. If something is exported from `@hover/shared`, import it directly from there—do not create a local file that re-exports it.
 
-// consumer.ts
-import type { Foo } from './types';
+Bad (never do this):
+```typescript
+// src/foo/parsing.ts - DO NOT CREATE FILES LIKE THIS
+export { parseHoverHintBatchFromStream } from '@hover/shared';
+
+// src/bar/consumer.ts
+import { parseHoverHintBatchFromStream } from '../foo/parsing';
 ```
 
-Do:
+Good:
 ```typescript
-// consumer.ts
-import type { Foo } from '@pkg/shared';
+// src/bar/consumer.ts - import directly from the source
+import { parseHoverHintBatchFromStream } from '@hover/shared';
 ```
 
-Re-exports may be appropriate when creating a public API boundary, but avoid them for convenience alone.
+**When re-exports ARE appropriate:**
+- Creating a public API boundary (e.g., `shared/index.ts` aggregating the package's exports)
+- Barrel files for a module's own local code (not re-exporting external packages)

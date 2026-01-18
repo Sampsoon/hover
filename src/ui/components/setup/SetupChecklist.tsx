@@ -15,14 +15,22 @@ const ITEMS: { id: SettingsTab; label: string; icon: typeof ApiKeyIcon; statusKe
 ];
 
 async function checkSetupStatus(): Promise<SetupStatus> {
-  const [apiProvider, openRouterConfig, customConfig, websiteFilter] = await Promise.all([
+  const [apiProvider, openRouterConfig, customConfig, googleAuth, websiteFilter] = await Promise.all([
     storage.apiProvider.get(),
     storage.openRouterApiConfig.get(),
     storage.customApiConfig.get(),
+    storage.googleAuth.get(),
     storage.websiteFilter.get(),
   ]);
 
-  const hasApiKey = apiProvider === APIProvider.CUSTOM ? Boolean(customConfig?.key) : Boolean(openRouterConfig?.key);
+  let hasApiKey = false;
+  if (apiProvider === APIProvider.HOSTED_API) {
+    hasApiKey = Boolean(googleAuth?.googleToken);
+  } else if (apiProvider === APIProvider.CUSTOM) {
+    hasApiKey = Boolean(customConfig?.key);
+  } else {
+    hasApiKey = Boolean(openRouterConfig?.key);
+  }
 
   const hasWebsites = websiteFilter.mode === WebsiteFilterMode.ALLOW_ALL || websiteFilter.allowList.length > 0;
 

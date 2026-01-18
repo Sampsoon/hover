@@ -4,6 +4,7 @@ import { callLLMWithRetry, retrieveHoverHints, type HoverHint } from '@hover/sha
 import {
   verifyGoogleToken,
   checkAndRecordQuota,
+  hashEmail,
   initializeStreamResponse,
   writeHint,
   writeError,
@@ -83,11 +84,11 @@ export default async function handler(request: VercelRequest, response: VercelRe
     return;
   }
 
-  const userEmail = authResult.email;
+  const userHash = hashEmail(authResult.email);
 
   const [inputQuota, outputQuota] = await Promise.all([
-    checkAndRecordQuota(redis, userEmail, cleanedHtml.length, QUOTA_CONFIG.weeklyInputCharLimit, 'input'),
-    checkAndRecordQuota(redis, userEmail, 0, QUOTA_CONFIG.weeklyOutputCharLimit, 'output'),
+    checkAndRecordQuota(redis, userHash, cleanedHtml.length, QUOTA_CONFIG.weeklyInputCharLimit, 'input'),
+    checkAndRecordQuota(redis, userHash, 0, QUOTA_CONFIG.weeklyOutputCharLimit, 'output'),
   ]);
 
   setQuotaHeaders(response, inputQuota, outputQuota);
@@ -126,7 +127,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
 
     const finalOutputQuota = await checkAndRecordQuota(
       redis,
-      userEmail,
+      userHash,
       totalOutputChars,
       QUOTA_CONFIG.weeklyOutputCharLimit,
       'output',
@@ -134,7 +135,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
     response.setHeader('X-Quota-Output-Remaining', finalOutputQuota.remaining);
 
     if (!finalOutputQuota.allowed) {
-      console.warn(`User ${userEmail} exceeded output quota: ${totalOutputChars.toString()} chars`);
+      console.warn(`User ${userHash} exceeded output quota: ${totalOutputChars.toString()} chars`);
     }
 
     writeComplete(response, totalHints);

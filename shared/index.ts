@@ -1,6 +1,6 @@
-export { APIProvider, isAPIProvider } from './types';
-export type { Json, APIConfig } from './types';
-export { RETRIEVAL_HOVER_HINTS_PROMPT } from './prompt';
+export { APIProvider, isAPIProvider } from './types.js';
+export type { Json, APIConfig } from './types.js';
+export { RETRIEVAL_HOVER_HINTS_PROMPT } from './prompt.js';
 export type {
   HoverHint,
   HoverHintDocumentation,
@@ -8,6 +8,10 @@ export type {
   PropertyDocString,
   ReturnDocString,
   SignatureStyles,
-} from './hoverHintSchema';
-export { hoverHintDocumentation, hoverHintListSchema, hoverHintSchema } from './hoverHintSchema';
-export { callLLMWithConfig, callLLMWithRetry, type LlmParams } from './llm';
+} from './hoverHintSchema.js';
+export { hoverHintDocumentation, hoverHintListSchema, hoverHintSchema } from './hoverHintSchema.js';
+export { callLLMWithConfig, callLLMWithRetry, type LlmParams } from './llm.js';
+export { parseHoverHintBatchFromStream } from './parsing.js';
+export { retrieveHoverHints, type CallLLMFn } from './retrieval.js';
+export type { HintMessage, ErrorMessage, CompleteMessage, StreamMessage } from './streamTypes.js';
+export { isHintMessage, isErrorMessage } from './streamTypes.js';

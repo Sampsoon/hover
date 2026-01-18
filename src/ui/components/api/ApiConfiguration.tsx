@@ -52,7 +52,7 @@ function getAdditionalArgumentsRows(additionalArguments: Json): number {
 }
 
 export function ApiConfiguration() {
-  const [selectedProvider, setSelectedProvider] = useState<APIProvider>(APIProvider.OPEN_ROUTER);
+  const [selectedProvider, setSelectedProvider] = useState<APIProvider>(APIProvider.HOSTED_API);
   const [openRouterKey, setOpenRouterKey] = useState('');
   const [customModel, setCustomModel] = useState('');
   const [customUrl, setCustomUrl] = useState('');

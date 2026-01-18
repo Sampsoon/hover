@@ -18,7 +18,6 @@
 - Use official documentation
 - https://context7.com/
 - https://cht.sh/
-- Add backend
 - Use on device LLMs
   - Would require completely changing flow to optimize for smaller context window
   - Low chance of being smart enough

@@ -1,9 +1,9 @@
-import type { HoverHint, APIConfig } from '@hover/shared';
-import { hoverHintListSchema, hoverHintSchema } from '@hover/shared';
-import type { LlmParams } from '../../llm';
-import { parseHoverHintBatchFromStream } from '../../stream';
-import { buildContinuationInput, cleanHoverHintRetrievalHtml } from './inputPreparation';
-import { RETRIEVAL_HOVER_HINTS_PROMPT } from '@hover/shared';
+import type { APIConfig } from './types.js';
+import type { HoverHint } from './hoverHintSchema.js';
+import { hoverHintListSchema, hoverHintSchema } from './hoverHintSchema.js';
+import type { LlmParams } from './llm.js';
+import { parseHoverHintBatchFromStream } from './parsing.js';
+import { RETRIEVAL_HOVER_HINTS_PROMPT } from './prompt.js';
 
 const MAX_BATCHES = 10;
 
@@ -14,8 +14,20 @@ export type CallLLMFn = (
   onChunk: (chunk: string) => void,
 ) => Promise<void>;
 
+function buildContinuationInput(cleanedHtml: string, previousHints: HoverHint[]): string {
+  if (previousHints.length === 0) {
+    return cleanedHtml;
+  }
+
+  const hintsJson = JSON.stringify(previousHints, null, 2);
+  return `Previously generated hover hints (maintain signatureStyles consistency, skip these IDs):
+${hintsJson}
+
+${cleanedHtml}`;
+}
+
 export async function retrieveHoverHints(
-  codeBlockRawHtml: string,
+  cleanedHtml: string,
   callLLM: CallLLMFn,
   config: APIConfig,
   onHoverHint?: (hoverHint: HoverHint) => void,
@@ -25,7 +37,6 @@ export async function retrieveHoverHints(
     schema: hoverHintListSchema,
   };
 
-  const cleanedHtml = cleanHoverHintRetrievalHtml(codeBlockRawHtml);
   const previousHints: HoverHint[] = [];
   let remainingTokenCount = 0;
   let batchCount = 0;

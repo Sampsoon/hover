@@ -1,3 +1,3 @@
 export { cleanHoverHintRetrievalHtml, buildContinuationInput } from './inputPreparation';
-export { retrieveHoverHints } from './retrieval';
-export type { CallLLMFn } from './retrieval';
+export { fetchHoverHintsFromHostedApi } from './hostedApiClient';
+export { handleHoverHintRetrievalMessages } from './handleHoverHintRetrievalMessages';

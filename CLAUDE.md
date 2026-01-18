@@ -19,7 +19,7 @@ This is a bun workspace monorepo with three packages:
 ### Extension (root)
 ```bash
 bun run build      # Lint, typecheck, and build extension to dist_chrome/
-bun run dev        # Start Vite dev server
+bun run dev        # Start Vite dev server with HMR
 bun run lint       # Run ESLint
 bun run package    # Build and zip for Chrome Web Store
 ```
@@ -31,8 +31,63 @@ cd shared && bun run build    # Compile TypeScript to dist/
 
 ### Server
 ```bash
-cd server && bun run typecheck    # Type check (no build script - Vercel handles deployment)
+cd server && bunx vercel dev      # Run server locally (requires `vercel link` first)
+cd server && bun run typecheck    # Type check
 cd server && bun run lint         # Lint and typecheck
+```
+
+## Local Development
+
+### Testing extension changes
+
+1. Build the shared package first if you've modified it:
+   ```bash
+   cd shared && bun run build
+   ```
+
+2. Build the extension:
+   ```bash
+   bun run build
+   ```
+
+3. Load in Chrome: `chrome://extensions` → Enable **Developer Mode** → **Load Unpacked** → Select `dist_chrome/`
+
+4. Optional: Create `.env` at project root to bundle an API key into dev builds:
+   ```
+   VITE_OPEN_ROUTER_API_KEY=your-key
+   ```
+
+### Testing server changes locally
+
+1. Build the shared package:
+   ```bash
+   cd shared && bun run build
+   ```
+
+2. Link the server directory to Vercel (first time only):
+   ```bash
+   cd server && bunx vercel link
+   ```
+   Select the existing `hover-coral` project when prompted.
+
+3. Pull environment variables:
+   ```bash
+   cd server && bunx vercel env pull
+   ```
+
+4. Run the server locally:
+   ```bash
+   cd server && bunx vercel dev
+   ```
+   This starts the Vercel dev server on `http://localhost:3000`.
+
+5. To test with the extension, temporarily modify `HOSTED_API_URL` in `src/storage/constants.ts` to point to `http://localhost:3000/api/hoverHints`.
+
+The server requires these environment variables:
+```
+OPENROUTER_API_KEY=...           # For LLM API calls
+UPSTASH_REDIS_REST_URL=...       # For rate limiting
+UPSTASH_REDIS_REST_TOKEN=...     # For rate limiting
 ```
 
 ## Architecture
@@ -78,3 +133,46 @@ import { parseHoverHintBatchFromStream } from '@hover/shared';
 **When re-exports ARE appropriate:**
 - Creating a public API boundary (e.g., `shared/index.ts` aggregating the package's exports)
 - Barrel files for a module's own local code (not re-exporting external packages)
+
+## Code Style
+
+**Always use braces for if statements.** Never write one-line if statements.
+
+Bad:
+```typescript
+if (!allowed) errors.push('input');
+```
+
+Good:
+```typescript
+if (!allowed) {
+  errors.push('input');
+}
+```
+
+**Use whitespace to separate logical chunks.** Group related lines together and separate distinct operations with blank lines.
+
+Bad:
+```typescript
+const response = await fetch(url);
+if (!response.ok) {
+  throw new Error('Failed');
+}
+const data = await response.json();
+const processed = transform(data);
+return processed;
+```
+
+Good:
+```typescript
+const response = await fetch(url);
+
+if (!response.ok) {
+  throw new Error('Failed');
+}
+
+const data = await response.json();
+const processed = transform(data);
+
+return processed;
+```

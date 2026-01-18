@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import { isHoverHintRetrievalMessage, isServiceWorkerMessage } from './interface';
-import handleHoverHintRetrievalMessages from './handleHoverHintRetrievalMessages';
+import { handleHoverHintRetrievalMessages } from './hoverHintRetrieval';
 import { registerProcessCodeBlocksScript } from './processCodeBlocksRegistration';
 import { getMatchConfigFromWebsiteFilter } from '../../permissions';
 import { storage } from '../../storage';

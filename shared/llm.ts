@@ -2,7 +2,7 @@ import { OpenAI } from 'openai';
 import type * as z from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import type { ChatCompletionCreateParams } from 'openai/resources.mjs';
-import type { APIConfig, Json } from './types';
+import type { APIConfig, Json } from './types.js';
 
 export interface LlmParams {
   prompt: string;

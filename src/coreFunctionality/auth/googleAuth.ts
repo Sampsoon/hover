@@ -50,12 +50,51 @@ export async function logout(): Promise<void> {
   await storage.googleAuth.remove();
 }
 
+async function silentlyRefreshToken(): Promise<GoogleAuthConfig | undefined> {
+  try {
+    const hasPermission = await chrome.permissions.contains({ permissions: ['identity'] });
+    if (!hasPermission) {
+      console.error('Permission denied for silently refreshing token');
+      return undefined;
+    }
+
+    const result = await chrome.identity.getAuthToken({ interactive: false });
+    const token = result.token;
+
+    if (!token) {
+      return undefined;
+    }
+
+    const email = await fetchUserEmail(token);
+
+    const newAuth: GoogleAuthConfig = {
+      googleToken: token,
+      userEmail: email,
+      expiresAt: Date.now() + 3600 * 1000,
+    };
+
+    await storage.googleAuth.set(newAuth);
+    return newAuth;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function getAuthState(): Promise<GoogleAuthConfig | undefined> {
   const auth = await storage.googleAuth.get();
 
-  if (auth?.expiresAt && auth.expiresAt < Date.now()) {
-    await storage.googleAuth.remove();
+  if (!auth?.googleToken) {
     return undefined;
+  }
+
+  if (auth.expiresAt && auth.expiresAt < Date.now()) {
+    const refreshed = await silentlyRefreshToken();
+
+    if (!refreshed) {
+      await storage.googleAuth.remove();
+    }
+
+    return refreshed;
   }
 
   return auth;

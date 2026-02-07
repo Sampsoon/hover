@@ -5,6 +5,7 @@ import { trackProviderRequest } from '../../metrics';
 import { createHoverHintStreamError, createHoverHintStreamMessage } from '../../stream';
 import { cleanHoverHintRetrievalHtml, fetchHoverHintsFromHostedApi } from '.';
 import { HoverHintRetrievalMessage } from '../interface';
+import { getAuthState } from '../../auth/googleAuth';
 import browser from 'webextension-polyfill';
 
 function logLatency(label: string, startTime: number, hintCount?: number): void {
@@ -21,7 +22,7 @@ async function retrieveHoverHintsViaHostedApi(
   const startTime = performance.now();
   let hintCount = 0;
 
-  const googleAuth = await storage.googleAuth.get();
+  const googleAuth = await getAuthState();
   if (!googleAuth?.googleToken) {
     onError('Not authenticated. Please sign in with Google.');
     return false;
